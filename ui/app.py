@@ -71,9 +71,10 @@ _STEPS = [
     ("②", "基础过滤"),
     ("③", "数据质量"),
     ("④", "文本摘要"),
-    ("⑤", "画像生成"),  # 预留
-    ("⑥", "岗位匹配"),  # 预留
-    ("⑦", "推荐结果"),  # 预留
+    ("⑤", "360评价"),
+    ("⑥", "画像生成"),
+    ("⑦", "岗位匹配"),
+    ("⑧", "推荐结果"),
 ]
 
 # ── 政治面貌选项（单一来源，后续可统一到 config）────────────────────────────
@@ -932,7 +933,10 @@ def _render_step_text_summary() -> None:
             st.session_state["step"] = 3
             st.rerun()
     with col_next:
-        st.info("下一步 → 画像生成（预留）")
+        if st.button("下一步 → 360评价", use_container_width=True, key="btn_ts_next_360"):
+            st.session_state["step"] = 5
+            st.session_state["selected_employee"] = None
+            st.rerun()
 
 
 def _collect_employee_text(df, emp_id: str, column: str, separator: str = "; ") -> str:
@@ -1010,9 +1014,212 @@ def _render_summary_comparison(emp_summary: dict) -> None:
                     st.caption(f"... 还有 {len(anchor_list) - 10} 个锚点")
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# 公共入口
-# ═══════════════════════════════════════════════════════════════════════════════
+# ── Step 5: 360 评价展示 ────────────────────────────────────────────────────────
+
+
+def _compute_360_scores(eval_df: pd.DataFrame, employees_df: pd.DataFrame) -> dict:
+    """轻量级 360 评分计算（用于 UI 预览，无 LLM 依赖）。
+
+    使用基线角色权重 + 简单异常检测，返回 nested dict 结构。
+    """
+    from config import (
+        ROLE_WEIGHTS_BASELINE,
+        SELF_EVAL_ROLE,
+        ANOMALY_SIGMA_THRESHOLD,
+        ANOMALY_PENALTY_FACTOR,
+    )
+
+    all_scores = eval_df["score"].dropna()
+    if len(all_scores) == 0:
+        return {}
+
+    global_mean = all_scores.mean()
+    global_std = all_scores.std()
+
+    # 异常检测
+    evaluator_means = eval_df.groupby("evaluator_id")["score"].agg(["mean", "count"]).reset_index()
+    anomalous = set()
+    for _, row in evaluator_means.iterrows():
+        if row["count"] < 15:
+            continue
+        if abs(row["mean"] - global_mean) > ANOMALY_SIGMA_THRESHOLD * global_std:
+            anomalous.add(row["evaluator_id"])
+
+    result = {}
+    for emp_id in eval_df["employee_id"].unique():
+        emp_data = eval_df[eval_df["employee_id"] == emp_id]
+        dims = emp_data["dimension"].unique()
+        emp_scores = {}
+        for dim in dims:
+            dim_data = emp_data[emp_data["dimension"] == dim]
+            w_sum, w_total = 0.0, 0.0
+            for _, row in dim_data.iterrows():
+                if pd.isna(row["score"]) or row["evaluator_role"] == SELF_EVAL_ROLE:
+                    continue
+                base_w = ROLE_WEIGHTS_BASELINE.get(row["evaluator_role"])
+                if base_w is None:
+                    continue
+                penalty = ANOMALY_PENALTY_FACTOR if row["evaluator_id"] in anomalous else 1.0
+                fw = base_w * penalty
+                w_sum += row["score"] * fw
+                w_total += fw
+            emp_scores[dim] = round(float(w_sum / w_total), 4) if w_total > 0 else None
+        result[emp_id] = emp_scores
+    return result
+
+
+def _render_step_360() -> None:
+    """主区域 Step 5：360 评价展示。"""
+    from config import (
+        ROLE_WEIGHTS_BASELINE as _rwb_display,
+        ANOMALY_SIGMA_THRESHOLD as _ast,
+        ANOMALY_PENALTY_FACTOR as _apf,
+        TIME_DECAY_RATE as _tdr,
+        DISCRIMINATION_PERFUNCTORY_WEIGHT as _dpw,
+        DISCRIMINATION_POSITIVE_THRESHOLD as _dpt,
+        CONFIDENCE_EVALUATOR_BASELINE as _ceb,
+    )
+
+    st.markdown("## Step 5：360 评价")
+    st.caption("查看员工 360 评价各维度得分，权重因子详情，以及全局统计。")
+
+    eval_df = st.session_state.get("evaluation_360_df")
+    employees_df = st.session_state.get("employees_df")
+    if eval_df is None or employees_df is None:
+        st.info("请先上传数据")
+        if st.button("← 返回上传", use_container_width=True, key="btn_360_back_upload"):
+            st.session_state["step"] = 1
+            st.rerun()
+        return
+
+    # 员工列表
+    emp_ids = eval_df["employee_id"].astype(str).unique().tolist()
+    emp_names = dict(zip(
+        employees_df["employee_id"].astype(str),
+        employees_df.get("name", employees_df["employee_id"]).astype(str),
+    ))
+
+    if not emp_ids:
+        st.warning("360 评价数据中无员工记录")
+        return
+
+    # ── 员工选择器 ──
+    emp_options = {f"{eid} - {emp_names.get(eid, '?')}": eid for eid in emp_ids}
+    selected_label = st.selectbox(
+        "👤 选择员工",
+        options=list(emp_options.keys()),
+        key="360_employee_selector",
+    )
+    selected_emp_id = emp_options[selected_label]
+    st.session_state["selected_employee"] = selected_emp_id
+
+    # ── 计算评分 ──
+    all_scores = _compute_360_scores(eval_df, employees_df)
+    emp_scores = all_scores.get(selected_emp_id, {})
+
+    if not emp_scores:
+        st.warning("该员工暂无 360 评分数据")
+    else:
+        # 5 维度得分
+        st.markdown("### 📊 各维度得分")
+        dim_order = ["专业能力", "沟通协作", "领导力", "责任心", "学习能力"]
+        dims_with_scores = [(d, emp_scores.get(d)) for d in dim_order if d in emp_scores]
+        n_cols = min(len(dims_with_scores), 5)
+        cols = st.columns(n_cols)
+        for i, (dim, score) in enumerate(dims_with_scores):
+            with cols[i]:
+                if score is not None:
+                    st.metric(label=dim, value=f"{score:.2f}")
+                    # 条形图（用 st.progress，score 假设 1-5 分）
+                    pct = max(0.0, min(1.0, score / 5.0))
+                    st.progress(pct, text=f"{score:.2f} / 5")
+                else:
+                    st.metric(label=dim, value="N/A")
+
+        # 维度得分横向对比条形图
+        st.markdown("#### 维度得分横向对比")
+        chart_data = {
+            d: s for d, s in dims_with_scores if s is not None
+        }
+        if chart_data:
+            chart_df = pd.DataFrame({
+                "维度": list(chart_data.keys()),
+                "得分": list(chart_data.values()),
+            })
+            st.bar_chart(chart_df.set_index("维度"), use_container_width=True)
+
+    # ── 置信度（色彩编码） ──
+    st.markdown("### 🎯 置信度")
+    confidence = None
+    # 从 session_state 已处理的 scores_360 中读取（如果 DataUnderstanding 已运行）
+    processed = st.session_state.get("scores_360", {})
+    emp_proc = processed.get(selected_emp_id, {})
+    if isinstance(emp_proc, dict) and "confidence" in emp_proc:
+        confidence = emp_proc["confidence"]
+    if confidence is not None:
+        if confidence >= 0.8:
+            st.success(f"🟢 高置信度 ({confidence:.2f})")
+        elif confidence >= 0.5:
+            st.warning(f"🟡 中等置信度 ({confidence:.2f})")
+        else:
+            st.error(f"🔴 低置信度 ({confidence:.2f})")
+    else:
+        st.caption("（运行完整 Pipeline 后显示置信度；当前为预览模式）")
+
+    # ── 权重因子详情（折叠区） ──
+    with st.expander("⚙️ 权重因子详情", expanded=False):
+        st.markdown("**角色基线权重**")
+        for role, w in _rwb_display.items():
+            st.caption(f"  • {role}: {w:.2f}")
+        st.markdown("**异常检测**")
+        st.caption(f"  • σ 阈值: {_ast}σ（来自 config）")
+        st.caption(f"  • 异常惩罚系数: {_apf}")
+        st.caption(f"  • 时间衰减率: {_tdr}")
+        st.markdown("**区分度检测**")
+        st.caption(f"  • 敷衍判定权重: {_dpw}")
+        st.caption(f"  • 正向阈值: {_dpt}")
+        st.markdown("**置信度**")
+        st.caption(f"  • 评价者基线: {_ceb}")
+
+    # ── 全局摘要 ──
+    with st.expander("📈 全局统计摘要", expanded=False):
+        _render_360_global_summary(eval_df)
+
+    # ── 导航按钮 ──
+    st.divider()
+    col_back, col_next = st.columns([1, 1])
+    with col_back:
+        if st.button("← 返回文本摘要", use_container_width=True, key="btn_360_back_summary"):
+            st.session_state["step"] = 4
+            st.rerun()
+    with col_next:
+        if st.button("下一步 → 画像生成", use_container_width=True, key="btn_360_next_profile"):
+            st.session_state["step"] = 6
+            st.rerun()
+
+
+def _render_360_global_summary(eval_df: pd.DataFrame) -> None:
+    """渲染 360 评价全局统计摘要。"""
+    all_scores = eval_df["score"].dropna()
+    if len(all_scores) == 0:
+        st.caption("无可用评分数据")
+        return
+
+    st.metric("评价总条数", len(eval_df))
+    st.metric("员工覆盖数", eval_df["employee_id"].nunique())
+    st.metric("评价者总数", eval_df["evaluator_id"].nunique())
+
+    # 各维度均分
+    st.markdown("**各维度全局均分**")
+    dim_means = eval_df.groupby("dimension")["score"].mean().round(2)
+    dim_df = pd.DataFrame({"维度": dim_means.index, "均分": dim_means.values})
+    st.dataframe(dim_df, use_container_width=True, hide_index=True)
+
+    # 角色分布
+    st.markdown("**评价者角色分布**")
+    role_counts = eval_df["evaluator_role"].value_counts()
+    role_df = pd.DataFrame({"角色": role_counts.index, "评价数": role_counts.values})
+    st.dataframe(role_df, use_container_width=True, hide_index=True)
 
 
 def render() -> None:
@@ -1047,5 +1254,7 @@ def render() -> None:
         _render_step_data_quality()
     elif step == 4:
         _render_step_text_summary()
+    elif step == 5:
+        _render_step_360()
     else:
         st.info(f"Step {step} 尚未实现，敬请期待。")

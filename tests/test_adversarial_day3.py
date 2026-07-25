@@ -26,7 +26,8 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from agents.data_understanding import DataUnderstanding, ROLE_WEIGHTS_BASELINE
+from agents.data_understanding import DataUnderstanding
+from config import ROLE_WEIGHTS_BASELINE
 
 
 from utils.data_quality import (
@@ -375,18 +376,22 @@ def _make_minimal_data(tmp_dir, n=3):
     eval_rows = []
     roles = ["上级", "同事", "下属", "HR"]
     dims = ["专业能力", "沟通协作", "领导力", "责任心", "学习能力"]
+    from datetime import datetime
+    current_year = datetime.now().year
     for emp in emp_rows:
         eid = emp["employee_id"]
         for dim in dims:
             for role in roles:
-                eval_rows.append({
-                    "employee_id": eid,
-                    "evaluator_id": f"E{role}_{eid}",
-                    "evaluator_role": role,
-                    "dimension": dim,
-                    "score": 3 + hash(f"{eid}{dim}{role}") % 3,
-                    "comment": f"{role}评价：{dim}表现良好。",
-                })
+                for yr in [current_year - 2, current_year - 1, current_year]:
+                    eval_rows.append({
+                        "employee_id": eid,
+                        "evaluator_id": f"E{role}_{eid}",
+                        "evaluator_role": role,
+                        "dimension": dim,
+                        "score": 3 + hash(f"{eid}{dim}{role}{yr}") % 3,
+                        "comment": f"{role}评价：{dim}表现良好。",
+                        "year": yr,
+                    })
             eval_rows.append({
                 "employee_id": emp["employee_id"],
                 "evaluator_id": f"E{emp['employee_id']}",
@@ -481,7 +486,7 @@ class Test360WeightTotalZero:
         result = agent._preprocess_360(df, emp_df)
         summary = result.get("_summary", {})
         assert summary.get("error") is None, "只有自评不应报 error"
-        scores = result.get("T0001", {})
+        scores = result.get("T0001", {}).get("dimensions", {})
         for dim in ["专业能力", "沟通协作", "领导力", "责任心", "学习能力"]:
             assert scores.get(dim) is None, f"{dim} 应为 None"
 
@@ -499,7 +504,7 @@ class Test360WeightTotalZero:
         emp_df = pd.DataFrame([{"employee_id": "T0001", "job_sequence": "技术研发类"}])
         result = agent._preprocess_360(df, emp_df)
         assert result.get("_summary", {}).get("error") is None
-        scores = result.get("T0001", {})
+        scores = result.get("T0001", {}).get("dimensions", {})
         for dim in ["专业能力", "沟通协作", "领导力", "责任心", "学习能力"]:
             assert scores.get(dim) is None
 
@@ -610,6 +615,7 @@ class TestEmployeeIDTypeMismatch:
                         "employee_id": eid, "evaluator_id": f"E{role}_{eid}",
                         "evaluator_role": role, "dimension": dim,
                         "score": 3, "comment": f"{role}评价。",
+                        "year": 2024,
                     })
         _write_csv(data["evaluation_360"], eval_rows)
 

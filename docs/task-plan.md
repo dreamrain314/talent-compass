@@ -48,8 +48,10 @@
 | 2.1.5 | 07.23 | **Agent① 数据理解（结构化）:** CSV/JSON 读取 → 缺失值检测 → 数据质量报告 | ✅ | DataUnderstanding + 28 测试 + 39 对抗测试 |
 | 2.1.6 | 07.24 | **Agent① 非结构化文本语义理解:** LLM 摘要 + 原文锚点 + Streamlit 对照视图 | ✅ | utils/llm_summarizer.py + Step 4 UI + 21 测试，207/207 通过 |
 | 2.1.6a | 07.24 | **债务清偿:** 命令行流水线脚本 + 默认过滤配置 + FutureWarning 修复 + README | ✅ | scripts/run_pipeline_phase1.py + pipeline_config/filter_conditions.json + README.md，209/209 零 Warning |
-| 2.1.7 | 07.25 | **Agent① 360 评价预处理:** 偏差校准 + 区分度权重 + 时间衰减 + 角色权重 → 综合加权得分 | ⏳ | |
-| 2.1.8 | 07.25 | **Agent① 联调:** 全流程：读取→清洗→摘要→360加权→融合 JSON | ⏳ | |
+| 2.1.7 | 07.25 | **Agent① 360 评价预处理:** 偏差校准 + 区分度权重 + 时间衰减 + 角色权重 → 综合加权得分 | ✅ | Day 5 测试 5/5 通过，baseline_360_v1.json 已生成 |
+| 2.1.8 | 07.25 | **Agent① 联调:** 全流程：读取→清洗→摘要→360加权→融合 JSON | ✅ | scripts/validate_phase1.py 已创建，全量 213/213 通过 |
+| 2.1.7 | 07.25 | **Agent① 360 评价预处理:** 偏差校准 + 区分度权重 + 时间衰减 + 角色权重 → 综合加权得分 | ✅ | 第 5 天测试 5/5 通过，baseline_360_v1.json 已生成 |
+| 2.1.8 | 07.25 | **Agent① 联调:** 全流程：读取→清洗→摘要→360加权→融合 JSON | ✅ | scripts/validate_phase1.py 已创建，全量 213/213 通过 |
 | 2.1.9 | 07.26 | **学习日 + 词典编写:** Embedding 基础 + 标准标签库种子（30-50 标签）+ T0 词典（50 条）+ Plotly 雷达图 | ⏳ | |
 
 **第 1 周里程碑:**

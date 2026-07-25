@@ -308,4 +308,59 @@ def _try_parse_json(raw: str) -> dict | list | None:
         except json.JSONDecodeError:
             pass
 
+    # 5. 修复截断的 JSON：尝试补全尾部（finish_reason=length 场景）
+    if start != -1:
+        try:
+            repaired = _repair_truncated_json(raw, start)
+            if repaired is not None:
+                return repaired
+        except Exception:
+            pass
+
+    return None
+
+
+def _repair_truncated_json(raw: str, start: int = 0) -> dict | None:
+    """修复截断的 JSON 对象：用正则提取完整 + 半截 key-value 对重建。
+
+    finish_reason=length 时响应被截断，json.loads 因尾部不完整而失败。
+    两轮提取：
+      1. 完整字段（含闭合引号的字符串 / 数字 / 布尔 / null / 数组 / 对象）
+      2. 截断字符串值：开引号在、闭引号缺失（finish_reason=length 最常见情形，
+         字符串值被从中间切断）→ 取到下一个 ,"key" 或字符串末尾。
+    """
+    import re
+    content = raw[start:]
+    result: dict = {}
+
+    # ── 第 1 轮：完整 key-value ──
+    strict = (
+        r'"([^"]+)"\s*:\s*'
+        r'("[^"\\]*(?:\\.[^"\\]*)*"|\d+\.?\d*|true|false|null|\[[^\]]*\]|\{[^}]*\})'
+    )
+    for m in re.finditer(strict, content):
+        key, val_str = m.group(1), m.group(2)
+        if key in result:
+            continue
+        try:
+            result[key] = json.loads(val_str)
+        except (json.JSONDecodeError, ValueError):
+            result[key] = val_str.strip('"')
+
+    # ── 第 2 轮：截断字符串值（闭引号缺失）──
+    # 值部分消费到：下一个 ,"key" 或 } 或 EOF。完整字符串不会被匹配
+    # （其闭引号阻断消费，且其后是 " 而非 lookahead 要求的 ,/}/$）。
+    trunc = r'"([^"]+)"\s*:\s*"((?:\\.|[^"\\])*)(?=\s*,\s*"|\s*\}|\s*$)'
+    for m in re.finditer(trunc, content, re.DOTALL):
+        key, partial = m.group(1), m.group(2)
+        if key in result:
+            continue
+        # 尝试补全闭引号后解析（处理转义），失败则原样存为字符串
+        try:
+            result[key] = json.loads('"' + partial + '"')
+        except (json.JSONDecodeError, ValueError):
+            result[key] = partial
+
+    if result and all(isinstance(k, str) for k in result):
+        return result
     return None

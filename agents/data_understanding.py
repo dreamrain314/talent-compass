@@ -23,6 +23,16 @@ from config import (
     RAW_DATA_DIR,
     EVALUATOR_MIN_SAMPLE_SIZE,
     AGENT_DATAUNDERSTANDING_TIMEOUT,
+    ROLE_WEIGHTS_BASELINE,
+    SELF_EVAL_ROLE,
+    KNOWN_360_DIMENSIONS,
+    ANOMALY_SIGMA_THRESHOLD,
+    ANOMALY_PENALTY_FACTOR,
+    TIME_DECAY_RATE,
+    DISCRIMINATION_PERFUNCTORY_WEIGHT,
+    DISCRIMINATION_POSITIVE_THRESHOLD,
+    CONFIDENCE_EVALUATOR_BASELINE,
+    CONFIDENCE_YEAR_COVERAGE,
 )
 from utils.llm_client import call_llm_json
 
@@ -37,31 +47,11 @@ REQUIRED_COLUMNS = {
     "projects": {"employee_id", "project_name", "role", "description", "tools_used"},
     "training": {"employee_id", "course_name", "completion_date", "status", "score"},
     "evaluation_360": {"employee_id", "evaluator_id", "evaluator_role", "dimension",
-                       "score", "comment"},
+                       "score", "comment", "year"},
 }
-
-# ── 360 评价角色权重（基线） ────────────────────────────────────────
-# 来源：《多Agent协作完整行为逻辑与实现方法.md》Agent① 360评价者权重分配
-# 排除自评后归一化，和 = 1.0
-ROLE_WEIGHTS_BASELINE = {
-    "上级": 0.47,
-    "同事": 0.26,
-    "下属": 0.13,
-    "HR": 0.14,
-}
-SELF_ROLE = "自评"
-
-# 角色权重调节（按岗位类型）
-ROLE_ADJUSTMENTS = {
-    "技术研发类": {"上级": -0.09, "同事": 0.09},   # 同事权重上调至 0.35，上级下调至 0.38
-    "管理职能类": {"下属": 0.05, "上级": -0.05},  # 下属上调至 0.18，上级下调至 0.42
-}
-
-# 360 评价维度
-KNOWN_DIMENSIONS = {"专业能力", "沟通协作", "领导力", "责任心", "学习能力"}
 
 # LLM 频率控制常量
-LLM_CALL_SLEEP = 0.5
+LLM_CALL_SLEEP = 0.2
 LLM_BACKOFF_BASE = 2
 LLM_BACKOFF_MAX = 15
 LLM_CANCEL_CHECK_INTERVAL = 10
@@ -361,7 +351,7 @@ class DataUnderstanding(BaseAgent):
             proj_text = "；".join(emp_proj["description"].dropna().tolist())
             eval_text = "；".join(emp_eval["comment"].dropna().tolist())
 
-            record = {"employee_id": emp_id}
+            record = {"employee_id": emp_id, "summary_model": ""}
 
             if not perf_text and not proj_text and not eval_text:
                 record["summary_error"] = "文本数据不足"
@@ -413,6 +403,9 @@ class DataUnderstanding(BaseAgent):
                     "evaluation_summary": content.get("evaluation_summary", ""),
                 }
                 record["anchors"] = content.get("anchors", {})
+                # C8: 保留摘要来源标记（"deepseek-chat" / "offline-placeholder"
+                # / "degraded-placeholder"），下游可审计占位符降级，不靠日志。
+                record["summary_model"] = summary.get("model", "")
 
                 # 锚点存在性验证
                 record["anchor_mismatch"] = self._verify_anchors(
@@ -572,30 +565,39 @@ class DataUnderstanding(BaseAgent):
 
     def _preprocess_360(self, eval_df: pd.DataFrame,
                         employees_df: pd.DataFrame) -> dict:
-        """360 评价预处理：异常检测 + 角色权重 + 加权得分。
+        """360 评价预处理：综合公式（综合公式）。
 
         算法：
-        1. 计算全局均值 μ 和标准差 σ
-        2. 对每个评价者计算个人评分均值
-        3. |μ_evaluator - μ_global| > 2σ → 标记异常 → 权重 ×0.2
-        4. 角色权重加权 → 每员工×每维度的加权得分
+        Block A: year 列守卫 — 缺 year → time_decay=1.0, logger.warning
+        Block B: 全局统计量
+        Block C: 异常检测（|μ_evaluator - μ_global| > σ×ANOMALY_SIGMA_THRESHOLD → ANOMALY_PENALTY_FACTOR）
+        Block D: 区分度权重 per evaluator — std=0 且 mean≤DISCRIMINATION_POSITIVE_THRESHOLD → 0.1, else 1.0
+        Block E: 每员工 — 角色权重 × time_decay × discrimination × anomaly_penalty → 归一化 → 加权得分
+        Block F: _summary
+
+        输出: {emp_id: {"dimensions": {dim: float}, "confidence": float}, "_summary": {...}}
         """
-        # 第 1 步：全局统计量
+        # ── Block A: year 列守卫 ──────────────────────────────────────
+        if "year" not in eval_df.columns:
+            logger.warning("evaluation_360 缺少 year 列，time_decay 将回退为 1.0")
+            has_year = False
+        else:
+            has_year = True
+
+        # ── Block B: 全局统计量 ────────────────────────────────────────
         all_scores = eval_df["score"].dropna()
         if len(all_scores) == 0:
-            return {"_summary": {"error": "无可用评分"}, "_evaluators_skipped": 0}
+            return {"_summary": {"error": "无可用评分"}}
 
         global_mean = all_scores.mean()
         global_std = all_scores.std()
 
-        # 第 2 步：评价者均值
+        # ── Block C: 异常检测 ──────────────────────────────────────────
         evaluator_means = (
             eval_df.groupby("evaluator_id")["score"]
             .agg(["mean", "count"])
             .reset_index()
         )
-
-        # 第 3 步：异常检测
         anomalous_evaluators = set()
         evaluators_skipped = 0
         for _, row in evaluator_means.iterrows():
@@ -603,75 +605,145 @@ class DataUnderstanding(BaseAgent):
                 evaluators_skipped += 1
                 continue
             deviation = abs(row["mean"] - global_mean)
-            if deviation > 2 * global_std:
+            if deviation > ANOMALY_SIGMA_THRESHOLD * global_std:
                 anomalous_evaluators.add(row["evaluator_id"])
 
-        # 员工 → 岗位类型映射
-        emp_job_type = dict(zip(
-            employees_df["employee_id"].astype(str),
-            employees_df.get("job_sequence", "技术研发类").astype(str),
-        ))
+        # ── Block D: 区分度权重 per evaluator ──────────────────────────
+        # 每个评价者自己的评分 std=0 且均值 ≤ DISCRIMINATION_POSITIVE_THRESHOLD
+        # → 该评价者被视为"敷衍"，权重 × DISCRIMINATION_PERFUNCTORY_WEIGHT
+        evaluator_std = (
+            eval_df.groupby("evaluator_id")["score"]
+            .agg(["std", "mean", "count"])
+            .reset_index()
+        )
+        perfunctory_evaluators = set()
+        for _, row in evaluator_std.iterrows():
+            std_val = row["std"]
+            if pd.isna(std_val) or std_val == 0:
+                if row["mean"] <= DISCRIMINATION_POSITIVE_THRESHOLD:
+                    perfunctory_evaluators.add(row["evaluator_id"])
 
-        # 第 4 步：角色权重加权
+        # ── Block E: 每员工计算 ────────────────────────────────────────
         result = {}
         employee_ids = eval_df["employee_id"].unique()
 
         for emp_id in employee_ids:
             emp_data = eval_df[eval_df["employee_id"] == emp_id]
-            job_type = emp_job_type.get(emp_id, "技术研发类")
 
-            role_weights = dict(ROLE_WEIGHTS_BASELINE)
-            adj = ROLE_ADJUSTMENTS.get(job_type, {})
-            for role, delta in adj.items():
-                if role in role_weights:
-                    role_weights[role] = round(role_weights[role] + delta, 4)
+            # 时间衰减：逐 year 计算，聚合到 raw_weight 层面
+            if has_year:
+                years_present = emp_data["year"].dropna().unique()
+                n_years = len(years_present)
+                year_coverage = CONFIDENCE_YEAR_COVERAGE.get(n_years, 0.6)
+            else:
+                n_years = 0
+                year_coverage = CONFIDENCE_YEAR_COVERAGE.get(1, 0.7)
 
-            # 同角色 ≥5 人 → 权重上调 5 个百分点
-            role_counts = emp_data[emp_data["evaluator_role"] != SELF_ROLE] \
-                .groupby("evaluator_role")["evaluator_id"].nunique()
-            for role, count in role_counts.items():
-                if count >= 5 and role in role_weights:
-                    role_weights[role] = round(role_weights[role] + 0.05, 4)
+            # 评价者数量 → confidence
+            unique_evaluators = emp_data[
+                emp_data["evaluator_role"] != SELF_EVAL_ROLE
+            ]["evaluator_id"].nunique()
+            anomaly_ratio = len(
+                anomalous_evaluators & set(emp_data["evaluator_id"].unique())
+            ) / max(unique_evaluators, 1)
+            confidence = (
+                min(1.0, unique_evaluators / CONFIDENCE_EVALUATOR_BASELINE)
+                * (1.0 - anomaly_ratio)
+                * year_coverage
+            )
 
+            # 按维度分组计算
             dims = emp_data["dimension"].unique()
             emp_scores = {}
             for dim in dims:
                 dim_data = emp_data[emp_data["dimension"] == dim]
-                weighted_sum = 0.0
-                weight_total = 0.0
+                raw_weights = []
+                score_values = []
 
                 for _, row in dim_data.iterrows():
                     role = row["evaluator_role"]
                     score = row["score"]
                     if pd.isna(score):
                         continue
-                    if role == SELF_ROLE:
+                    if role == SELF_EVAL_ROLE:
                         continue
 
-                    base_w = role_weights.get(role)
+                    base_w = ROLE_WEIGHTS_BASELINE.get(role)
                     if base_w is None:
                         continue
 
-                    penalty = 0.2 if row["evaluator_id"] in anomalous_evaluators else 1.0
-                    final_w = base_w * penalty
-                    weighted_sum += score * final_w
-                    weight_total += final_w
+                    # 时间衰减
+                    if has_year:
+                        yr = row.get("year")
+                        if pd.notna(yr):
+                            # 越近的 year 权重越高；假设当前年份参与评分
+                            # decay = (1 - TIME_DECAY_RATE)^(current_year - yr)
+                            yr_int = int(yr)
+                            current_year = datetime.now().year
+                            # 最多不超过 5 年差异
+                            yr_diff = min(max(current_year - yr_int, 0), 5)
+                            time_decay = (1.0 - TIME_DECAY_RATE) ** yr_diff
+                        else:
+                            time_decay = 1.0
+                    else:
+                        time_decay = 1.0
 
-                emp_scores[dim] = round(float(weighted_sum / weight_total), 4) if weight_total > 0 else None
+                    # 异常检测惩罚
+                    anomaly_penalty = (
+                        ANOMALY_PENALTY_FACTOR
+                        if row["evaluator_id"] in anomalous_evaluators
+                        else 1.0
+                    )
 
-            for dim in KNOWN_DIMENSIONS:
+                    # 区分度惩罚
+                    discrimination = (
+                        DISCRIMINATION_PERFUNCTORY_WEIGHT
+                        if row["evaluator_id"] in perfunctory_evaluators
+                        else 1.0
+                    )
+
+                    raw_w = base_w * time_decay * discrimination * anomaly_penalty
+                    raw_weights.append(raw_w)
+                    score_values.append(score)
+
+                if not raw_weights:
+                    emp_scores[dim] = None
+                    continue
+
+                # 全敷衍守卫 → 等权平均
+                if all(w <= DISCRIMINATION_PERFUNCTORY_WEIGHT * 1.01 for w in raw_weights):
+                    emp_scores[dim] = round(float(sum(score_values) / len(score_values)), 4)
+                    continue
+
+                # 零除守卫 → 同上
+                weight_sum = sum(raw_weights)
+                if weight_sum == 0:
+                    emp_scores[dim] = round(float(sum(score_values) / len(score_values)), 4)
+                    continue
+
+                # 归一化 → 加权得分
+                normalized_weights = [w / weight_sum for w in raw_weights]
+                dim_score = sum(s * nw for s, nw in zip(score_values, normalized_weights))
+                emp_scores[dim] = round(float(dim_score), 4)
+
+            # 补全缺失维度
+            for dim in KNOWN_360_DIMENSIONS:
                 if dim not in emp_scores:
                     emp_scores[dim] = None
 
-            result[emp_id] = emp_scores
+            result[emp_id] = {
+                "dimensions": emp_scores,
+                "confidence": round(float(confidence), 4),
+            }
 
+        # ── Block F: _summary ──────────────────────────────────────────
         result["_summary"] = {
             "global_mean": round(float(global_mean), 4),
             "global_std": round(float(global_std), 4),
             "anomalous_evaluators": len(anomalous_evaluators),
             "evaluators_skipped_low_sample": evaluators_skipped,
+            "perfunctory_evaluators_count": len(perfunctory_evaluators),
         }
-        result["_evaluators_skipped"] = evaluators_skipped
         return result
 
     # ── 步骤 1.5: 融合输出 ──────────────────────────────────────────
@@ -739,10 +811,10 @@ class DataUnderstanding(BaseAgent):
             text_summaries = s.get("text_summaries")
             anchors = s.get("anchors")
             summary_error = s.get("summary_error")
+            summary_model = s.get("summary_model", "")
             anchor_mismatch = s.get("anchor_mismatch", False)
             hallucination_flags = s.get("hallucination_flags", {})
 
-            scores = score_keys.get(emp_id, {})
             is_severe = emp_id in data_quality.get("severe_missing_employees", [])
 
             record = {
@@ -752,10 +824,12 @@ class DataUnderstanding(BaseAgent):
                 "projects": proj_records,
                 "training": train_records,
                 "text_summaries": text_summaries,
-                "scores_360": scores,
+                "scores_360": {},
+                "confidence_360": None,
                 "anchors": anchors,
                 "anchor_mismatch": anchor_mismatch,
                 "hallucination_flags": hallucination_flags,
+                "summary_model": summary_model,
                 "data_quality_flags": {
                     "missing_rate": None,
                     "text_sufficient": text_summaries is not None,
@@ -763,6 +837,14 @@ class DataUnderstanding(BaseAgent):
                     "summary_error": summary_error,
                 },
             }
+
+            scores_data = score_keys.get(emp_id, {})
+            if isinstance(scores_data, dict) and "dimensions" in scores_data:
+                record["scores_360"] = scores_data["dimensions"]
+                record["confidence_360"] = scores_data.get("confidence", None)
+            elif isinstance(scores_data, dict):
+                record["scores_360"] = scores_data
+
             records.append(record)
 
         return records

@@ -63,10 +63,10 @@ QWEN_BASE_URL = os.getenv("QWEN_BASE_URL", "")
 QWEN_MODEL = os.getenv("QWEN_MODEL", "qwen-max")
 
 # ── 超时常量（单一来源，参见 CLAUDE.md D2）────────────────────
-LLM_API_TIMEOUT = 60.0  # LLM API 调用超时（秒）
+LLM_API_TIMEOUT = 30.0  # LLM API 调用超时（秒）— Agent① 串行 100 次调用，偏小防卡住
 AGENT_EXEC_TIMEOUT = 120  # 单个 Agent 执行超时（秒）
-# Agent① 数据理解 Agent 超时（100 人 × ~3.5s/人 ≈ 350s + 余量）
-AGENT_DATAUNDERSTANDING_TIMEOUT = 600
+# Agent① 数据理解 Agent 超时（100 人 × ~5s/人 + 0.5s sleep + 360 预处理 ≈ 600s + 余量）
+AGENT_DATAUNDERSTANDING_TIMEOUT = 900
 
 # ── 绩效等级序数映射（用于 BasicFilter.min_performance 数值比较）───
 # 🔴 Day 2 关键：绩效等级 A>B>C>D 语义上优于，但 Python 字符串比较
@@ -92,5 +92,31 @@ INTERMEDIATE_DIR = DATA_DIR / "intermediate"
 LOG_DIR = PROJECT_ROOT / "logs"
 # 🔴 修复：原 "config" 与 config.py 模块名冲突 → 改为 pipeline_config
 PIPELINE_CONFIG_DIR = PROJECT_ROOT / "pipeline_config"
+
+# ── 360 评价预处理常量（D1: 单一来源，替代 data_understanding.py 内联常量）──
+ROLE_WEIGHTS_BASELINE = {"上级": 0.47, "同事": 0.26, "下属": 0.13, "HR": 0.14}
+SELF_EVAL_ROLE = "自评"
+KNOWN_360_DIMENSIONS = {"专业能力", "沟通协作", "领导力", "责任心", "学习能力"}
+ANOMALY_SIGMA_THRESHOLD = 2
+ANOMALY_PENALTY_FACTOR = 0.2
+TIME_DECAY_RATE = 0.3
+DISCRIMINATION_PERFUNCTORY_WEIGHT = 0.1
+DISCRIMINATION_POSITIVE_THRESHOLD = 4
+CONFIDENCE_EVALUATOR_BASELINE = 5
+CONFIDENCE_YEAR_COVERAGE = {3: 1.0, 2: 0.85, 1: 0.7}
+
+# ── 离线模式（不调用真实 LLM，用确定性占位符）──────────────────
+# TC_OFFLINE=1 时，summarize_employee_texts 跳过 API，从原文截前 N 字
+# 派生摘要与锚点。用于：① 无 API Key 时跑通 pipeline 验证编排逻辑
+# ② 真实 API 截断/限流时绕过雪崩。运行时读 env（非 import 冻结），
+# 支持 CLI flag 注入。消费者：utils/llm_summarizer.py
+def is_offline_mode() -> bool:
+    """运行时读取 TC_OFFLINE 环境变量判断是否启用离线模式。"""
+    return os.getenv("TC_OFFLINE", "").strip().lower() in ("1", "true", "yes", "on")
+
+
+# ── 占位符摘要派生常量（offline + degraded 共用，单一来源 D1）──
+PLACEHOLDER_SUMMARY_LEN = 150  # 摘要截取原文前 N 字
+PLACEHOLDER_ANCHOR_LEN = 10    # 锚点截取原文前 N 字
 
 # ── 目录创建已移至 main.py（避免 import 时因磁盘满/无权限崩溃）──

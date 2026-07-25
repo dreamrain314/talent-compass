@@ -43,6 +43,9 @@ htmlcov/
 output/
 logs/
 
+# Pipeline config (local debug, not committed)
+pipeline_config/
+
 # Pipeline intermediate artifacts (auto-generated per test run)
 data/intermediate/
 tmp/

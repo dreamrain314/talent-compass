@@ -26,8 +26,16 @@
 """
 import argparse
 import json
+import os
 import sys
 import time
+
+# 🔴 Windows GBK 编码修复：print 中的 Unicode 字符（▶ 等）无法在 GBK 下编码
+# 必须在 import 后立即重配置 stdout，否则 UnicodeEncodeError
+if sys.stdout and hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
+if sys.stderr and hasattr(sys.stderr, 'reconfigure'):
+    sys.stderr.reconfigure(encoding='utf-8')
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -212,6 +220,15 @@ def parse_args() -> argparse.Namespace:
         help="跳过基础过滤，直接处理全量数据",
     )
     parser.add_argument(
+        "--max-employees", type=int, default=None,
+        help="限制处理的员工数（抽样调试用，默认全量）",
+    )
+    parser.add_argument(
+        "--offline", action="store_true",
+        help="离线模式：跳过真实 LLM 调用，从原文确定性派生摘要与锚点。"
+             "用于无 API Key 或真实 API 截断/限流时跑通 pipeline（设置 TC_OFFLINE=1）",
+    )
+    parser.add_argument(
         "--output-dir", type=str, default=str(INTERMEDIATE_DIR),
         help=f"输出目录 (默认: {INTERMEDIATE_DIR})",
     )
@@ -272,7 +289,38 @@ def main() -> None:
 
     # ── Step 3: Agent① 数据理解 ──
     print("\n▶ 步骤 3/3: Agent① 数据理解")
+
+    # ── 离线模式：设置 env 让 summarize_employee_texts 走占位符派生 ──
+    if args.offline:
+        os.environ["TC_OFFLINE"] = "1"
+        print("  ✓ 离线模式已启用（TC_OFFLINE=1，不调用真实 LLM）")
+
+    # ── 抽样：限制员工数（调试用） ──
+    if args.max_employees is not None and args.max_employees > 0:
+        emp_path = agent_input["employees"]
+        emp_df = pd.read_csv(emp_path, dtype={"employee_id": str})
+        if len(emp_df) > args.max_employees:
+            sampled = emp_df.head(args.max_employees)
+            sample_path = INTERMEDIATE_DIR / f"sampled_employees_{args.max_employees}_{trace_id[-8:]}.csv"
+            INTERMEDIATE_DIR.mkdir(parents=True, exist_ok=True)
+            sampled.to_csv(sample_path, index=False, encoding="utf-8-sig")
+            agent_input["employees"] = str(sample_path)
+            print(f"  ✓ 抽样 {args.max_employees}/{len(emp_df)} 员工 → {sample_path.name}")
+        else:
+            print(f"  ✓ 数据仅 {len(emp_df)} 人，无需抽样")
+
     pipeline_result = run_agent1(agent_input, trace_id)
+
+    # ── 保存最终输出 ──
+    final_output = pipeline_result.get("final_output", {})
+    if isinstance(final_output, dict):
+        output_path = INTERMEDIATE_DIR / "phase1_output.json"
+        INTERMEDIATE_DIR.mkdir(parents=True, exist_ok=True)
+        with open(output_path, "w", encoding="utf-8") as f:
+            json.dump(final_output, f, ensure_ascii=False, default=str)
+        print(f"  ✓ 最终输出已保存: {output_path}")
+    else:
+        print(f"  ⚠ final_output 格式异常，跳过保存")
 
     # ── 摘要 ──
     total_duration = time.perf_counter() - t_total

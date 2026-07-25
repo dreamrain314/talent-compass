@@ -1,0 +1,350 @@
+{
+  "TOOL_REGISTRY": [
+    {
+      "name": "CAD",
+      "aliases": ["AutoCAD", "CAD软件", "计算机辅助设计"],
+      "category": "设计工具",
+      "typical_use": "二维工程图纸绘制与编辑"
+    },
+    {
+      "name": "Pro/E",
+      "aliases": ["Proe-E", "ProEngineer", "PTC Creo", "Creo"],
+      "category": "设计工具",
+      "typical_use": "三维参数化机械设计与装配"
+    },
+    {
+      "name": "SolidWorks",
+      "aliases": ["SW", "SolidWorks仿真"],
+      "category": "设计工具",
+      "typical_use": "三维机械CAD设计与工程分析"
+    },
+    {
+      "name": "Altium Designer",
+      "aliases": ["AD", "Altium", "Protel"],
+      "category": "设计工具",
+      "typical_use": "PCB原理图设计与布线"
+    },
+    {
+      "name": "SAP",
+      "aliases": ["SAP ERP", "SAP系统"],
+      "category": "企业管理",
+      "typical_use": "企业资源计划与业务流程管理"
+    },
+    {
+      "name": "SQL Server",
+      "aliases": ["MSSQL", "Microsoft SQL Server"],
+      "category": "数据平台",
+      "typical_use": "关系型数据库管理与查询"
+    },
+    {
+      "name": "Oracle DB",
+      "aliases": ["Oracle数据库", "Oracle Database"],
+      "category": "数据平台",
+      "typical_use": "大型企业级数据库管理"
+    },
+    {
+      "name": "MySQL",
+      "aliases": ["MySql", "MariaDB"],
+      "category": "数据平台",
+      "typical_use": "开源关系型数据库管理"
+    },
+    {
+      "name": "示波器",
+      "aliases": ["Oscilloscope", "数字示波器", "混合信号示波器"],
+      "category": "测试仪器",
+      "typical_use": "电信号波形测量与分析"
+    },
+    {
+      "name": "频谱仪",
+      "aliases": ["频谱分析仪", "Spectrum Analyzer", "信号分析仪"],
+      "category": "测试仪器",
+      "typical_use": "射频信号频域分析与测量"
+    },
+    {
+      "name": "网络分析仪",
+      "aliases": ["Network Analyzer", "VNA", "矢量网络分析仪"],
+      "category": "测试仪器",
+      "typical_use": "射频网络参数(S参数)测量"
+    },
+    {
+      "name": "Docker",
+      "aliases": ["容器", "Docker容器", "Docker Engine"],
+      "category": "开发运维",
+      "typical_use": "应用容器化部署与隔离运行"
+    },
+    {
+      "name": "Kubernetes",
+      "aliases": ["K8s", "k8s集群"],
+      "category": "开发运维",
+      "typical_use": "容器编排与集群管理"
+    },
+    {
+      "name": "Python",
+      "aliases": ["Python3", "Py", "Python语言"],
+      "category": "编程语言",
+      "typical_use": "通用编程、数据分析与AI开发"
+    },
+    {
+      "name": "Java",
+      "aliases": ["Java语言", "JDK", "Spring Boot"],
+      "category": "编程语言",
+      "typical_use": "企业级后端服务开发"
+    },
+    {
+      "name": "C++",
+      "aliases": ["CPP", "C++语言", "Cpp"],
+      "category": "编程语言",
+      "typical_use": "高性能系统与嵌入式开发"
+    },
+    {
+      "name": "C语言",
+      "aliases": ["C", "C编程", "ANSI C"],
+      "category": "编程语言",
+      "typical_use": "底层系统与嵌入式编程"
+    },
+    {
+      "name": "Go",
+      "aliases": ["Golang", "Go语言"],
+      "category": "编程语言",
+      "typical_use": "高并发服务端与云原生开发"
+    },
+    {
+      "name": "Rust",
+      "aliases": ["Rust语言"],
+      "category": "编程语言",
+      "typical_use": "安全高性能系统开发"
+    },
+    {
+      "name": "Linux",
+      "aliases": ["GNU/Linux", "Linux系统", "Ubuntu", "CentOS", "RedHat"],
+      "category": "操作系统",
+      "typical_use": "服务器运维与系统管理"
+    },
+    {
+      "name": "Git",
+      "aliases": ["Git版本控制", "git命令"],
+      "category": "开发运维",
+      "typical_use": "源代码版本管理与协作"
+    },
+    {
+      "name": "Jenkins",
+      "aliases": ["CI/CD", "持续集成", "Jenkins Pipeline"],
+      "category": "开发运维",
+      "typical_use": "自动化持续集成与部署"
+    },
+    {
+      "name": "ANSYS",
+      "aliases": ["ANSYS仿真", "有限元分析软件"],
+      "category": "仿真分析",
+      "typical_use": "结构/流体/电磁有限元仿真分析"
+    },
+    {
+      "name": "MATLAB",
+      "aliases": ["Matlab", "Simulink"],
+      "category": "仿真分析",
+      "typical_use": "数学计算、信号处理与仿真建模"
+    },
+    {
+      "name": "FPGA",
+      "aliases": ["现场可编程门阵列", "Verilog", "VHDL", "Xilinx", "Altera"],
+      "category": "硬件开发",
+      "typical_use": "数字逻辑设计与可编程硬件开发"
+    },
+    {
+      "name": "PLC",
+      "aliases": ["可编程逻辑控制器", "西门子PLC", "PLC编程"],
+      "category": "硬件开发",
+      "typical_use": "工业自动化控制与逻辑编程"
+    },
+    {
+      "name": "嵌入式开发",
+      "aliases": ["嵌入式系统", "MCU", "单片机", "STM32", "ARM"],
+      "category": "硬件开发",
+      "typical_use": "嵌入式系统软硬件开发"
+    },
+    {
+      "name": "射频设计",
+      "aliases": ["RF设计", "射频电路", "微波设计", "ADS"],
+      "category": "硬件开发",
+      "typical_use": "射频电路设计与调试"
+    },
+    {
+      "name": "PowerBI",
+      "aliases": ["Power BI", "微软BI"],
+      "category": "数据分析",
+      "typical_use": "业务数据可视化与报表"
+    },
+    {
+      "name": "Tableau",
+      "aliases": ["Tableau可视化"],
+      "category": "数据分析",
+      "typical_use": "交互式数据可视化分析"
+    },
+    {
+      "name": "Spark",
+      "aliases": ["Apache Spark", "PySpark"],
+      "category": "数据平台",
+      "typical_use": "大规模数据处理与分布式计算"
+    },
+    {
+      "name": "Hadoop",
+      "aliases": ["Apache Hadoop", "HDFS"],
+      "category": "数据平台",
+      "typical_use": "分布式大数据存储与处理"
+    },
+    {
+      "name": "Nginx",
+      "aliases": ["nginx服务器", "反向代理"],
+      "category": "开发运维",
+      "typical_use": "Web服务器与反向代理配置"
+    },
+    {
+      "name": "Redis",
+      "aliases": ["Redis缓存", "缓存数据库"],
+      "category": "数据平台",
+      "typical_use": "高速缓存与消息队列"
+    }
+  ],
+  "DOMAIN_REGISTRY": [
+    {
+      "name": "PCB行业",
+      "aliases": ["印制电路板", "PCB制造", "电路板设计"],
+      "category": "制造业"
+    },
+    {
+      "name": "网通产品",
+      "aliases": ["网络通信", "通信设备", "路由器", "交换机", "光通信"],
+      "category": "信息技术"
+    },
+    {
+      "name": "智能制造",
+      "aliases": ["智能工厂", "工业4.0", "工业互联网", "MES"],
+      "category": "制造业"
+    },
+    {
+      "name": "低空装备",
+      "aliases": ["无人机", "低空经济", "飞行器", "eVTOL"],
+      "category": "新兴产业"
+    },
+    {
+      "name": "汽车电子",
+      "aliases": ["车载电子", "智能驾驶", "ADAS", "车联网"],
+      "category": "交通运输"
+    },
+    {
+      "name": "军工电子",
+      "aliases": ["国防电子", "军用通信", "雷达", "电子对抗"],
+      "category": "国防"
+    },
+    {
+      "name": "数字政府",
+      "aliases": ["政务数字化", "电子政务", "智慧城市"],
+      "category": "公共服务"
+    },
+    {
+      "name": "新能源",
+      "aliases": ["储能", "光伏", "风电", "电池管理", "BMS"],
+      "category": "能源"
+    },
+    {
+      "name": "轨道交通",
+      "aliases": ["铁路信号", "地铁", "列车控制", "CBTC"],
+      "category": "交通运输"
+    },
+    {
+      "name": "医疗电子",
+      "aliases": ["医疗设备", "医疗器械", "生命体征监测"],
+      "category": "医疗健康"
+    },
+    {
+      "name": "物联网",
+      "aliases": ["IoT", "传感器网络", "边缘计算"],
+      "category": "信息技术"
+    },
+    {
+      "name": "金融科技",
+      "aliases": ["FinTech", "支付系统", "风控系统"],
+      "category": "金融"
+    }
+  ],
+  "KNOWLEDGE_REGISTRY": [
+    {
+      "name": "ISO9001",
+      "aliases": ["质量管理体系", "ISO 9001", "9001认证"],
+      "category": "质量管理",
+      "typical_use": "质量管理体系建立与认证"
+    },
+    {
+      "name": "IATF16949",
+      "aliases": ["汽车质量体系", "IATF 16949", "TS16949"],
+      "category": "质量管理",
+      "typical_use": "汽车行业质量管理体系认证"
+    },
+    {
+      "name": "GJB9001C",
+      "aliases": ["军工质量体系", "国军标", "GJB 9001C"],
+      "category": "质量管理",
+      "typical_use": "军工产品质量管理体系认证"
+    },
+    {
+      "name": "会计准则",
+      "aliases": ["中国会计准则", "CAS", "企业会计准则"],
+      "category": "财务管理",
+      "typical_use": "企业财务核算与报表编制"
+    },
+    {
+      "name": "安全生产法",
+      "aliases": ["安全生产", "安全法规", "EHS"],
+      "category": "安全管理",
+      "typical_use": "安全生产合规管理与监督"
+    },
+    {
+      "name": "项目管理知识体系",
+      "aliases": ["PMBOK", "PMP", "项目管理"],
+      "category": "项目管理",
+      "typical_use": "项目全生命周期管理方法论"
+    },
+    {
+      "name": "CMMI",
+      "aliases": ["能力成熟度模型", "CMMI认证"],
+      "category": "过程管理",
+      "typical_use": "软件开发过程能力评估与改进"
+    },
+    {
+      "name": "数据安全法",
+      "aliases": ["数据安全", "个人信息保护法", "网络安全法"],
+      "category": "法律合规",
+      "typical_use": "数据安全合规与隐私保护"
+    },
+    {
+      "name": "六西格玛",
+      "aliases": ["Six Sigma", "6σ", "精益六西格玛"],
+      "category": "质量管理",
+      "typical_use": "统计驱动的过程改进与质量控制"
+    },
+    {
+      "name": "敏捷开发",
+      "aliases": ["Scrum", "敏捷", "Kanban", "SAFe"],
+      "category": "项目管理",
+      "typical_use": "快速迭代交付与团队协作管理"
+    },
+    {
+      "name": "知识产权法",
+      "aliases": ["专利法", "著作权法", "IP保护"],
+      "category": "法律合规",
+      "typical_use": "知识产权申请、保护与纠纷处理"
+    },
+    {
+      "name": "供应链管理",
+      "aliases": ["SCM", "供应链", "采购管理"],
+      "category": "运营管理",
+      "typical_use": "供应链规划、采购与物流管理"
+    },
+    {
+      "name": "ITIL",
+      "aliases": ["IT服务管理", "ITIL框架"],
+      "category": "IT管理",
+      "typical_use": "IT服务交付与运维管理标准化"
+    }
+  ]
+}

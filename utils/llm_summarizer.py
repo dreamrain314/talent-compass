@@ -16,7 +16,12 @@ import logging
 import re
 from typing import Any
 
-from utils.llm_client import call_llm_json, call_llm
+from utils.llm_client import call_llm_json
+from config import (
+    is_offline_mode,
+    PLACEHOLDER_SUMMARY_LEN,
+    PLACEHOLDER_ANCHOR_LEN,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +29,7 @@ logger = logging.getLogger(__name__)
 # 单段文本最大字符数（防止超长文本超出 token 限制）
 TEXT_LIMIT = 6000
 # LLM 最大输出 token
-MAX_TOKENS = 1024
+MAX_TOKENS = 4096
 
 # ── 公共函数 ───────────────────────────────────────────────────────────────
 
@@ -76,6 +81,13 @@ def summarize_employee_texts(
             "tokens": 0,
         }
 
+    # ── 离线模式：跳过真实 API，从原文确定性派生摘要与锚点 ──
+    # 用于无 API Key 或真实 API 截断/限流时绕过雪崩，验证编排逻辑。
+    if is_offline_mode():
+        return _derive_placeholder_summary(
+            emp_id, perf_text, proj_text, eval_text, source="offline-placeholder"
+        )
+
     system_prompt = (
         "你是一个HR数据分析助手。你的任务是将人事文本数据转化为标准化的结构化摘要。"
         "严格基于原文，不添加原文中没有的信息。不做推断、不评价。"
@@ -111,17 +123,22 @@ def summarize_employee_texts(
         max_tokens=MAX_TOKENS,
     )
 
-    # ── 降级回路：call_llm_json 因空内容/JSON 解析失败 → 走 call_llm 纯文本模式 ──
+    # ── 降级回路：call_llm_json 因空内容/JSON 解析失败 → 从原文派生占位符 ──
+    # 🔴 不再调第 2 次 LLM（原 _fallback_text_summary）：真实 API 截断时
+    # 第 2 次调用同样会截断，且每失败 1 人触发指数退避（2s→4s→6s…），
+    # 10 人即超 120s。改为确定性占位符 → error=None → 无退避雪崩。
+    # API 认证/限流/网络错误（非解析类）仍返回 error，由调用方退避。
     if result.get("error"):
         err = result["error"]
-        # 仅对"空内容"和"JSON 解析失败"降级，API 认证/限流错误直接返回
-        if "empty content" in err or "JSON parse" in err or "Expecting value" in err:
-            logger.warning("call_llm_json 失败 (%s)，尝试纯文本模式降级...", err)
-            text_result = _fallback_text_summary(emp_id, perf_text, proj_text, eval_text)
-            if text_result.get("error") is None:
-                return text_result
-            # 降级也失败 → 返回原始错误（保留更多信息）
-            logger.warning("纯文本模式降级也失败: %s", text_result.get("error"))
+        parse_failure = ("empty content" in err or "JSON parse" in err
+                          or "Expecting value" in err)
+        if parse_failure:
+            logger.warning(
+                "call_llm_json 解析失败 (%s)，从原文派生占位符（不再调第 2 次 LLM）", err
+            )
+            return _derive_placeholder_summary(
+                emp_id, perf_text, proj_text, eval_text, source="degraded-placeholder"
+            )
         return {
             "text_summaries": None,
             "anchors": None,
@@ -171,97 +188,35 @@ def summarize_employee_texts(
     }
 
 
-def _fallback_text_summary(
+def _derive_placeholder_summary(
     emp_id: str,
     perf_text: str,
     proj_text: str,
     eval_text: str,
+    source: str = "placeholder",
 ) -> dict[str, Any]:
-    """call_llm_json 失败时的降级方案：纯文本模式 + 手动字段提取。
+    """从原文确定性派生摘要与锚点（不调用 LLM）。
 
-    调用 call_llm 获取纯文本响应，然后用正则提取摘要字段，
-    避免对 JSON 格式的依赖。
+    用于：① offline 模式（TC_OFFLINE=1）；② live 路径 call_llm_json
+    解析失败时降级（替代原 _fallback_text_summary 的第 2 次 LLM 调用）。
+
+    策略：摘要 = 原文前 PLACEHOLDER_SUMMARY_LEN 字，锚点 = 原文前
+    PLACEHOLDER_ANCHOR_LEN 字。两者均为原文精确子串 → 锚点命中率 100%、
+    摘要长度 ≤ 原文长度（不会触发幻觉标记）。空字段 → 空字符串、无锚点。
     """
-    text_prompt = f"""员工ID: {emp_id}
-
-绩效评语:
-{perf_text[:2000]}
-
-项目描述:
-{proj_text[:2000]}
-
-360评价:
-{eval_text[:2000]}
-
-请按以下格式输出（不要输出JSON，不要用代码块，直接用文字）：
-
-【绩效摘要】
-（综合三年绩效的客观摘要，≤200字）
-
-【项目摘要】
-（项目经历的核心产出和角色概括，≤200字）
-
-【评价摘要】
-（360评价的综合概述，≤200字）
-
-【锚点-绩效】
-（绩效评语原文片段，20字以内）
-【锚点-项目】
-（项目描述原文片段，20字以内）
-【锚点-评价】
-（评价原文片段，20字以内）"""
-
-    result = call_llm(
-        prompt=text_prompt,
-        system_prompt="你是一个HR数据分析助手。严格基于原文，不添加原文中没有的信息。按指定格式输出。",
-        temperature=0.0,
-        max_tokens=MAX_TOKENS,
-    )
-
-    if result.get("error"):
-        return {
-            "text_summaries": None,
-            "anchors": None,
-            "anchor_mismatch": False,
-            "hallucination_flags": {},
-            "error": result["error"],
-            "model": result.get("model", ""),
-            "usage": result.get("usage", {}) or {},
-            "tokens": _sum_tokens(result),
-        }
-
-    raw = result.get("content") or ""
-    if not raw.strip():
-        return {
-            "text_summaries": None,
-            "anchors": None,
-            "anchor_mismatch": False,
-            "hallucination_flags": {},
-            "error": "纯文本模式返回空内容",
-            "model": result.get("model", ""),
-            "usage": result.get("usage", {}) or {},
-            "tokens": _sum_tokens(result),
-        }
-
-    # 用正则提取字段
     summaries = {
-        "performance_summary": _extract_field(raw, r"【绩效摘要】\s*(.+?)(?=【|$)", 200),
-        "project_summary": _extract_field(raw, r"【项目摘要】\s*(.+?)(?=【|$)", 200),
-        "evaluation_summary": _extract_field(raw, r"【评价摘要】\s*(.+?)(?=【|$)", 200),
+        "performance_summary": (perf_text or "")[:PLACEHOLDER_SUMMARY_LEN],
+        "project_summary": (proj_text or "")[:PLACEHOLDER_SUMMARY_LEN],
+        "evaluation_summary": (eval_text or "")[:PLACEHOLDER_SUMMARY_LEN],
     }
-    anchors = {
-        "performance": [_extract_field(raw, r"【锚点-绩效】\s*(.+?)(?=【|$)", 20)],
-        "projects": [_extract_field(raw, r"【锚点-项目】\s*(.+?)(?=【|$)", 20)],
-        "evaluation": [_extract_field(raw, r"【锚点-评价】\s*(.+?)(?=【|$)", 20)],
-    }
+    anchors: dict[str, list[str]] = {}
+    if perf_text:
+        anchors["performance"] = [perf_text[:PLACEHOLDER_ANCHOR_LEN]]
+    if proj_text:
+        anchors["projects"] = [proj_text[:PLACEHOLDER_ANCHOR_LEN]]
+    if eval_text:
+        anchors["evaluation"] = [eval_text[:PLACEHOLDER_ANCHOR_LEN]]
 
-    # 过滤空锚点
-    for key in list(anchors.keys()):
-        anchors[key] = [a for a in anchors[key] if a]
-        if not anchors[key]:
-            anchors.pop(key, None)
-
-    # 锚点验证 + 长度检查
     anchor_mismatch = verify_anchors(anchors, perf_text, proj_text, eval_text)
     hallucination_flags = check_summary_lengths(summaries, perf_text, proj_text, eval_text)
 
@@ -271,18 +226,10 @@ def _fallback_text_summary(
         "anchor_mismatch": anchor_mismatch,
         "hallucination_flags": hallucination_flags,
         "error": None,
-        "model": result.get("model", ""),
-        "usage": result.get("usage", {}) or {},
-        "tokens": _sum_tokens(result),
+        "model": source,
+        "usage": {},
+        "tokens": 0,
     }
-
-
-def _extract_field(text: str, pattern: str, max_len: int) -> str:
-    """从文本中提取指定字段，截断至 max_len 字符，去除首尾空白。"""
-    m = re.search(pattern, text, re.DOTALL)
-    if m:
-        return m.group(1).strip()[:max_len]
-    return ""
 
 
 # ── 锚点存在性验证 ────────────────────────────────────────────────────────

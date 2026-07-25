@@ -5,6 +5,7 @@
 import json
 import os
 import tempfile
+from datetime import datetime
 from pathlib import Path
 from unittest.mock import patch
 
@@ -69,18 +70,21 @@ def _make_minimal_data(tmp_dir, n=3):
     eval_rows = []
     roles = ["上级", "同事", "下属", "HR"]
     dims = ["专业能力", "沟通协作", "领导力", "责任心", "学习能力"]
+    current_year = datetime.now().year
     for emp in emp_rows:
         eid = emp["employee_id"]
         for dim in dims:
             for role in roles:
-                eval_rows.append({
-                    "employee_id": eid,
-                    "evaluator_id": f"E{role}_{eid}",
-                    "evaluator_role": role,
-                    "dimension": dim,
-                    "score": 3 + hash(f"{eid}{dim}{role}") % 3,
-                    "comment": f"{role}评价：{dim}表现良好。",
-                })
+                for yr in [current_year - 2, current_year - 1, current_year]:
+                    eval_rows.append({
+                        "employee_id": eid,
+                        "evaluator_id": f"E{role}_{eid}",
+                        "evaluator_role": role,
+                        "dimension": dim,
+                        "score": 3 + hash(f"{eid}{dim}{role}{yr}") % 3,
+                        "comment": f"{role}评价：{dim}表现良好。",
+                        "year": yr,
+                    })
             eval_rows.append({
                 "employee_id": emp["employee_id"],
                 "evaluator_id": f"E{emp['employee_id']}",
@@ -370,9 +374,9 @@ class TestRoleWeights:
         dfs = agent._read_data_files(tmp_data)
         result = agent._preprocess_360(dfs["evaluation_360"], dfs["employees"])
         for emp_id in dfs["employees"]["employee_id"]:
-            scores = result.get(emp_id, {})
+            emp_scores = result.get(emp_id, {}).get("dimensions", {})
             for dim in ["专业能力", "沟通协作", "领导力", "责任心", "学习能力"]:
-                assert dim in scores, f"{emp_id} 缺少维度 {dim}"
+                assert dim in emp_scores, f"{emp_id} 缺少维度 {dim}"
 
     def test_self_eval_excluded(self, agent, tmp_data):
         dfs = agent._read_data_files(tmp_data)
@@ -382,21 +386,9 @@ class TestRoleWeights:
         assert len(self_evals) > 0
         result = agent._preprocess_360(eval_df, employees_df)
         for emp_id in employees_df["employee_id"]:
-            scores = result.get(emp_id, {})
-            has_valid = any(v is not None for v in scores.values())
+            emp_scores = result.get(emp_id, {}).get("dimensions", {})
+            has_valid = any(v is not None for v in emp_scores.values())
             assert has_valid, f"{emp_id} 所有维度都是 None"
-
-    def test_tech_role_adjustment(self, agent, tmp_data):
-        dfs = agent._read_data_files(tmp_data)
-        emp_df = dfs["employees"].copy()
-        emp_df["job_sequence"] = "技术研发类"
-        result = agent._preprocess_360(dfs["evaluation_360"], emp_df)
-        for emp_id, scores in result.items():
-            if emp_id.startswith("_"):
-                continue
-            for v in scores.values():
-                if v is not None:
-                    assert 1.0 <= v <= 5.0, f"{emp_id} 得分 {v} 超出范围"
 
 
 class TestOutputFormat:
@@ -559,6 +551,7 @@ class TestMergeRecords:
             assert "training" in rec
             assert "text_summaries" in rec
             assert "scores_360" in rec
+            assert "confidence_360" in rec
             assert "anchors" in rec
             assert "data_quality_flags" in rec
 
@@ -722,8 +715,226 @@ class TestWithRealMockData:
         assert "global_mean" in summary
         assert "global_std" in summary
         for emp_id in dfs["employees"]["employee_id"]:
-            scores = result.get(emp_id, {})
+            emp_scores = result.get(emp_id, {}).get("dimensions", {})
             if emp_id.startswith("_"):
                 continue
             for dim in ["专业能力", "沟通协作", "领导力", "责任心", "学习能力"]:
-                assert dim in scores, f"{emp_id} 缺少 {dim}"
+                assert dim in emp_scores, f"{emp_id} 缺少 {dim}"
+
+
+class Test360ComprehensiveFormula:
+    """360 综合公式测试（Day 5 新增）。"""
+
+    def test_3yr_full_no_anomaly(self, agent, tmp_path):
+        """3年完整数据，无异常 → confidence ≈ 1.0，权重接近基线。"""
+        tmp = str(tmp_path)
+        _write_csv(os.path.join(tmp, "employees.csv"), [
+            {"employee_id": "T0001", "name": "员工1", "age": 30,
+             "gender": "男", "education": "本科", "major": "计算机",
+             "job_sequence": "技术研发类", "current_position": "工程师",
+             "current_level": "P3", "hire_date": "2020-01-01", "years_of_service": 6},
+        ])
+        _write_csv(os.path.join(tmp, "performance.csv"), [
+            {"employee_id": "T0001", "year": 2024, "performance_grade": "B", "performance_comment": "良好"},
+        ])
+        _write_json(os.path.join(tmp, "projects.json"), [
+            {"employee_id": "T0001", "project_name": "测试", "role": "开发",
+             "description": "项目", "tools_used": []},
+        ])
+        _write_csv(os.path.join(tmp, "training.csv"), [
+            {"employee_id": "T0001", "course_name": "Python", "completion_date": "2025-03",
+             "status": "已完成", "score": 85},
+        ])
+        cy = datetime.now().year
+        eval_rows = []
+        for role in ["上级", "同事", "下属", "HR"]:
+            for dim in ["专业能力", "沟通协作", "领导力", "责任心", "学习能力"]:
+                for yr in [cy - 2, cy - 1, cy]:
+                    eval_rows.append({
+                        "employee_id": "T0001", "evaluator_id": f"E_{role}",
+                        "evaluator_role": role, "dimension": dim,
+                        "score": 4, "comment": "良好", "year": yr,
+                    })
+        _write_csv(os.path.join(tmp, "evaluation_360.csv"), eval_rows)
+        data = {"employees": os.path.join(tmp, "employees.csv"),
+                "performance": os.path.join(tmp, "performance.csv"),
+                "projects": os.path.join(tmp, "projects.json"),
+                "training": os.path.join(tmp, "training.csv"),
+                "evaluation_360": os.path.join(tmp, "evaluation_360.csv")}
+        dfs = agent._read_data_files(data)
+        result = agent._preprocess_360(dfs["evaluation_360"], dfs["employees"])
+        emp = result.get("T0001", {})
+        assert "confidence" in emp
+        assert emp["confidence"] >= 0.7, f"confidence {emp['confidence']} < 0.7"
+        dims = emp.get("dimensions", {})
+        for d in ["专业能力", "沟通协作", "领导力", "责任心", "学习能力"]:
+            assert d in dims and dims[d] is not None, f"维度 {d} 缺失"
+            assert 3.0 <= dims[d] <= 5.0, f"{d}={dims[d]} 超出范围"
+
+    def test_1yr_perfunctory(self, agent, tmp_path):
+        """单年数据 + 敷衍评价者 → confidence 较低。"""
+        tmp = str(tmp_path)
+        _write_csv(os.path.join(tmp, "employees.csv"), [
+            {"employee_id": "T0001", "name": "员工1", "age": 30,
+             "gender": "男", "education": "本科", "major": "计算机",
+             "job_sequence": "技术研发类", "current_position": "工程师",
+             "current_level": "P3", "hire_date": "2020-01-01", "years_of_service": 6},
+        ])
+        _write_csv(os.path.join(tmp, "performance.csv"), [
+            {"employee_id": "T0001", "year": 2024, "performance_grade": "B", "performance_comment": "良好"},
+        ])
+        _write_json(os.path.join(tmp, "projects.json"), [
+            {"employee_id": "T0001", "project_name": "测试", "role": "开发", "description": "项目", "tools_used": []},
+        ])
+        _write_csv(os.path.join(tmp, "training.csv"), [
+            {"employee_id": "T0001", "course_name": "Python", "completion_date": "2025-03", "status": "已完成", "score": 85},
+        ])
+        cy = datetime.now().year
+        eval_rows = []
+        for dim in ["专业能力", "沟通协作"]:
+            for _ in range(10):
+                eval_rows.append({
+                    "employee_id": "T0001", "evaluator_id": "Perfunctory_1",
+                    "evaluator_role": "上级", "dimension": dim,
+                    "score": 3, "comment": "一般", "year": cy,
+                })
+        _write_csv(os.path.join(tmp, "evaluation_360.csv"), eval_rows)
+        data = {"employees": os.path.join(tmp, "employees.csv"),
+                "performance": os.path.join(tmp, "performance.csv"),
+                "projects": os.path.join(tmp, "projects.json"),
+                "training": os.path.join(tmp, "training.csv"),
+                "evaluation_360": os.path.join(tmp, "evaluation_360.csv")}
+        dfs = agent._read_data_files(data)
+        result = agent._preprocess_360(dfs["evaluation_360"], dfs["employees"])
+        emp = result.get("T0001", {})
+        assert emp.get("confidence", 1) <= 0.6, f"敷衍场景 confidence 应较低"
+        dims = emp.get("dimensions", {})
+        for d in ["专业能力", "沟通协作"]:
+            assert dims.get(d) is not None, f"{d} 不应为 None"
+
+    def test_all_anomalous(self, agent, tmp_path):
+        """所有评价者都异常 → confidence 很低。"""
+        tmp = str(tmp_path)
+        _write_csv(os.path.join(tmp, "employees.csv"), [
+            {"employee_id": "T0001", "name": "员工1", "age": 30,
+             "gender": "男", "education": "本科", "major": "计算机",
+             "job_sequence": "技术研发类", "current_position": "工程师",
+             "current_level": "P3", "hire_date": "2020-01-01", "years_of_service": 6},
+        ])
+        _write_csv(os.path.join(tmp, "performance.csv"), [
+            {"employee_id": "T0001", "year": 2024, "performance_grade": "B", "performance_comment": "良好"},
+        ])
+        _write_json(os.path.join(tmp, "projects.json"), [
+            {"employee_id": "T0001", "project_name": "测试", "role": "开发", "description": "项目", "tools_used": []},
+        ])
+        _write_csv(os.path.join(tmp, "training.csv"), [
+            {"employee_id": "T0001", "course_name": "Python", "completion_date": "2025-03", "status": "已完成", "score": 85},
+        ])
+        cy = datetime.now().year
+        eval_rows = []
+        for i in range(20):
+            for dim in ["专业能力", "沟通协作"]:
+                eval_rows.append({
+                    "employee_id": f"N{i:04d}", "evaluator_id": "Normal",
+                    "evaluator_role": "上级", "dimension": dim,
+                    "score": 3, "comment": "正常", "year": cy,
+                })
+        for i in range(5):
+            for dim in ["专业能力", "沟通协作"]:
+                eval_rows.append({
+                    "employee_id": "T0001", "evaluator_id": "Anomalous",
+                    "evaluator_role": "上级", "dimension": dim,
+                    "score": 1, "comment": "异常低分", "year": cy,
+                })
+        _write_csv(os.path.join(tmp, "evaluation_360.csv"), eval_rows)
+        data = {"employees": os.path.join(tmp, "employees.csv"),
+                "performance": os.path.join(tmp, "performance.csv"),
+                "projects": os.path.join(tmp, "projects.json"),
+                "training": os.path.join(tmp, "training.csv"),
+                "evaluation_360": os.path.join(tmp, "evaluation_360.csv")}
+        dfs = agent._read_data_files(data)
+        result = agent._preprocess_360(dfs["evaluation_360"], dfs["employees"])
+        emp = result.get("T0001", {})
+        conf = emp.get("confidence", 1.0)
+        assert conf < 0.5, f"全异常场景 confidence 应 < 0.5, 实际 {conf}"
+
+    def test_no_year_fallback(self, agent, tmp_path):
+        """year 列缺失 → time_decay=1.0，不崩。"""
+        tmp = str(tmp_path)
+        _write_csv(os.path.join(tmp, "employees.csv"), [
+            {"employee_id": "T0001", "name": "员工1", "age": 30,
+             "gender": "男", "education": "本科", "major": "计算机",
+             "job_sequence": "技术研发类", "current_position": "工程师",
+             "current_level": "P3", "hire_date": "2020-01-01", "years_of_service": 6},
+        ])
+        _write_csv(os.path.join(tmp, "performance.csv"), [
+            {"employee_id": "T0001", "year": 2024, "performance_grade": "B", "performance_comment": "良好"},
+        ])
+        _write_json(os.path.join(tmp, "projects.json"), [
+            {"employee_id": "T0001", "project_name": "测试", "role": "开发", "description": "项目", "tools_used": []},
+        ])
+        _write_csv(os.path.join(tmp, "training.csv"), [
+            {"employee_id": "T0001", "course_name": "Python", "completion_date": "2025-03", "status": "已完成", "score": 85},
+        ])
+        eval_rows = []
+        for role in ["上级", "同事"]:
+            for dim in ["专业能力", "沟通协作"]:
+                eval_rows.append({
+                    "employee_id": "T0001", "evaluator_id": f"E_{role}",
+                    "evaluator_role": role, "dimension": dim,
+                    "score": 4, "comment": "良好",
+                })
+        _write_csv(os.path.join(tmp, "evaluation_360.csv"), eval_rows)
+        data = {"employees": os.path.join(tmp, "employees.csv"),
+                "performance": os.path.join(tmp, "performance.csv"),
+                "projects": os.path.join(tmp, "projects.json"),
+                "training": os.path.join(tmp, "training.csv"),
+                "evaluation_360": os.path.join(tmp, "evaluation_360.csv")}
+        dfs = agent._read_data_files(data)
+        result = agent._preprocess_360(dfs["evaluation_360"], dfs["employees"])
+        emp = result.get("T0001", {})
+        dims = emp.get("dimensions", {})
+        for d in ["专业能力", "沟通协作"]:
+            assert dims.get(d) is not None, f"缺 year 时 {d} 不应为 None"
+
+    def test_all_perfunctory_zero_div_guard(self, agent, tmp_path):
+        """全敷衍 → 等权平均，不零除。"""
+        tmp = str(tmp_path)
+        _write_csv(os.path.join(tmp, "employees.csv"), [
+            {"employee_id": "T0001", "name": "员工1", "age": 30,
+             "gender": "男", "education": "本科", "major": "计算机",
+             "job_sequence": "技术研发类", "current_position": "工程师",
+             "current_level": "P3", "hire_date": "2020-01-01", "years_of_service": 6},
+        ])
+        _write_csv(os.path.join(tmp, "performance.csv"), [
+            {"employee_id": "T0001", "year": 2024, "performance_grade": "B", "performance_comment": "良好"},
+        ])
+        _write_json(os.path.join(tmp, "projects.json"), [
+            {"employee_id": "T0001", "project_name": "测试", "role": "开发", "description": "项目", "tools_used": []},
+        ])
+        _write_csv(os.path.join(tmp, "training.csv"), [
+            {"employee_id": "T0001", "course_name": "Python", "completion_date": "2025-03", "status": "已完成", "score": 85},
+        ])
+        cy = datetime.now().year
+        eval_rows = []
+        for evaluator in ["E1", "E2", "E3"]:
+            for dim in ["专业能力", "沟通协作"]:
+                for _ in range(5):
+                    eval_rows.append({
+                        "employee_id": "T0001", "evaluator_id": evaluator,
+                        "evaluator_role": "上级", "dimension": dim,
+                        "score": 3, "comment": "一般", "year": cy,
+                    })
+        _write_csv(os.path.join(tmp, "evaluation_360.csv"), eval_rows)
+        data = {"employees": os.path.join(tmp, "employees.csv"),
+                "performance": os.path.join(tmp, "performance.csv"),
+                "projects": os.path.join(tmp, "projects.json"),
+                "training": os.path.join(tmp, "training.csv"),
+                "evaluation_360": os.path.join(tmp, "evaluation_360.csv")}
+        dfs = agent._read_data_files(data)
+        result = agent._preprocess_360(dfs["evaluation_360"], dfs["employees"])
+        emp = result.get("T0001", {})
+        dims = emp.get("dimensions", {})
+        for d in ["专业能力", "沟通协作"]:
+            assert dims.get(d) is not None, f"全敷衍时 {d} 不应为 None"
+            assert 1.0 <= dims[d] <= 5.0, f"{d}={dims[d]} 超出范围"

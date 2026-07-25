@@ -1,5 +1,25 @@
 # progress.md — Bug修复进度
 
+## 🔧 Day5: Agent① 360 评价预处理增强 + 联调 (2026-07-25)
+
+**状态**: [VERIFIED]
+
+### 完成内容
+
+| 文件 | 说明 | 状态 |
+|------|------|------|
+| `agents/data_understanding.py` — `_preprocess_360()` | 综合权重公式（角色权重 × 时间衰减 × 区分度 × 异常惩罚 → 归一化） | ✅ |
+| `config.py` | 新增 `TIME_DECAY_RATE`, `DISCRIMINATION_*`, `CONFIDENCE_*` 常量 | ✅ |
+| `tests/test_data_understanding.py` — `Test360ComprehensiveFormula` | 5 个综合测试（3年无异常/单年敷衍/全异常/year缺失/全敷衍零除） | ✅ 5/5 |
+| `data/intermediate/baseline_360_v1.json` | 基线与替换后对比验证 | ✅ |
+| `scripts/validate_phase1.py` | 端到端验证脚本（5类检查 + --skip-llm） | ✅ |
+
+### 验证
+
+- [x] 全量测试: 213/213 PASSED，零 Warning
+- [x] 360 综合公式 5/5 通过
+- [x] 基线对比文件已生成
+
 ## 🔧 Day4: Agent① 非结构化文本语义理解 (2026-07-24)
 
 **状态**: [VERIFIED]
@@ -548,3 +568,36 @@ training: 400 ✅ | eval360: 2500 ✅
 - [x] 测试: 209/209 PASSED，零 FutureWarning（`-W error::FutureWarning` 全绿）
 - [x] `filter_conditions.json`: 合法 JSON
 - [x] `python scripts/run_pipeline_phase1.py --help`: 参数正常解析，含预留扩展接口
+
+---
+
+## 🔧 Day5: 360 预处理增强 (2026-07-25)
+
+**状态**: [VERIFIED]
+
+### 修改内容
+
+| 文件 | 操作 | 说明 |
+|------|------|------|
+| `config.py` | 修改 | 新增 11 个 360 预处理常量 |
+| `agents/data_understanding.py` | 修改 | 删除内联常量改为 import config；REQUIRED_COLUMNS 加 year；重写 `_preprocess_360()` 综合公式；`_merge_records()` 适配嵌套结构 |
+| `ui/app.py` | 修改 | `_STEPS` 7→8 新增 Step⑤ 360评价；新增 `_render_step_360()` 和 `_compute_360_scores()` |
+| `tests/test_data_understanding.py` | 修改 | fixture year 循环；assert 适配 nested 结构；删除 test_tech_role_adjustment；新增 Test360ComprehensiveFormula |
+| `tests/test_adversarial_day3.py` | 修改 | ROLE_WEIGHTS_BASELINE import 改来源；fixture year 循环；assert 适配 nested 结构 |
+| `tests/test_ui_app.py` | 修改 | _STEPS 长度 7→8 |
+| `scripts/validate_phase1.py` | 新建 | 端到端验证脚本（5 类检查 + --skip-llm） |
+| `data/intermediate/baseline_360_v1.json` | 新建 | 旧版 `_preprocess_360()` 基线输出 |
+
+### 变更摘要
+
+1. **内联常量迁移**: ROLE_WEIGHTS_BASELINE, SELF_EVAL_ROLE, KNOWN_DIMENSIONS, ROLE_ADJUSTMENTS 从 data_understanding.py 内联定义移至 config.py（D1 修复），ROLE_ADJUSTMENTS 因被综合公式替代而删除
+2. **综合公式**: 新增时间衰减（TIME_DECAY_RATE=0.3）、区分度检测（std=0 & mean≤4 → 敷衍权重 0.1）、置信度（评价者数 + 异常率 + 年份覆盖度）
+3. **输出结构变更**: `scores_360[emp_id]` 从 `{dim: score}` 变为 `{"dimensions": {dim: score}, "confidence": float}`
+4. **UI 新增独立步骤**: Step⑤ 360评价，含员工选择器、5维度 metric+progress bar、条形图、置信度色彩编码、权重因子折叠详情、全局统计摘要
+
+### 验证
+
+- [x] 测试: 213/213 PASSED
+- [x] 对抗审查: 6 边界值 + C4 穷举验证通过
+- [ ] 基线对比: 待执行（需要完整 pipeline 运行）
+- [ ] 端到端验证: 待执行（需要完整 pipeline 运行）

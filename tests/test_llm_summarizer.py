@@ -42,6 +42,16 @@ _MOCK_ERROR = {
     "model": "deepseek-chat",
 }
 
+# call_llm_json 返回 JSON 解析失败（finish_reason=length 截断场景）
+_MOCK_PARSE_ERROR = {
+    "content": None,
+    "error": "JSON parse failed: Expecting value",
+    "raw_content": '{"performance_summary": "2024年',
+    "usage": {"prompt_tokens": 400, "completion_tokens": 80},
+    "model": "deepseek-chat",
+    "schema_validated": False,
+}
+
 _MOCK_EMPTY_ANCHORS = {
     "content": {
         "performance_summary": "绩效表现稳定。",
@@ -176,6 +186,64 @@ class TestSummarizeEmployeeTexts:
     def test_return_format_keys(self, mock_call):
         """返回字典包含所有必需顶层 key。"""
         result = summarize_employee_texts("T0001", "绩效文本", "项目文本", "评价文本")
+        _assert_expected_keys(result)
+
+
+# ── offline / degraded 占位符派生 ──────────────────────────────────────
+
+
+class TestPlaceholderDerivation:
+    """验证 offline 模式与 live 解析失败降级都走确定性占位符（不调 LLM）。"""
+
+    def test_offline_mode_no_llm_call(self, monkeypatch):
+        """TC_OFFLINE=1 → 不调用 call_llm_json，从原文派生摘要。"""
+        monkeypatch.setenv("TC_OFFLINE", "1")
+        with patch("utils.llm_summarizer.call_llm_json") as mock_call:
+            result = summarize_employee_texts(
+                "T0001",
+                "该员工本年度表现良好，完成各项目标。",
+                "核心系统开发项目，担任核心开发。",
+                "专业能力强，沟通协作好。",
+            )
+            mock_call.assert_not_called()
+        assert result["error"] is None
+        assert result["model"] == "offline-placeholder"
+        perf = "该员工本年度表现良好，完成各项目标。"
+        assert result["text_summaries"]["performance_summary"] == perf[:150]
+        # 锚点是原文前 N 字 → 精确子串 → anchor_mismatch False
+        assert result["anchor_mismatch"] is False
+        assert result["anchors"]["performance"][0] == perf[:10]
+        assert result["anchors"]["performance"][0] in perf
+        _assert_expected_keys(result)
+
+    def test_offline_anchors_exact_substring(self, monkeypatch):
+        """offline 派生的锚点必须是原文精确子串（命中率 100%）。"""
+        monkeypatch.setenv("TC_OFFLINE", "1")
+        perf = "2024年度绩效评定为A级，超额完成KPI指标。"
+        proj = "主导核心交易系统重构，Q3上线。"
+        result = summarize_employee_texts("T0001", perf, proj, "")
+        assert result["anchors"]["performance"][0] in perf
+        assert result["anchors"]["projects"][0] in proj
+        assert "evaluation" not in result["anchors"]  # 空字段无锚点
+        assert result["anchor_mismatch"] is False
+
+    def test_offline_off_by_default(self, monkeypatch):
+        """TC_OFFLINE 未设 → 走真实 LLM 路径（mock 验证）。"""
+        monkeypatch.delenv("TC_OFFLINE", raising=False)
+        with patch("utils.llm_summarizer.call_llm_json", return_value=_MOCK_SUCCESS) as mock_call:
+            result = summarize_employee_texts("T0001", "绩效文本", "项目文本", "评价文本")
+            mock_call.assert_called_once()
+            assert result["model"] == "deepseek-chat"
+
+    @patch("utils.llm_summarizer.call_llm_json", return_value=_MOCK_PARSE_ERROR)
+    def test_parse_failure_derives_placeholder_no_second_llm(self, mock_call):
+        """call_llm_json 解析失败 → 从原文派生占位符，不调第 2 次 LLM。"""
+        result = summarize_employee_texts("T0001", "绩效文本", "项目文本", "评价文本")
+        # 仅调 1 次（call_llm_json），不再调 call_llm
+        assert mock_call.call_count == 1
+        assert result["error"] is None  # 降级为占位符成功
+        assert result["model"] == "degraded-placeholder"
+        assert result["text_summaries"]["performance_summary"] == "绩效文本"
         _assert_expected_keys(result)
 
 

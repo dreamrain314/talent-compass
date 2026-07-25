@@ -64,7 +64,7 @@ def test_constants_exist():
 
     # 步骤配置
     assert isinstance(app._STEPS, list)
-    assert len(app._STEPS) == 7
+    assert len(app._STEPS) == 8
     assert app._STEPS[0] == ("①", "数据上传")
     assert app._STEPS[1] == ("②", "基础过滤")
     assert app._STEPS[2] == ("③", "数据质量")
