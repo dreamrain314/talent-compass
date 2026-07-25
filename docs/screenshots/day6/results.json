@@ -1,0 +1,15 @@
+[
+  {
+    "id": "S4",
+    "name": "str_score_360",
+    "expect": "Step5 360 可读错误，非 TypeError 堆栈",
+    "upload_issues": [],
+    "alerts": [
+      "该员工暂无 360 评分数据"
+    ],
+    "exception": null,
+    "page_text_head": "📋 操作流程\n\n① 数据上传 ✅\n\n② 基础过滤 ✅\n\n③ 数据质量 ✅\n\n④ 文本摘要 ✅\n\n⑤ 360评价 ← 当前\n\n⑥ 画像生成\n\n⑦ 岗位匹配\n\n⑧ 推荐结果\n\n⚙️ API 配置\n\nDeepSeek API Key\n\n🔄 应用 Key 变更\n\n当前 Key: ...Cz_g\n\nkeyboard_arrow_right\n\n🔧 API 调试\n\n🔍 过滤条件\n\n年龄区间\n\n30\n45\n22\n60\n\n政治面貌\n\nChoose options\n\n专业关键词（逗号分隔）\n\n最低工作年限\n\n职级范围\n\nP1\nP9\nP1\nP9\n\n绩效底线\n\nB\n\n▶ 执行过滤\n\nDeploy\n🧭 Talent Compass —— AI驱动的动态胜任力画像与智能人岗匹配系统\n\n当前时间：2026-07-26 00:31:16\n\nStep 5：360 评价\n\n查看员工 360 评价各维度得分，权重因子详情，以及全局统计。\n\n👤 选择员工\n\nJZ0001 - 周诗涵\n\n该员工暂无 360 评分数据\n\n🎯 置信度\n\n（运行完整 Pipeline 后显示置信度；当前为预览模式）\n\nkeyboard_arrow_right\n\n⚙️ 权重因子详情\n\nkeyboard_arrow_right\n\n📈 全局统计摘要\n\n← 返回文本摘要\n\n下一步 → 画像生成",
+    "screenshot": "docs/screenshots/day6/S4.png",
+    "has_exception_box": false
+  }
+]

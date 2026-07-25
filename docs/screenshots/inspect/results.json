@@ -1,0 +1,66 @@
+{
+  "url": "http://localhost:8765/",
+  "steps": [
+    {
+      "step": 1,
+      "name": "数据上传-初始表单",
+      "shot": "D:\\workplace\\talent-compass\\docs\\screenshots\\inspect\\S1_01_initial.png"
+    },
+    {
+      "step": 1,
+      "name": "数据上传-已加载",
+      "shot": "D:\\workplace\\talent-compass\\docs\\screenshots\\inspect\\S1_02_loaded.png"
+    },
+    {
+      "step": 2,
+      "name": "过滤-初始",
+      "shot": "D:\\workplace\\talent-compass\\docs\\screenshots\\inspect\\S2_01_filter_initial.png"
+    },
+    {
+      "step": 2,
+      "name": "过滤-结果",
+      "shot": "D:\\workplace\\talent-compass\\docs\\screenshots\\inspect\\S2_02_filter_result.png"
+    },
+    {
+      "step": 3,
+      "name": "数据质量报告",
+      "shot": "D:\\workplace\\talent-compass\\docs\\screenshots\\inspect\\S3_01_quality.png"
+    },
+    {
+      "step": 3,
+      "name": "数据质量-展开",
+      "shot": "D:\\workplace\\talent-compass\\docs\\screenshots\\inspect\\S3_02_expanded.png"
+    },
+    {
+      "step": 4,
+      "name": "文本摘要-初始",
+      "shot": "D:\\workplace\\talent-compass\\docs\\screenshots\\inspect\\S4_01_summary_initial.png"
+    },
+    {
+      "step": 5,
+      "name": "360评价",
+      "shot": "D:\\workplace\\talent-compass\\docs\\screenshots\\inspect\\S5_01_360.png"
+    },
+    {
+      "step": 6,
+      "name": "画像生成",
+      "shot": "D:\\workplace\\talent-compass\\docs\\screenshots\\inspect\\S6_01_画像生成.png"
+    },
+    {
+      "step": 7,
+      "name": "岗位匹配",
+      "shot": "D:\\workplace\\talent-compass\\docs\\screenshots\\inspect\\S7_01_岗位匹配.png"
+    },
+    {
+      "step": 8,
+      "name": "推荐结果",
+      "shot": "D:\\workplace\\talent-compass\\docs\\screenshots\\inspect\\S8_01_推荐结果.png"
+    },
+    {
+      "step": 0,
+      "name": "侧边栏",
+      "shot": "D:\\workplace\\talent-compass\\docs\\screenshots\\inspect\\S0_sidebar.png"
+    }
+  ],
+  "issues": []
+}

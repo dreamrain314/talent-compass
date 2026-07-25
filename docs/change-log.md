@@ -73,6 +73,7 @@
 |-----|------|------|
 | ADV-3 | `ui/app.py` L775 | 删除多余的 `st.rerun()` |
 | ADV-4 | `ui/app.py` L1001 | `st.code(a, line_limit=1)` → `st.code(a[:80], line_height=24)` |
+| ADV-4（Day6 真正修复） | `ui/app.py` L1012 | `line_height=24` 同样无效，Streamlit 1.51 严格校验抛 TypeError → 删除 kwarg：`st.code(a[:80])` |
 
 ---
 

@@ -585,6 +585,10 @@ class DataUnderstanding(BaseAgent):
             has_year = True
 
         # ── Block B: 全局统计量 ────────────────────────────────────────
+        # C3 守卫：score 可能含字符串（如"优良中"夹具），转 numeric 防下游 .mean()/.std()/groupby/row["score"]*fw 崩
+        # 复用 utils/data_quality.py:248 的 to_numeric(errors='coerce') 模式（D2）
+        eval_df = eval_df.copy()
+        eval_df["score"] = pd.to_numeric(eval_df["score"], errors="coerce")
         all_scores = eval_df["score"].dropna()
         if len(all_scores) == 0:
             return {"_summary": {"error": "无可用评分"}}

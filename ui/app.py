@@ -1009,7 +1009,9 @@ def _render_summary_comparison(emp_summary: dict) -> None:
             if anchor_list and isinstance(anchor_list, list):
                 st.markdown(f"**{key}** ({len(anchor_list)} 个锚点)")
                 for a in anchor_list[:10]:  # 最多显示 10 个
-                    st.code(a[:80], line_height=24)
+                    # st.code 不支持 line_height/line_limit（Streamlit 1.51 签名仅 body/language/line_numbers/wrap_lines/height/width）；
+                    # a[:80] 已截断长度，锚点单行短语无需额外行高控制
+                    st.code(a[:80])
                 if len(anchor_list) > 10:
                     st.caption(f"... 还有 {len(anchor_list) - 10} 个锚点")
 
@@ -1029,6 +1031,10 @@ def _compute_360_scores(eval_df: pd.DataFrame, employees_df: pd.DataFrame) -> di
         ANOMALY_PENALTY_FACTOR,
     )
 
+    # C3 守卫：score 可能含字符串（如"优良中"夹具），转 numeric 防下游 .mean()/.std()/groupby 崩
+    # 复用 utils/data_quality.py:248 的 to_numeric(errors='coerce') 模式（D2：不在本处独立定义转换语义）
+    eval_df = eval_df.copy()
+    eval_df["score"] = pd.to_numeric(eval_df["score"], errors="coerce")
     all_scores = eval_df["score"].dropna()
     if len(all_scores) == 0:
         return {}
@@ -1209,9 +1215,10 @@ def _render_360_global_summary(eval_df: pd.DataFrame) -> None:
     st.metric("员工覆盖数", eval_df["employee_id"].nunique())
     st.metric("评价者总数", eval_df["evaluator_id"].nunique())
 
-    # 各维度均分
+    # 各维度均分（C3 守卫：score 转 numeric 防字符串崩，与 _compute_360_scores 同模式）
     st.markdown("**各维度全局均分**")
-    dim_means = eval_df.groupby("dimension")["score"].mean().round(2)
+    _score_num = pd.to_numeric(eval_df["score"], errors="coerce")
+    dim_means = _score_num.groupby(eval_df["dimension"]).mean().round(2)
     dim_df = pd.DataFrame({"维度": dim_means.index, "均分": dim_means.values})
     st.dataframe(dim_df, use_container_width=True, hide_index=True)
 

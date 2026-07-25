@@ -1,0 +1,601 @@
+[
+  {
+    "employee_id": "JZ0001",
+    "project_name": "工业IoT管理平台",
+    "role": "核心开发",
+    "start_date": "2024-06-17",
+    "end_date": "2025-01-12",
+    "description": "参与工业IoT管理平台，负责核心模块开发，涉及gRPC等技术应用。",
+    "team_size": 11,
+    "tools_used": [
+      "InfluxDB",
+      "Go",
+      "gRPC",
+      "Grafana"
+    ]
+  },
+  {
+    "employee_id": "JZ0002",
+    "project_name": "数字孪生可视化平台",
+    "role": "核心开发",
+    "start_date": "2025-09-14",
+    "end_date": "2026-07-01",
+    "team_size": 7,
+    "tools_used": [
+      "Three.js",
+      "MongoDB",
+      "Unity",
+      "Node.js"
+    ]
+  },
+  {
+    "employee_id": "JZ0002",
+    "project_name": "智能仓储WMS系统",
+    "role": "技术负责人",
+    "start_date": "2025-02-12",
+    "end_date": "2026-01-21",
+    "description": "参与智能仓储WMS系统，负责性能优化，涉及Redis等技术应用。",
+    "team_size": 15,
+    "tools_used": [
+      "SQL Server",
+      "Redis",
+      ".NET Core",
+      "C#"
+    ]
+  },
+  {
+    "employee_id": "JZ0003",
+    "project_name": "数字孪生可视化平台",
+    "role": "项目成员",
+    "start_date": "2024-12-12",
+    "end_date": "2026-04-02",
+    "description": "参与数字孪生可视化平台，负责架构设计，涉及Node.js等技术应用。",
+    "team_size": 7,
+    "tools_used": [
+      "Node.js",
+      "Unity",
+      "Three.js",
+      "MongoDB"
+    ]
+  },
+  {
+    "employee_id": "JZ0003",
+    "project_name": "工业IoT管理平台",
+    "role": "核心开发",
+    "start_date": "2025-08-07",
+    "end_date": "2026-07-01",
+    "description": "参与工业IoT管理平台，负责代码审查，涉及gRPC等技术应用。",
+    "team_size": 7,
+    "tools_used": [
+      "gRPC",
+      "Grafana",
+      "Go",
+      "InfluxDB"
+    ]
+  },
+  {
+    "employee_id": "JZ0004",
+    "project_name": "工业大数据分析平台",
+    "role": "项目成员",
+    "start_date": "2022-04-16",
+    "end_date": "2022-11-29",
+    "description": "参与工业大数据分析平台，负责技术攻关，涉及Airflow等技术应用。",
+    "team_size": 3,
+    "tools_used": [
+      "Python",
+      "Spark",
+      "Hadoop",
+      "Airflow"
+    ]
+  },
+  {
+    "employee_id": "JZ0004",
+    "project_name": "ERP系统定制开发",
+    "role": "架构师",
+    "start_date": "2024-09-08",
+    "end_date": "2025-03-23",
+    "description": "参与ERP系统定制开发，负责性能优化，涉及Java等技术应用。",
+    "team_size": 6,
+    "tools_used": [
+      "SAP",
+      "Oracle",
+      "Java",
+      "CI/CD"
+    ]
+  },
+  {
+    "employee_id": "JZ0004",
+    "project_name": "边缘计算网关开发",
+    "role": "核心开发",
+    "start_date": "2023-05-12",
+    "end_date": "2024-07-31",
+    "description": "参与边缘计算网关开发，负责代码审查，涉及Linux等技术应用。",
+    "team_size": 11,
+    "tools_used": [
+      "MQTT",
+      "Linux",
+      "嵌入式",
+      "C++"
+    ]
+  },
+  {
+    "employee_id": "JZ0005",
+    "project_name": "数字孪生可视化平台",
+    "role": "项目成员",
+    "start_date": "2025-06-01",
+    "end_date": "2026-05-11",
+    "description": "参与数字孪生可视化平台，负责核心模块开发，涉及Unity等技术应用。",
+    "team_size": 15,
+    "tools_used": [
+      "MongoDB",
+      "Three.js",
+      "Node.js",
+      "Unity"
+    ]
+  },
+  {
+    "employee_id": "JZ0005",
+    "project_name": "工业机器人控制",
+    "role": "核心开发",
+    "start_date": "2024-11-10",
+    "end_date": "2025-03-03",
+    "description": "参与工业机器人控制，负责架构设计，涉及C++等技术应用。",
+    "team_size": 7,
+    "tools_used": [
+      "PLC",
+      "ROS",
+      "C++",
+      "EtherCAT"
+    ]
+  },
+  {
+    "employee_id": "JZ0005",
+    "project_name": "产品质量追溯系统",
+    "role": "项目成员",
+    "start_date": "2024-05-22",
+    "end_date": "2024-12-15",
+    "description": "参与产品质量追溯系统，负责技术攻关，涉及Django等技术应用。",
+    "team_size": 10,
+    "tools_used": [
+      "PostgreSQL",
+      "Django",
+      "React",
+      "Python"
+    ]
+  },
+  {
+    "employee_id": "JZ0006",
+    "project_name": "智能仓储WMS系统",
+    "role": "项目成员",
+    "start_date": "2026-01-15",
+    "end_date": "2026-07-01",
+    "description": "参与智能仓储WMS系统，负责架构设计，涉及C#等技术应用。",
+    "team_size": 11,
+    "tools_used": [
+      "C#",
+      "Redis",
+      "SQL Server",
+      ".NET Core"
+    ]
+  },
+  {
+    "employee_id": "JZ0006",
+    "project_name": "产品质量追溯系统",
+    "role": "核心开发",
+    "start_date": "2024-04-24",
+    "end_date": "2024-10-01",
+    "description": "参与产品质量追溯系统，负责核心模块开发，涉及Django等技术应用。",
+    "team_size": 3,
+    "tools_used": [
+      "Django",
+      "PostgreSQL",
+      "React",
+      "Python"
+    ]
+  },
+  {
+    "employee_id": "JZ0006",
+    "project_name": "工业机器人控制",
+    "role": "项目成员",
+    "start_date": "2022-05-04",
+    "end_date": "2023-06-14",
+    "description": "参与工业机器人控制，负责代码审查，涉及C++等技术应用。",
+    "team_size": 3,
+    "tools_used": [
+      "PLC",
+      "C++",
+      "EtherCAT",
+      "ROS"
+    ]
+  },
+  {
+    "employee_id": "JZ0006",
+    "project_name": "工业大数据分析平台",
+    "role": "技术负责人",
+    "start_date": "2025-01-02",
+    "end_date": "2025-08-26",
+    "description": "参与工业大数据分析平台，负责技术攻关，涉及Tableau等技术应用。",
+    "team_size": 15,
+    "tools_used": [
+      "Spark",
+      "Python",
+      "Tableau",
+      "Hadoop"
+    ]
+  },
+  {
+    "employee_id": "JZ0007",
+    "project_name": "边缘计算网关开发",
+    "role": "架构师",
+    "start_date": "2023-06-01",
+    "end_date": "2024-10-20",
+    "description": "参与边缘计算网关开发，负责性能优化，涉及嵌入式等技术应用。",
+    "team_size": 4,
+    "tools_used": [
+      "MQTT",
+      "Linux",
+      "嵌入式",
+      "C++"
+    ]
+  },
+  {
+    "employee_id": "JZ0007",
+    "project_name": "ERP系统定制开发",
+    "role": "架构师",
+    "start_date": "2025-11-28",
+    "end_date": "2026-06-21",
+    "description": "参与ERP系统定制开发，负责核心模块开发，涉及Java等技术应用。",
+    "team_size": 4,
+    "tools_used": [
+      "CI/CD",
+      "SAP",
+      "Oracle",
+      "Java"
+    ]
+  },
+  {
+    "employee_id": "JZ0008",
+    "project_name": "智能制造MES系统升级",
+    "role": "技术负责人",
+    "start_date": "2025-12-10",
+    "end_date": "2026-06-05",
+    "description": "参与智能制造MES系统升级，负责代码审查，涉及Docker等技术应用。",
+    "team_size": 13,
+    "tools_used": [
+      "MySQL",
+      "Java",
+      "K8s",
+      "Docker"
+    ]
+  },
+  {
+    "employee_id": "JZ0009",
+    "project_name": "边缘计算网关开发",
+    "role": "技术负责人",
+    "start_date": "2023-07-10",
+    "end_date": "2023-10-31",
+    "description": "参与边缘计算网关开发，负责性能优化，涉及C++等技术应用。",
+    "team_size": 5,
+    "tools_used": [
+      "MQTT",
+      "C++",
+      "嵌入式",
+      "Linux"
+    ]
+  },
+  {
+    "employee_id": "JZ0009",
+    "project_name": "AI视觉检测系统",
+    "role": "项目成员",
+    "start_date": "2026-03-21",
+    "end_date": "2026-07-01",
+    "description": "参与AI视觉检测系统，负责核心模块开发，涉及OpenCV等技术应用。",
+    "team_size": 5,
+    "tools_used": [
+      "PyTorch",
+      "OpenCV",
+      "FastAPI",
+      "Python"
+    ]
+  },
+  {
+    "employee_id": "JZ0010",
+    "project_name": "智能仓储WMS系统",
+    "role": "核心开发",
+    "start_date": "2026-03-27",
+    "end_date": "2026-07-01",
+    "description": "参与智能仓储WMS系统，负责核心模块开发，涉及SQL Server等技术应用。",
+    "team_size": 12,
+    "tools_used": [
+      "Redis",
+      ".NET Core",
+      "C#",
+      "SQL Server"
+    ]
+  },
+  {
+    "employee_id": "JZ0010",
+    "project_name": "工业大数据分析平台",
+    "role": "核心开发",
+    "start_date": "2026-05-11",
+    "end_date": "2026-07-01",
+    "description": "参与工业大数据分析平台，负责性能优化，涉及Airflow等技术应用。",
+    "team_size": 9,
+    "tools_used": [
+      "Tableau",
+      "Spark",
+      "Hadoop",
+      "Airflow"
+    ]
+  },
+  {
+    "employee_id": "JZ0010",
+    "project_name": "产品质量追溯系统",
+    "role": "架构师",
+    "start_date": "2026-03-25",
+    "end_date": "2026-07-01",
+    "description": "参与产品质量追溯系统，负责架构设计，涉及Python等技术应用。",
+    "team_size": 4,
+    "tools_used": [
+      "PostgreSQL",
+      "Python",
+      "Django",
+      "React"
+    ]
+  },
+  {
+    "employee_id": "JZ0010",
+    "project_name": "智能制造MES系统升级",
+    "role": "架构师",
+    "start_date": "2026-05-03",
+    "end_date": "2026-07-01",
+    "description": "参与智能制造MES系统升级，负责核心模块开发，涉及Java等技术应用。",
+    "team_size": 3,
+    "tools_used": [
+      "MySQL",
+      "Docker",
+      "Spring Cloud",
+      "K8s"
+    ]
+  },
+  {
+    "employee_id": "JZ0011",
+    "project_name": "智能仓储WMS系统",
+    "role": "项目成员",
+    "start_date": "2022-06-28",
+    "end_date": "2022-12-30",
+    "description": "参与智能仓储WMS系统，负责代码审查，涉及Redis等技术应用。",
+    "team_size": 4,
+    "tools_used": [
+      "C#",
+      "Redis",
+      ".NET Core",
+      "SQL Server"
+    ]
+  },
+  {
+    "employee_id": "JZ0012",
+    "project_name": "工业IoT管理平台",
+    "role": "技术负责人",
+    "start_date": "2024-04-27",
+    "end_date": "2025-02-09",
+    "description": "参与工业IoT管理平台，负责技术攻关，涉及gRPC等技术应用。",
+    "team_size": 12,
+    "tools_used": [
+      "gRPC",
+      "InfluxDB",
+      "Grafana",
+      "Go"
+    ]
+  },
+  {
+    "employee_id": "JZ0012",
+    "project_name": "智能制造MES系统升级",
+    "role": "架构师",
+    "start_date": "2022-10-12",
+    "end_date": "2023-05-27",
+    "description": "参与智能制造MES系统升级，负责性能优化，涉及Docker等技术应用。",
+    "team_size": 5,
+    "tools_used": [
+      "Java",
+      "Spring Cloud",
+      "Docker",
+      "MySQL"
+    ]
+  },
+  {
+    "employee_id": "JZ0012",
+    "project_name": "数字孪生可视化平台",
+    "role": "项目成员",
+    "start_date": "2024-05-12",
+    "end_date": "2025-01-10",
+    "description": "参与数字孪生可视化平台，负责核心模块开发，涉及MongoDB等技术应用。",
+    "team_size": 7,
+    "tools_used": [
+      "Node.js",
+      "MongoDB",
+      "Unity",
+      "Three.js"
+    ]
+  },
+  {
+    "employee_id": "JZ0013",
+    "project_name": "工业大数据分析平台",
+    "role": "项目成员",
+    "start_date": "2024-03-21",
+    "end_date": "2024-12-06",
+    "description": "参与工业大数据分析平台，负责性能优化，涉及Tableau等技术应用。",
+    "team_size": 8,
+    "tools_used": [
+      "Tableau",
+      "Spark",
+      "Airflow",
+      "Hadoop"
+    ]
+  },
+  {
+    "employee_id": "JZ0013",
+    "project_name": "智能仓储WMS系统",
+    "role": "核心开发",
+    "start_date": "2025-05-20",
+    "end_date": "2026-07-01",
+    "description": "参与智能仓储WMS系统，负责代码审查，涉及SQL Server等技术应用。",
+    "team_size": 5,
+    "tools_used": [
+      "Redis",
+      ".NET Core",
+      "SQL Server",
+      "C#"
+    ]
+  },
+  {
+    "employee_id": "JZ0013",
+    "project_name": "数字孪生可视化平台",
+    "role": "核心开发",
+    "start_date": "2025-03-25",
+    "end_date": "2026-07-01",
+    "description": "参与数字孪生可视化平台，负责性能优化，涉及Unity等技术应用。",
+    "team_size": 7,
+    "tools_used": [
+      "Unity",
+      "Node.js",
+      "Three.js",
+      "MongoDB"
+    ]
+  },
+  {
+    "employee_id": "JZ0013",
+    "project_name": "智能制造MES系统升级",
+    "role": "核心开发",
+    "start_date": "2025-04-27",
+    "end_date": "2026-05-01",
+    "description": "参与智能制造MES系统升级，负责技术攻关，涉及Java等技术应用。",
+    "team_size": 14,
+    "tools_used": [
+      "Docker",
+      "Spring Cloud",
+      "K8s",
+      "MySQL"
+    ]
+  },
+  {
+    "employee_id": "JZ0014",
+    "project_name": "工业IoT管理平台",
+    "role": "核心开发",
+    "start_date": "2025-10-10",
+    "end_date": "2026-07-01",
+    "description": "参与工业IoT管理平台，负责性能优化，涉及gRPC等技术应用。",
+    "team_size": 7,
+    "tools_used": [
+      "gRPC",
+      "InfluxDB",
+      "Grafana",
+      "Go"
+    ]
+  },
+  {
+    "employee_id": "JZ0015",
+    "project_name": "AI视觉检测系统",
+    "role": "项目成员",
+    "start_date": "2025-05-09",
+    "end_date": "2026-04-09",
+    "description": "参与AI视觉检测系统，负责技术攻关，涉及FastAPI等技术应用。",
+    "team_size": 11,
+    "tools_used": [
+      "Python",
+      "PyTorch",
+      "FastAPI",
+      "OpenCV"
+    ]
+  },
+  {
+    "employee_id": "JZ0016",
+    "project_name": "产品质量追溯系统",
+    "role": "技术负责人",
+    "start_date": "2025-08-18",
+    "end_date": "2026-07-01",
+    "description": "参与产品质量追溯系统，负责技术攻关，涉及React等技术应用。",
+    "team_size": 15,
+    "tools_used": [
+      "PostgreSQL",
+      "Django",
+      "Python",
+      "React"
+    ]
+  },
+  {
+    "employee_id": "JZ0016",
+    "project_name": "智能仓储WMS系统",
+    "role": "核心开发",
+    "start_date": "2022-07-21",
+    "end_date": "2023-02-28",
+    "description": "参与智能仓储WMS系统，负责技术攻关，涉及.NET Core等技术应用。",
+    "team_size": 10,
+    "tools_used": [
+      "SQL Server",
+      ".NET Core",
+      "Redis",
+      "C#"
+    ]
+  },
+  {
+    "employee_id": "JZ0017",
+    "project_name": "智能制造MES系统升级",
+    "role": "技术负责人",
+    "start_date": "2023-08-29",
+    "end_date": "2024-06-26",
+    "description": "参与智能制造MES系统升级，负责核心模块开发，涉及Spring Cloud等技术应用。",
+    "team_size": 8,
+    "tools_used": [
+      "MySQL",
+      "K8s",
+      "Spring Cloud",
+      "Java"
+    ]
+  },
+  {
+    "employee_id": "JZ0017",
+    "project_name": "AI视觉检测系统",
+    "role": "架构师",
+    "start_date": "2024-12-03",
+    "end_date": "2025-11-05",
+    "description": "参与AI视觉检测系统，负责代码审查，涉及Python等技术应用。",
+    "team_size": 10,
+    "tools_used": [
+      "FastAPI",
+      "PyTorch",
+      "Python",
+      "OpenCV"
+    ]
+  },
+  {
+    "employee_id": "JZ0017",
+    "project_name": "工业大数据分析平台",
+    "role": "技术负责人",
+    "start_date": "2022-04-02",
+    "end_date": "2023-08-19",
+    "description": "参与工业大数据分析平台，负责核心模块开发，涉及Hadoop等技术应用。",
+    "team_size": 13,
+    "tools_used": [
+      "Python",
+      "Spark",
+      "Hadoop",
+      "Airflow"
+    ]
+  },
+  {
+    "employee_id": "JZ0018",
+    "project_name": "ERP系统定制开发",
+    "role": "项目成员",
+    "start_date": "2023-11-09",
+    "end_date": "2024-11-19",
+    "description": "参与ERP系统定制开发，负责代码审查，涉及SAP等技术应用。",
+    "team_size": 15,
+    "tools_used": [
+      "CI/CD",
+      "Oracle",
+      "Java",
+      "SAP"
+    ]
+  }
+]
