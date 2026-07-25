@@ -38,4 +38,25 @@
 - `tests/test_llm_client.py`（新）— 覆盖 `_try_parse_json` / `_repair_truncated_json` 边界
 - `tests/test_llm_summarizer.py` — 增 offline + degraded 占位符派生测试
 
-闸门清掉前禁止继续编码新功能。
+## [VERIFIED] — 2026-07-26（Day 6）
+
+### 完成内容
+
+| 领域 | 子项 | 说明 | 状态 |
+|------|------|------|------|
+| 词典编写 | 标准标签库种子 | `data/standard_label_library_v1.json` — 35 标签（T1 13 / T2 13 / T3 9），冰山模型+大五人格框架 | ✅ |
+| 词典编写 | T0 初始词典 | `data/t0_registries.json` — 60 条目（35 工具 / 12 行业领域 / 13 知识体系），含别名/分类/典型用途 | ✅ |
+| 修复 | ADV-4 line_height 修复 | `ui/app.py:1012` `line_height=24` 无效参数 → 删除 kwarg（F8 修 API 调用必查签名） | ✅ |
+| 修复 | S4 str_score 360 崩溃 | `ui/app.py` + `agents/data_understanding.py` 3 处 score 聚合加 `pd.to_numeric(... errors="coerce")` 守卫 | ✅ |
+| 前端对抗测试 | Day 6 报告 | `docs/frontend-adversarial-report-day6.md` — 8/8 PASS（含 S4 回归），7 个对抗夹具包 | ✅ |
+| 前端完整性检验 | Day 7 报告 | `docs/frontend-inspect-report-day7.md` — Step 1-5 全模块构造正确，Step 6-8 占位符合计划 | ✅ |
+| 截图文档 | 检验截图 | `docs/screenshots/inspect/`（13 张）+ `docs/screenshots/regression/`（14 张）+ `docs/screenshots/boundary/`（5 张） | ✅ |
+
+### 学到的经验（防不同步机制）
+
+1. **task-plan.md 未随 commit 更新** — commit `08416ec` 完成了词典编写但 2.1.9 仍标记 ⏳
+2. **progress.md 未随修复生成** — Day 6 的 3 处修复+前端验证无 tracking 条目
+3. **change-log.md 遗漏** — Day 6 修复记录同样缺失
+4. **截图产出未 git add** — 测试脚本生成的 32 张截图未纳入版本管理
+
+→ 详见[防不同步流程改进方案]（本文件末尾）

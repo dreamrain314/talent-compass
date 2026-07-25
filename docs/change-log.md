@@ -1,5 +1,44 @@
 # progress.md — Bug修复进度
 
+## 🔧 Day6: 词典编写 + 前端对抗检验 + 修复 (2026-07-26)
+
+**状态**: [VERIFIED]
+
+### 词典编写
+
+| 文件 | 操作 | 说明 |
+|------|------|------|
+| `data/standard_label_library_v1.json` | 新建 | 标准标签库种子 — 35 标签（T1 专业能力 13 / T2 行为能力 13 / T3 发展潜力 9），冰山模型+大五人格框架 |
+| `data/t0_registries.json` | 新建 | T0 初始词典 — 60 条目（35 工具 / 12 行业领域 / 13 知识体系），含别名/分类/典型用途 |
+
+### 前端对抗检验（Day 6 报告）
+
+- **工具**: Playwright 原生（非 browser_use）
+- **数据**: `data/adversarial/` 7 个对抗夹具包
+- **结果**: 8/8 PASS（S4 str_score 已修复）
+- **报告**: `docs/frontend-adversarial-report-day6.md`
+
+### 前端完整性检验（Day 7 报告）
+
+- **范围**: Day 1-5 全部前端工程
+- **结果**: Step 1-5 全模块构造正确，Step 6-8 占位符合计划
+- **报告**: `docs/frontend-inspect-report-day7.md`
+
+### 修复
+
+| 问题 | 文件 | 变更 |
+|------|------|------|
+| ADV-4 line_height 无效参数 | `ui/app.py` L1012 | `st.code(a[:80], line_height=24)` → `st.code(a[:80])`（F8 修 API 调用必查签名） |
+| S4 str_score 360 崩溃 | `ui/app.py` + `agents/data_understanding.py` | 3 处 score 聚合加 `pd.to_numeric(... errors="coerce")` 守卫 |
+
+### 验证
+
+- [x] 测试: 231/231 PASSED
+- [x] 前端对抗: 8/8 PASS
+- [x] 前端完整性: Step 1-5 全部正确
+
+---
+
 ## 🔧 Day5: Agent① 360 评价预处理增强 + 联调 (2026-07-25)
 
 **状态**: [VERIFIED]

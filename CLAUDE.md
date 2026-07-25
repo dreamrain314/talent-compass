@@ -112,4 +112,10 @@ streamlit run main.py               # 启动 UI
 
 **改 Streamlit 源码后必须重启进程** — `ui/*.py` 或被 `main.py` import 的模块改源码后，必须 kill 旧 PID + 重启（`TC_OFFLINE=1 python -m streamlit run main.py --server.port 8502 --server.headless true`），**不依赖 rerun/file watcher**——`from ui.app import render` rerun 时命中 `sys.modules` 缓存跑旧代码。复测前 `curl _stcore/health` 确认新 PID 起来，否则"改了代码看似无效"假阴性（[[root-cause-fix-without-api-verification]] Bug B）。
 
-**kill 前必须先 netstat 确认真实 PID** — 禁止凭"上次 PID"直接 `taskkill`，进程可能已死/被替换，杀错 PID 让旧代码继续跑。流程：`netstat -ano | grep :8502 | grep LISTENING` 拿当前 PID → `taskkill //F //PID <真实PID>` → 重启 → `netstat` 确认新 PID ≠ 旧 PID → 复测。
+**kill 流程三步走（缺一不可）** — 禁止凭"上次 PID"直接 taskkill，也禁止在 Git Bash 中用 `kill -9`（MSYS2 信号模拟在 Windows 上不可靠，返回 0 但进程未终止，[[git-bash-kill-9-windows-unreliable]]）。
+
+1. `netstat -ano | grep :8502 | grep LISTENING` 拿当前 PID
+2. `taskkill //F //PID <真实PID>`（**必须用 taskkill，禁用 kill -9**）
+3. `netstat -ano | grep :8502` 确认端口无 LISTENING（**端口已释放才可重启**）→ 重启 → `netstat` 确认新 PID ≠ 旧 PID → 复测
+
+**空白页排查优先检查旧进程** — 访问 Streamlit 看到空白页 / 标题为"Streamlit"而非应用名 → 先 `netstat -ano | grep :8502` 检查是否有残留旧进程，而非盲目换端口或重试 navigate。
