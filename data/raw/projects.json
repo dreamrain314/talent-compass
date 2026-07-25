@@ -1,0 +1,3797 @@
+﻿[
+  {
+    "employee_id": "JZ0001",
+    "project_name": "工业IoT管理平台",
+    "role": "核心开发",
+    "start_date": "2024-06-17",
+    "end_date": "2025-01-12",
+    "description": "参与工业IoT管理平台，负责核心模块开发，涉及gRPC等技术应用。",
+    "team_size": 11,
+    "tools_used": [
+      "InfluxDB",
+      "Go",
+      "gRPC",
+      "Grafana"
+    ]
+  },
+  {
+    "employee_id": "JZ0002",
+    "project_name": "数字孪生可视化平台",
+    "role": "核心开发",
+    "start_date": "2025-09-14",
+    "end_date": "2026-07-01",
+    "description": "参与数字孪生可视化平台，负责代码审查，涉及MongoDB等技术应用。",
+    "team_size": 7,
+    "tools_used": [
+      "Three.js",
+      "MongoDB",
+      "Unity",
+      "Node.js"
+    ]
+  },
+  {
+    "employee_id": "JZ0002",
+    "project_name": "智能仓储WMS系统",
+    "role": "技术负责人",
+    "start_date": "2025-02-12",
+    "end_date": "2026-01-21",
+    "description": "参与智能仓储WMS系统，负责性能优化，涉及Redis等技术应用。",
+    "team_size": 15,
+    "tools_used": [
+      "SQL Server",
+      "Redis",
+      ".NET Core",
+      "C#"
+    ]
+  },
+  {
+    "employee_id": "JZ0003",
+    "project_name": "数字孪生可视化平台",
+    "role": "项目成员",
+    "start_date": "2024-12-12",
+    "end_date": "2026-04-02",
+    "description": "参与数字孪生可视化平台，负责架构设计，涉及Node.js等技术应用。",
+    "team_size": 7,
+    "tools_used": [
+      "Node.js",
+      "Unity",
+      "Three.js",
+      "MongoDB"
+    ]
+  },
+  {
+    "employee_id": "JZ0003",
+    "project_name": "工业IoT管理平台",
+    "role": "核心开发",
+    "start_date": "2025-08-07",
+    "end_date": "2026-07-01",
+    "description": "参与工业IoT管理平台，负责代码审查，涉及gRPC等技术应用。",
+    "team_size": 7,
+    "tools_used": [
+      "gRPC",
+      "Grafana",
+      "Go",
+      "InfluxDB"
+    ]
+  },
+  {
+    "employee_id": "JZ0004",
+    "project_name": "工业大数据分析平台",
+    "role": "项目成员",
+    "start_date": "2022-04-16",
+    "end_date": "2022-11-29",
+    "description": "参与工业大数据分析平台，负责技术攻关，涉及Airflow等技术应用。",
+    "team_size": 3,
+    "tools_used": [
+      "Python",
+      "Spark",
+      "Hadoop",
+      "Airflow"
+    ]
+  },
+  {
+    "employee_id": "JZ0004",
+    "project_name": "ERP系统定制开发",
+    "role": "架构师",
+    "start_date": "2024-09-08",
+    "end_date": "2025-03-23",
+    "description": "参与ERP系统定制开发，负责性能优化，涉及Java等技术应用。",
+    "team_size": 6,
+    "tools_used": [
+      "SAP",
+      "Oracle",
+      "Java",
+      "CI/CD"
+    ]
+  },
+  {
+    "employee_id": "JZ0004",
+    "project_name": "边缘计算网关开发",
+    "role": "核心开发",
+    "start_date": "2023-05-12",
+    "end_date": "2024-07-31",
+    "description": "参与边缘计算网关开发，负责代码审查，涉及Linux等技术应用。",
+    "team_size": 11,
+    "tools_used": [
+      "MQTT",
+      "Linux",
+      "嵌入式",
+      "C++"
+    ]
+  },
+  {
+    "employee_id": "JZ0005",
+    "project_name": "数字孪生可视化平台",
+    "role": "项目成员",
+    "start_date": "2025-06-01",
+    "end_date": "2026-05-11",
+    "description": "参与数字孪生可视化平台，负责核心模块开发，涉及Unity等技术应用。",
+    "team_size": 15,
+    "tools_used": [
+      "MongoDB",
+      "Three.js",
+      "Node.js",
+      "Unity"
+    ]
+  },
+  {
+    "employee_id": "JZ0005",
+    "project_name": "工业机器人控制",
+    "role": "核心开发",
+    "start_date": "2024-11-10",
+    "end_date": "2025-03-03",
+    "description": "参与工业机器人控制，负责架构设计，涉及C++等技术应用。",
+    "team_size": 7,
+    "tools_used": [
+      "PLC",
+      "ROS",
+      "C++",
+      "EtherCAT"
+    ]
+  },
+  {
+    "employee_id": "JZ0005",
+    "project_name": "产品质量追溯系统",
+    "role": "项目成员",
+    "start_date": "2024-05-22",
+    "end_date": "2024-12-15",
+    "description": "参与产品质量追溯系统，负责技术攻关，涉及Django等技术应用。",
+    "team_size": 10,
+    "tools_used": [
+      "PostgreSQL",
+      "Django",
+      "React",
+      "Python"
+    ]
+  },
+  {
+    "employee_id": "JZ0006",
+    "project_name": "智能仓储WMS系统",
+    "role": "项目成员",
+    "start_date": "2026-01-15",
+    "end_date": "2026-07-01",
+    "description": "参与智能仓储WMS系统，负责架构设计，涉及C#等技术应用。",
+    "team_size": 11,
+    "tools_used": [
+      "C#",
+      "Redis",
+      "SQL Server",
+      ".NET Core"
+    ]
+  },
+  {
+    "employee_id": "JZ0006",
+    "project_name": "产品质量追溯系统",
+    "role": "核心开发",
+    "start_date": "2024-04-24",
+    "end_date": "2024-10-01",
+    "description": "参与产品质量追溯系统，负责核心模块开发，涉及Django等技术应用。",
+    "team_size": 3,
+    "tools_used": [
+      "Django",
+      "PostgreSQL",
+      "React",
+      "Python"
+    ]
+  },
+  {
+    "employee_id": "JZ0006",
+    "project_name": "工业机器人控制",
+    "role": "项目成员",
+    "start_date": "2022-05-04",
+    "end_date": "2023-06-14",
+    "description": "参与工业机器人控制，负责代码审查，涉及C++等技术应用。",
+    "team_size": 3,
+    "tools_used": [
+      "PLC",
+      "C++",
+      "EtherCAT",
+      "ROS"
+    ]
+  },
+  {
+    "employee_id": "JZ0006",
+    "project_name": "工业大数据分析平台",
+    "role": "技术负责人",
+    "start_date": "2025-01-02",
+    "end_date": "2025-08-26",
+    "description": "参与工业大数据分析平台，负责技术攻关，涉及Tableau等技术应用。",
+    "team_size": 15,
+    "tools_used": [
+      "Spark",
+      "Python",
+      "Tableau",
+      "Hadoop"
+    ]
+  },
+  {
+    "employee_id": "JZ0007",
+    "project_name": "边缘计算网关开发",
+    "role": "架构师",
+    "start_date": "2023-06-01",
+    "end_date": "2024-10-20",
+    "description": "参与边缘计算网关开发，负责性能优化，涉及嵌入式等技术应用。",
+    "team_size": 4,
+    "tools_used": [
+      "MQTT",
+      "Linux",
+      "嵌入式",
+      "C++"
+    ]
+  },
+  {
+    "employee_id": "JZ0007",
+    "project_name": "ERP系统定制开发",
+    "role": "架构师",
+    "start_date": "2025-11-28",
+    "end_date": "2026-06-21",
+    "description": "参与ERP系统定制开发，负责核心模块开发，涉及Java等技术应用。",
+    "team_size": 4,
+    "tools_used": [
+      "CI/CD",
+      "SAP",
+      "Oracle",
+      "Java"
+    ]
+  },
+  {
+    "employee_id": "JZ0008",
+    "project_name": "智能制造MES系统升级",
+    "role": "技术负责人",
+    "start_date": "2025-12-10",
+    "end_date": "2026-06-05",
+    "description": "参与智能制造MES系统升级，负责代码审查，涉及Docker等技术应用。",
+    "team_size": 13,
+    "tools_used": [
+      "MySQL",
+      "Java",
+      "K8s",
+      "Docker"
+    ]
+  },
+  {
+    "employee_id": "JZ0009",
+    "project_name": "边缘计算网关开发",
+    "role": "技术负责人",
+    "start_date": "2023-07-10",
+    "end_date": "2023-10-31",
+    "description": "参与边缘计算网关开发，负责性能优化，涉及C++等技术应用。",
+    "team_size": 5,
+    "tools_used": [
+      "MQTT",
+      "C++",
+      "嵌入式",
+      "Linux"
+    ]
+  },
+  {
+    "employee_id": "JZ0009",
+    "project_name": "AI视觉检测系统",
+    "role": "项目成员",
+    "start_date": "2026-03-21",
+    "end_date": "2026-07-01",
+    "description": "参与AI视觉检测系统，负责核心模块开发，涉及OpenCV等技术应用。",
+    "team_size": 5,
+    "tools_used": [
+      "PyTorch",
+      "OpenCV",
+      "FastAPI",
+      "Python"
+    ]
+  },
+  {
+    "employee_id": "JZ0010",
+    "project_name": "智能仓储WMS系统",
+    "role": "核心开发",
+    "start_date": "2026-03-27",
+    "end_date": "2026-07-01",
+    "description": "参与智能仓储WMS系统，负责核心模块开发，涉及SQL Server等技术应用。",
+    "team_size": 12,
+    "tools_used": [
+      "Redis",
+      ".NET Core",
+      "C#",
+      "SQL Server"
+    ]
+  },
+  {
+    "employee_id": "JZ0010",
+    "project_name": "工业大数据分析平台",
+    "role": "核心开发",
+    "start_date": "2026-05-11",
+    "end_date": "2026-07-01",
+    "description": "参与工业大数据分析平台，负责性能优化，涉及Airflow等技术应用。",
+    "team_size": 9,
+    "tools_used": [
+      "Tableau",
+      "Spark",
+      "Hadoop",
+      "Airflow"
+    ]
+  },
+  {
+    "employee_id": "JZ0010",
+    "project_name": "产品质量追溯系统",
+    "role": "架构师",
+    "start_date": "2026-03-25",
+    "end_date": "2026-07-01",
+    "description": "参与产品质量追溯系统，负责架构设计，涉及Python等技术应用。",
+    "team_size": 4,
+    "tools_used": [
+      "PostgreSQL",
+      "Python",
+      "Django",
+      "React"
+    ]
+  },
+  {
+    "employee_id": "JZ0010",
+    "project_name": "智能制造MES系统升级",
+    "role": "架构师",
+    "start_date": "2026-05-03",
+    "end_date": "2026-07-01",
+    "description": "参与智能制造MES系统升级，负责核心模块开发，涉及Java等技术应用。",
+    "team_size": 3,
+    "tools_used": [
+      "MySQL",
+      "Docker",
+      "Spring Cloud",
+      "K8s"
+    ]
+  },
+  {
+    "employee_id": "JZ0011",
+    "project_name": "智能仓储WMS系统",
+    "role": "项目成员",
+    "start_date": "2022-06-28",
+    "end_date": "2022-12-30",
+    "description": "参与智能仓储WMS系统，负责代码审查，涉及Redis等技术应用。",
+    "team_size": 4,
+    "tools_used": [
+      "C#",
+      "Redis",
+      ".NET Core",
+      "SQL Server"
+    ]
+  },
+  {
+    "employee_id": "JZ0012",
+    "project_name": "工业IoT管理平台",
+    "role": "技术负责人",
+    "start_date": "2024-04-27",
+    "end_date": "2025-02-09",
+    "description": "参与工业IoT管理平台，负责技术攻关，涉及gRPC等技术应用。",
+    "team_size": 12,
+    "tools_used": [
+      "gRPC",
+      "InfluxDB",
+      "Grafana",
+      "Go"
+    ]
+  },
+  {
+    "employee_id": "JZ0012",
+    "project_name": "智能制造MES系统升级",
+    "role": "架构师",
+    "start_date": "2022-10-12",
+    "end_date": "2023-05-27",
+    "description": "参与智能制造MES系统升级，负责性能优化，涉及Docker等技术应用。",
+    "team_size": 5,
+    "tools_used": [
+      "Java",
+      "Spring Cloud",
+      "Docker",
+      "MySQL"
+    ]
+  },
+  {
+    "employee_id": "JZ0012",
+    "project_name": "数字孪生可视化平台",
+    "role": "项目成员",
+    "start_date": "2024-05-12",
+    "end_date": "2025-01-10",
+    "description": "参与数字孪生可视化平台，负责核心模块开发，涉及MongoDB等技术应用。",
+    "team_size": 7,
+    "tools_used": [
+      "Node.js",
+      "MongoDB",
+      "Unity",
+      "Three.js"
+    ]
+  },
+  {
+    "employee_id": "JZ0013",
+    "project_name": "工业大数据分析平台",
+    "role": "项目成员",
+    "start_date": "2024-03-21",
+    "end_date": "2024-12-06",
+    "description": "参与工业大数据分析平台，负责性能优化，涉及Tableau等技术应用。",
+    "team_size": 8,
+    "tools_used": [
+      "Tableau",
+      "Spark",
+      "Airflow",
+      "Hadoop"
+    ]
+  },
+  {
+    "employee_id": "JZ0013",
+    "project_name": "智能仓储WMS系统",
+    "role": "核心开发",
+    "start_date": "2025-05-20",
+    "end_date": "2026-07-01",
+    "description": "参与智能仓储WMS系统，负责代码审查，涉及SQL Server等技术应用。",
+    "team_size": 5,
+    "tools_used": [
+      "Redis",
+      ".NET Core",
+      "SQL Server",
+      "C#"
+    ]
+  },
+  {
+    "employee_id": "JZ0013",
+    "project_name": "数字孪生可视化平台",
+    "role": "核心开发",
+    "start_date": "2025-03-25",
+    "end_date": "2026-07-01",
+    "description": "参与数字孪生可视化平台，负责性能优化，涉及Unity等技术应用。",
+    "team_size": 7,
+    "tools_used": [
+      "Unity",
+      "Node.js",
+      "Three.js",
+      "MongoDB"
+    ]
+  },
+  {
+    "employee_id": "JZ0013",
+    "project_name": "智能制造MES系统升级",
+    "role": "核心开发",
+    "start_date": "2025-04-27",
+    "end_date": "2026-05-01",
+    "description": "参与智能制造MES系统升级，负责技术攻关，涉及Java等技术应用。",
+    "team_size": 14,
+    "tools_used": [
+      "Docker",
+      "Spring Cloud",
+      "K8s",
+      "MySQL"
+    ]
+  },
+  {
+    "employee_id": "JZ0014",
+    "project_name": "工业IoT管理平台",
+    "role": "核心开发",
+    "start_date": "2025-10-10",
+    "end_date": "2026-07-01",
+    "description": "参与工业IoT管理平台，负责性能优化，涉及gRPC等技术应用。",
+    "team_size": 7,
+    "tools_used": [
+      "gRPC",
+      "InfluxDB",
+      "Grafana",
+      "Go"
+    ]
+  },
+  {
+    "employee_id": "JZ0015",
+    "project_name": "AI视觉检测系统",
+    "role": "项目成员",
+    "start_date": "2025-05-09",
+    "end_date": "2026-04-09",
+    "description": "参与AI视觉检测系统，负责技术攻关，涉及FastAPI等技术应用。",
+    "team_size": 11,
+    "tools_used": [
+      "Python",
+      "PyTorch",
+      "FastAPI",
+      "OpenCV"
+    ]
+  },
+  {
+    "employee_id": "JZ0016",
+    "project_name": "产品质量追溯系统",
+    "role": "技术负责人",
+    "start_date": "2025-08-18",
+    "end_date": "2026-07-01",
+    "description": "参与产品质量追溯系统，负责技术攻关，涉及React等技术应用。",
+    "team_size": 15,
+    "tools_used": [
+      "PostgreSQL",
+      "Django",
+      "Python",
+      "React"
+    ]
+  },
+  {
+    "employee_id": "JZ0016",
+    "project_name": "智能仓储WMS系统",
+    "role": "核心开发",
+    "start_date": "2022-07-21",
+    "end_date": "2023-02-28",
+    "description": "参与智能仓储WMS系统，负责技术攻关，涉及.NET Core等技术应用。",
+    "team_size": 10,
+    "tools_used": [
+      "SQL Server",
+      ".NET Core",
+      "Redis",
+      "C#"
+    ]
+  },
+  {
+    "employee_id": "JZ0017",
+    "project_name": "智能制造MES系统升级",
+    "role": "技术负责人",
+    "start_date": "2023-08-29",
+    "end_date": "2024-06-26",
+    "description": "参与智能制造MES系统升级，负责核心模块开发，涉及Spring Cloud等技术应用。",
+    "team_size": 8,
+    "tools_used": [
+      "MySQL",
+      "K8s",
+      "Spring Cloud",
+      "Java"
+    ]
+  },
+  {
+    "employee_id": "JZ0017",
+    "project_name": "AI视觉检测系统",
+    "role": "架构师",
+    "start_date": "2024-12-03",
+    "end_date": "2025-11-05",
+    "description": "参与AI视觉检测系统，负责代码审查，涉及Python等技术应用。",
+    "team_size": 10,
+    "tools_used": [
+      "FastAPI",
+      "PyTorch",
+      "Python",
+      "OpenCV"
+    ]
+  },
+  {
+    "employee_id": "JZ0017",
+    "project_name": "工业大数据分析平台",
+    "role": "技术负责人",
+    "start_date": "2022-04-02",
+    "end_date": "2023-08-19",
+    "description": "参与工业大数据分析平台，负责核心模块开发，涉及Hadoop等技术应用。",
+    "team_size": 13,
+    "tools_used": [
+      "Python",
+      "Spark",
+      "Hadoop",
+      "Airflow"
+    ]
+  },
+  {
+    "employee_id": "JZ0018",
+    "project_name": "ERP系统定制开发",
+    "role": "项目成员",
+    "start_date": "2023-11-09",
+    "end_date": "2024-11-19",
+    "description": "参与ERP系统定制开发，负责代码审查，涉及SAP等技术应用。",
+    "team_size": 15,
+    "tools_used": [
+      "CI/CD",
+      "Oracle",
+      "Java",
+      "SAP"
+    ]
+  },
+  {
+    "employee_id": "JZ0018",
+    "project_name": "智能仓储WMS系统",
+    "role": "项目成员",
+    "start_date": "2025-08-04",
+    "end_date": "2026-07-01",
+    "description": "参与智能仓储WMS系统，负责代码审查，涉及C#等技术应用。",
+    "team_size": 14,
+    "tools_used": [
+      ".NET Core",
+      "Redis",
+      "SQL Server",
+      "C#"
+    ]
+  },
+  {
+    "employee_id": "JZ0019",
+    "project_name": "边缘计算网关开发",
+    "role": "技术负责人",
+    "start_date": "2023-02-26",
+    "end_date": "2023-10-16",
+    "description": "参与边缘计算网关开发，负责技术攻关，涉及C++等技术应用。",
+    "team_size": 15,
+    "tools_used": [
+      "Linux",
+      "嵌入式",
+      "MQTT",
+      "C++"
+    ]
+  },
+  {
+    "employee_id": "JZ0020",
+    "project_name": "工业大数据分析平台",
+    "role": "项目成员",
+    "start_date": "2025-08-01",
+    "end_date": "2026-04-08",
+    "description": "参与工业大数据分析平台，负责技术攻关，涉及Tableau等技术应用。",
+    "team_size": 12,
+    "tools_used": [
+      "Python",
+      "Hadoop",
+      "Spark",
+      "Tableau"
+    ]
+  },
+  {
+    "employee_id": "JZ0020",
+    "project_name": "数字孪生可视化平台",
+    "role": "架构师",
+    "start_date": "2025-06-18",
+    "end_date": "2025-12-13",
+    "description": "参与数字孪生可视化平台，负责技术攻关，涉及Three.js等技术应用。",
+    "team_size": 13,
+    "tools_used": [
+      "Node.js",
+      "Unity",
+      "Three.js",
+      "MongoDB"
+    ]
+  },
+  {
+    "employee_id": "JZ0020",
+    "project_name": "AI视觉检测系统",
+    "role": "核心开发",
+    "start_date": "2023-09-18",
+    "end_date": "2024-02-14",
+    "description": "参与AI视觉检测系统，负责性能优化，涉及PyTorch等技术应用。",
+    "team_size": 11,
+    "tools_used": [
+      "FastAPI",
+      "PyTorch",
+      "Python",
+      "OpenCV"
+    ]
+  },
+  {
+    "employee_id": "JZ0020",
+    "project_name": "ERP系统定制开发",
+    "role": "项目成员",
+    "start_date": "2024-05-16",
+    "end_date": "2024-11-17",
+    "description": "参与ERP系统定制开发，负责技术攻关，涉及SAP等技术应用。",
+    "team_size": 11,
+    "tools_used": [
+      "SAP",
+      "CI/CD",
+      "Oracle",
+      "Java"
+    ]
+  },
+  {
+    "employee_id": "JZ0021",
+    "project_name": "产品质量追溯系统",
+    "role": "架构师",
+    "start_date": "2025-06-22",
+    "end_date": "2025-10-17",
+    "description": "参与产品质量追溯系统，负责核心模块开发，涉及React等技术应用。",
+    "team_size": 5,
+    "tools_used": [
+      "Django",
+      "React",
+      "PostgreSQL",
+      "Python"
+    ]
+  },
+  {
+    "employee_id": "JZ0021",
+    "project_name": "AI视觉检测系统",
+    "role": "项目成员",
+    "start_date": "2025-11-03",
+    "end_date": "2026-07-01",
+    "description": "参与AI视觉检测系统，负责代码审查，涉及FastAPI等技术应用。",
+    "team_size": 5,
+    "tools_used": [
+      "Python",
+      "OpenCV",
+      "FastAPI",
+      "PyTorch"
+    ]
+  },
+  {
+    "employee_id": "JZ0022",
+    "project_name": "智能制造MES系统升级",
+    "role": "核心开发",
+    "start_date": "2025-11-08",
+    "end_date": "2026-07-01",
+    "description": "参与智能制造MES系统升级，负责代码审查，涉及K8s等技术应用。",
+    "team_size": 14,
+    "tools_used": [
+      "Docker",
+      "Java",
+      "MySQL",
+      "K8s"
+    ]
+  },
+  {
+    "employee_id": "JZ0022",
+    "project_name": "数字孪生可视化平台",
+    "role": "架构师",
+    "start_date": "2025-02-05",
+    "end_date": "2026-06-06",
+    "description": "参与数字孪生可视化平台，负责技术攻关，涉及Three.js等技术应用。",
+    "team_size": 15,
+    "tools_used": [
+      "Unity",
+      "MongoDB",
+      "Three.js",
+      "Node.js"
+    ]
+  },
+  {
+    "employee_id": "JZ0022",
+    "project_name": "边缘计算网关开发",
+    "role": "核心开发",
+    "start_date": "2024-08-19",
+    "end_date": "2025-11-28",
+    "description": "参与边缘计算网关开发，负责性能优化，涉及C++等技术应用。",
+    "team_size": 10,
+    "tools_used": [
+      "MQTT",
+      "Linux",
+      "C++",
+      "嵌入式"
+    ]
+  },
+  {
+    "employee_id": "JZ0023",
+    "project_name": "边缘计算网关开发",
+    "role": "架构师",
+    "start_date": "2025-08-18",
+    "end_date": "2026-07-01",
+    "description": "参与边缘计算网关开发，负责技术攻关，涉及嵌入式等技术应用。",
+    "team_size": 5,
+    "tools_used": [
+      "Linux",
+      "C++",
+      "MQTT",
+      "嵌入式"
+    ]
+  },
+  {
+    "employee_id": "JZ0024",
+    "project_name": "ERP系统定制开发",
+    "role": "架构师",
+    "start_date": "2023-10-25",
+    "end_date": "2025-01-17",
+    "description": "参与ERP系统定制开发，负责性能优化，涉及Oracle等技术应用。",
+    "team_size": 11,
+    "tools_used": [
+      "Java",
+      "CI/CD",
+      "SAP",
+      "Oracle"
+    ]
+  },
+  {
+    "employee_id": "JZ0024",
+    "project_name": "数字孪生可视化平台",
+    "role": "核心开发",
+    "start_date": "2023-07-22",
+    "end_date": "2025-01-05",
+    "description": "参与数字孪生可视化平台，负责架构设计，涉及Node.js等技术应用。",
+    "team_size": 5,
+    "tools_used": [
+      "MongoDB",
+      "Three.js",
+      "Node.js",
+      "Unity"
+    ]
+  },
+  {
+    "employee_id": "JZ0024",
+    "project_name": "智能仓储WMS系统",
+    "role": "架构师",
+    "start_date": "2022-10-19",
+    "end_date": "2023-11-08",
+    "description": "参与智能仓储WMS系统，负责代码审查，涉及Redis等技术应用。",
+    "team_size": 10,
+    "tools_used": [
+      "C#",
+      "SQL Server",
+      "Redis",
+      ".NET Core"
+    ]
+  },
+  {
+    "employee_id": "JZ0025",
+    "project_name": "产品质量追溯系统",
+    "role": "技术负责人",
+    "start_date": "2023-11-02",
+    "end_date": "2024-11-23",
+    "description": "参与产品质量追溯系统，负责核心模块开发，涉及React等技术应用。",
+    "team_size": 13,
+    "tools_used": [
+      "PostgreSQL",
+      "Python",
+      "Django",
+      "React"
+    ]
+  },
+  {
+    "employee_id": "JZ0025",
+    "project_name": "AI视觉检测系统",
+    "role": "核心开发",
+    "start_date": "2024-05-29",
+    "end_date": "2025-10-23",
+    "description": "参与AI视觉检测系统，负责代码审查，涉及OpenCV等技术应用。",
+    "team_size": 8,
+    "tools_used": [
+      "OpenCV",
+      "PyTorch",
+      "Python",
+      "FastAPI"
+    ]
+  },
+  {
+    "employee_id": "JZ0025",
+    "project_name": "ERP系统定制开发",
+    "role": "技术负责人",
+    "start_date": "2023-12-05",
+    "end_date": "2025-02-16",
+    "description": "参与ERP系统定制开发，负责核心模块开发，涉及Java等技术应用。",
+    "team_size": 13,
+    "tools_used": [
+      "CI/CD",
+      "Java",
+      "Oracle",
+      "SAP"
+    ]
+  },
+  {
+    "employee_id": "JZ0026",
+    "project_name": "薪酬体系改革",
+    "role": "协调人",
+    "start_date": "2025-11-11",
+    "end_date": "2026-04-17",
+    "description": "参与薪酬体系改革，负责资源协调，涉及Excel等技术应用。",
+    "team_size": 4,
+    "tools_used": [
+      "Excel",
+      "岗评工具",
+      "薪酬调研",
+      "合规审计"
+    ]
+  },
+  {
+    "employee_id": "JZ0026",
+    "project_name": "人力资源数字化平台",
+    "role": "核心成员",
+    "start_date": "2025-09-22",
+    "end_date": "2026-07-01",
+    "description": "参与人力资源数字化平台，负责方案设计，涉及OA等技术应用。",
+    "team_size": 13,
+    "tools_used": [
+      "Power BI",
+      "OA",
+      "SAP HR",
+      "Excel"
+    ]
+  },
+  {
+    "employee_id": "JZ0026",
+    "project_name": "全面预算管理系统",
+    "role": "项目负责人",
+    "start_date": "2025-09-04",
+    "end_date": "2026-01-18",
+    "description": "参与全面预算管理系统，负责方案设计，涉及Excel等技术应用。",
+    "team_size": 10,
+    "tools_used": [
+      "用友NC",
+      "BI报表",
+      "SQL",
+      "Excel"
+    ]
+  },
+  {
+    "employee_id": "JZ0026",
+    "project_name": "企业内控体系建设",
+    "role": "协调人",
+    "start_date": "2022-01-20",
+    "end_date": "2022-04-24",
+    "description": "参与企业内控体系建设，负责方案设计，涉及审计软件等技术应用。",
+    "team_size": 14,
+    "tools_used": [
+      "风险矩阵",
+      "审计软件",
+      "COSO",
+      "流程梳理"
+    ]
+  },
+  {
+    "employee_id": "JZ0027",
+    "project_name": "人力资源数字化平台",
+    "role": "核心成员",
+    "start_date": "2024-01-23",
+    "end_date": "2024-09-22",
+    "description": "参与人力资源数字化平台，负责报告撰写，涉及Excel等技术应用。",
+    "team_size": 13,
+    "tools_used": [
+      "Excel",
+      "SAP HR",
+      "Power BI",
+      "OA"
+    ]
+  },
+  {
+    "employee_id": "JZ0027",
+    "project_name": "企业内控体系建设",
+    "role": "核心成员",
+    "start_date": "2024-06-20",
+    "end_date": "2025-03-16",
+    "description": "参与企业内控体系建设，负责资源协调，涉及审计软件等技术应用。",
+    "team_size": 12,
+    "tools_used": [
+      "审计软件",
+      "COSO",
+      "流程梳理",
+      "风险矩阵"
+    ]
+  },
+  {
+    "employee_id": "JZ0027",
+    "project_name": "薪酬体系改革",
+    "role": "项目负责人",
+    "start_date": "2022-10-14",
+    "end_date": "2024-02-01",
+    "description": "参与薪酬体系改革，负责交付管理，涉及合规审计等技术应用。",
+    "team_size": 8,
+    "tools_used": [
+      "合规审计",
+      "岗评工具",
+      "薪酬调研",
+      "Excel"
+    ]
+  },
+  {
+    "employee_id": "JZ0027",
+    "project_name": "全面预算管理系统",
+    "role": "项目负责人",
+    "start_date": "2023-07-22",
+    "end_date": "2024-09-14",
+    "description": "参与全面预算管理系统，负责资源协调，涉及SQL等技术应用。",
+    "team_size": 15,
+    "tools_used": [
+      "用友NC",
+      "SQL",
+      "Excel",
+      "BI报表"
+    ]
+  },
+  {
+    "employee_id": "JZ0028",
+    "project_name": "薪酬体系改革",
+    "role": "核心成员",
+    "start_date": "2025-08-16",
+    "end_date": "2025-12-11",
+    "description": "参与薪酬体系改革，负责报告撰写，涉及合规审计等技术应用。",
+    "team_size": 4,
+    "tools_used": [
+      "岗评工具",
+      "合规审计",
+      "薪酬调研",
+      "Excel"
+    ]
+  },
+  {
+    "employee_id": "JZ0028",
+    "project_name": "组织架构优化项目",
+    "role": "核心成员",
+    "start_date": "2024-01-10",
+    "end_date": "2024-09-18",
+    "description": "参与组织架构优化项目，负责报告撰写，涉及战略地图等技术应用。",
+    "team_size": 8,
+    "tools_used": [
+      "人才测评",
+      "战略地图",
+      "组织诊断",
+      "360评估"
+    ]
+  },
+  {
+    "employee_id": "JZ0029",
+    "project_name": "人力资源数字化平台",
+    "role": "项目负责人",
+    "start_date": "2023-06-21",
+    "end_date": "2024-01-07",
+    "description": "参与人力资源数字化平台，负责方案设计，涉及OA等技术应用。",
+    "team_size": 11,
+    "tools_used": [
+      "Power BI",
+      "OA",
+      "Excel",
+      "SAP HR"
+    ]
+  },
+  {
+    "employee_id": "JZ0030",
+    "project_name": "人力资源数字化平台",
+    "role": "核心成员",
+    "start_date": "2023-09-27",
+    "end_date": "2024-02-04",
+    "description": "参与人力资源数字化平台，负责资源协调，涉及Power BI等技术应用。",
+    "team_size": 9,
+    "tools_used": [
+      "SAP HR",
+      "Excel",
+      "Power BI",
+      "OA"
+    ]
+  },
+  {
+    "employee_id": "JZ0030",
+    "project_name": "全面预算管理系统",
+    "role": "项目负责人",
+    "start_date": "2022-04-29",
+    "end_date": "2022-11-30",
+    "description": "参与全面预算管理系统，负责报告撰写，涉及用友NC等技术应用。",
+    "team_size": 10,
+    "tools_used": [
+      "用友NC",
+      "Excel",
+      "BI报表",
+      "SQL"
+    ]
+  },
+  {
+    "employee_id": "JZ0030",
+    "project_name": "薪酬体系改革",
+    "role": "核心成员",
+    "start_date": "2022-01-26",
+    "end_date": "2023-04-23",
+    "description": "参与薪酬体系改革，负责方案设计，涉及岗评工具等技术应用。",
+    "team_size": 10,
+    "tools_used": [
+      "Excel",
+      "合规审计",
+      "岗评工具",
+      "薪酬调研"
+    ]
+  },
+  {
+    "employee_id": "JZ0030",
+    "project_name": "企业内控体系建设",
+    "role": "协调人",
+    "start_date": "2024-02-01",
+    "end_date": "2024-07-04",
+    "description": "参与企业内控体系建设，负责方案设计，涉及COSO等技术应用。",
+    "team_size": 8,
+    "tools_used": [
+      "审计软件",
+      "风险矩阵",
+      "COSO",
+      "流程梳理"
+    ]
+  },
+  {
+    "employee_id": "JZ0031",
+    "project_name": "薪酬体系改革",
+    "role": "协调人",
+    "start_date": "2024-07-21",
+    "end_date": "2025-07-07",
+    "description": "参与薪酬体系改革，负责方案设计，涉及合规审计等技术应用。",
+    "team_size": 12,
+    "tools_used": [
+      "岗评工具",
+      "合规审计",
+      "薪酬调研",
+      "Excel"
+    ]
+  },
+  {
+    "employee_id": "JZ0032",
+    "project_name": "企业内控体系建设",
+    "role": "项目负责人",
+    "start_date": "2025-10-12",
+    "end_date": "2026-07-01",
+    "description": "参与企业内控体系建设，负责资源协调，涉及COSO等技术应用。",
+    "team_size": 3,
+    "tools_used": [
+      "COSO",
+      "审计软件",
+      "流程梳理",
+      "风险矩阵"
+    ]
+  },
+  {
+    "employee_id": "JZ0033",
+    "project_name": "薪酬体系改革",
+    "role": "执行人",
+    "start_date": "2022-03-14",
+    "end_date": "2023-03-22",
+    "description": "参与薪酬体系改革，负责资源协调，涉及Excel等技术应用。",
+    "team_size": 6,
+    "tools_used": [
+      "合规审计",
+      "Excel",
+      "岗评工具",
+      "薪酬调研"
+    ]
+  },
+  {
+    "employee_id": "JZ0033",
+    "project_name": "全面预算管理系统",
+    "role": "协调人",
+    "start_date": "2022-06-09",
+    "end_date": "2023-06-26",
+    "description": "参与全面预算管理系统，负责方案设计，涉及用友NC等技术应用。",
+    "team_size": 5,
+    "tools_used": [
+      "Excel",
+      "SQL",
+      "用友NC",
+      "BI报表"
+    ]
+  },
+  {
+    "employee_id": "JZ0033",
+    "project_name": "人力资源数字化平台",
+    "role": "执行人",
+    "start_date": "2022-05-22",
+    "end_date": "2023-11-12",
+    "description": "参与人力资源数字化平台，负责流程优化，涉及Power BI等技术应用。",
+    "team_size": 8,
+    "tools_used": [
+      "SAP HR",
+      "Power BI",
+      "Excel",
+      "OA"
+    ]
+  },
+  {
+    "employee_id": "JZ0034",
+    "project_name": "全面预算管理系统",
+    "role": "核心成员",
+    "start_date": "2026-05-26",
+    "end_date": "2026-07-01",
+    "description": "参与全面预算管理系统，负责报告撰写，涉及SQL等技术应用。",
+    "team_size": 12,
+    "tools_used": [
+      "BI报表",
+      "用友NC",
+      "SQL",
+      "Excel"
+    ]
+  },
+  {
+    "employee_id": "JZ0034",
+    "project_name": "组织架构优化项目",
+    "role": "项目负责人",
+    "start_date": "2022-01-14",
+    "end_date": "2022-11-09",
+    "description": "参与组织架构优化项目，负责资源协调，涉及360评估等技术应用。",
+    "team_size": 13,
+    "tools_used": [
+      "组织诊断",
+      "人才测评",
+      "战略地图",
+      "360评估"
+    ]
+  },
+  {
+    "employee_id": "JZ0034",
+    "project_name": "薪酬体系改革",
+    "role": "协调人",
+    "start_date": "2026-02-20",
+    "end_date": "2026-07-01",
+    "description": "参与薪酬体系改革，负责方案设计，涉及岗评工具等技术应用。",
+    "team_size": 11,
+    "tools_used": [
+      "岗评工具",
+      "合规审计",
+      "Excel",
+      "薪酬调研"
+    ]
+  },
+  {
+    "employee_id": "JZ0035",
+    "project_name": "组织架构优化项目",
+    "role": "执行人",
+    "start_date": "2022-03-31",
+    "end_date": "2022-10-25",
+    "description": "参与组织架构优化项目，负责流程优化，涉及战略地图等技术应用。",
+    "team_size": 14,
+    "tools_used": [
+      "组织诊断",
+      "360评估",
+      "战略地图",
+      "人才测评"
+    ]
+  },
+  {
+    "employee_id": "JZ0035",
+    "project_name": "人力资源数字化平台",
+    "role": "执行人",
+    "start_date": "2025-07-29",
+    "end_date": "2026-07-01",
+    "description": "参与人力资源数字化平台，负责方案设计，涉及SAP HR等技术应用。",
+    "team_size": 9,
+    "tools_used": [
+      "Excel",
+      "SAP HR",
+      "OA",
+      "Power BI"
+    ]
+  },
+  {
+    "employee_id": "JZ0036",
+    "project_name": "薪酬体系改革",
+    "role": "核心成员",
+    "start_date": "2024-07-16",
+    "end_date": "2025-03-02",
+    "description": "参与薪酬体系改革，负责方案设计，涉及岗评工具等技术应用。",
+    "team_size": 5,
+    "tools_used": [
+      "薪酬调研",
+      "合规审计",
+      "Excel",
+      "岗评工具"
+    ]
+  },
+  {
+    "employee_id": "JZ0036",
+    "project_name": "组织架构优化项目",
+    "role": "协调人",
+    "start_date": "2024-07-09",
+    "end_date": "2025-06-02",
+    "description": "参与组织架构优化项目，负责报告撰写，涉及组织诊断等技术应用。",
+    "team_size": 11,
+    "tools_used": [
+      "360评估",
+      "组织诊断",
+      "人才测评",
+      "战略地图"
+    ]
+  },
+  {
+    "employee_id": "JZ0036",
+    "project_name": "全面预算管理系统",
+    "role": "项目负责人",
+    "start_date": "2024-08-06",
+    "end_date": "2025-03-19",
+    "description": "参与全面预算管理系统，负责方案设计，涉及Excel等技术应用。",
+    "team_size": 15,
+    "tools_used": [
+      "SQL",
+      "BI报表",
+      "用友NC",
+      "Excel"
+    ]
+  },
+  {
+    "employee_id": "JZ0037",
+    "project_name": "全面预算管理系统",
+    "role": "执行人",
+    "start_date": "2023-05-24",
+    "end_date": "2024-02-20",
+    "description": "参与全面预算管理系统，负责交付管理，涉及用友NC等技术应用。",
+    "team_size": 13,
+    "tools_used": [
+      "SQL",
+      "Excel",
+      "用友NC",
+      "BI报表"
+    ]
+  },
+  {
+    "employee_id": "JZ0037",
+    "project_name": "人力资源数字化平台",
+    "role": "执行人",
+    "start_date": "2024-04-08",
+    "end_date": "2025-09-17",
+    "description": "参与人力资源数字化平台，负责交付管理，涉及Excel等技术应用。",
+    "team_size": 4,
+    "tools_used": [
+      "OA",
+      "SAP HR",
+      "Power BI",
+      "Excel"
+    ]
+  },
+  {
+    "employee_id": "JZ0037",
+    "project_name": "组织架构优化项目",
+    "role": "核心成员",
+    "start_date": "2022-01-25",
+    "end_date": "2022-05-26",
+    "description": "参与组织架构优化项目，负责资源协调，涉及人才测评等技术应用。",
+    "team_size": 9,
+    "tools_used": [
+      "360评估",
+      "战略地图",
+      "组织诊断",
+      "人才测评"
+    ]
+  },
+  {
+    "employee_id": "JZ0038",
+    "project_name": "人力资源数字化平台",
+    "role": "执行人",
+    "start_date": "2022-05-13",
+    "end_date": "2022-11-20",
+    "description": "参与人力资源数字化平台，负责资源协调，涉及SAP HR等技术应用。",
+    "team_size": 15,
+    "tools_used": [
+      "Power BI",
+      "SAP HR",
+      "OA",
+      "Excel"
+    ]
+  },
+  {
+    "employee_id": "JZ0039",
+    "project_name": "全面预算管理系统",
+    "role": "执行人",
+    "start_date": "2025-03-21",
+    "end_date": "2026-01-26",
+    "description": "参与全面预算管理系统，负责报告撰写，涉及用友NC等技术应用。",
+    "team_size": 9,
+    "tools_used": [
+      "BI报表",
+      "用友NC",
+      "Excel",
+      "SQL"
+    ]
+  },
+  {
+    "employee_id": "JZ0040",
+    "project_name": "组织架构优化项目",
+    "role": "项目负责人",
+    "start_date": "2024-07-02",
+    "end_date": "2024-12-15",
+    "description": "参与组织架构优化项目，负责交付管理，涉及人才测评等技术应用。",
+    "team_size": 13,
+    "tools_used": [
+      "360评估",
+      "人才测评",
+      "战略地图",
+      "组织诊断"
+    ]
+  },
+  {
+    "employee_id": "JZ0040",
+    "project_name": "企业内控体系建设",
+    "role": "协调人",
+    "start_date": "2022-05-05",
+    "end_date": "2022-09-16",
+    "description": "参与企业内控体系建设，负责报告撰写，涉及风险矩阵等技术应用。",
+    "team_size": 9,
+    "tools_used": [
+      "风险矩阵",
+      "流程梳理",
+      "COSO",
+      "审计软件"
+    ]
+  },
+  {
+    "employee_id": "JZ0041",
+    "project_name": "组织架构优化项目",
+    "role": "协调人",
+    "start_date": "2023-12-06",
+    "end_date": "2024-12-19",
+    "description": "参与组织架构优化项目，负责报告撰写，涉及360评估等技术应用。",
+    "team_size": 5,
+    "tools_used": [
+      "组织诊断",
+      "人才测评",
+      "战略地图",
+      "360评估"
+    ]
+  },
+  {
+    "employee_id": "JZ0041",
+    "project_name": "薪酬体系改革",
+    "role": "项目负责人",
+    "start_date": "2026-05-14",
+    "end_date": "2026-07-01",
+    "description": "参与薪酬体系改革，负责报告撰写，涉及Excel等技术应用。",
+    "team_size": 15,
+    "tools_used": [
+      "岗评工具",
+      "薪酬调研",
+      "Excel",
+      "合规审计"
+    ]
+  },
+  {
+    "employee_id": "JZ0041",
+    "project_name": "企业内控体系建设",
+    "role": "协调人",
+    "start_date": "2025-09-07",
+    "end_date": "2026-04-08",
+    "description": "参与企业内控体系建设，负责交付管理，涉及COSO等技术应用。",
+    "team_size": 15,
+    "tools_used": [
+      "风险矩阵",
+      "流程梳理",
+      "审计软件",
+      "COSO"
+    ]
+  },
+  {
+    "employee_id": "JZ0041",
+    "project_name": "全面预算管理系统",
+    "role": "核心成员",
+    "start_date": "2022-12-22",
+    "end_date": "2023-06-20",
+    "description": "参与全面预算管理系统，负责交付管理，涉及SQL等技术应用。",
+    "team_size": 15,
+    "tools_used": [
+      "SQL",
+      "BI报表",
+      "用友NC",
+      "Excel"
+    ]
+  },
+  {
+    "employee_id": "JZ0042",
+    "project_name": "企业内控体系建设",
+    "role": "协调人",
+    "start_date": "2024-10-05",
+    "end_date": "2025-10-07",
+    "description": "参与企业内控体系建设，负责资源协调，涉及审计软件等技术应用。",
+    "team_size": 3,
+    "tools_used": [
+      "COSO",
+      "审计软件",
+      "流程梳理",
+      "风险矩阵"
+    ]
+  },
+  {
+    "employee_id": "JZ0042",
+    "project_name": "全面预算管理系统",
+    "role": "执行人",
+    "start_date": "2022-02-10",
+    "end_date": "2023-02-04",
+    "description": "参与全面预算管理系统，负责方案设计，涉及SQL等技术应用。",
+    "team_size": 12,
+    "tools_used": [
+      "Excel",
+      "用友NC",
+      "BI报表",
+      "SQL"
+    ]
+  },
+  {
+    "employee_id": "JZ0043",
+    "project_name": "人力资源数字化平台",
+    "role": "核心成员",
+    "start_date": "2025-04-16",
+    "end_date": "2026-07-01",
+    "description": "参与人力资源数字化平台，负责方案设计，涉及Power BI等技术应用。",
+    "team_size": 4,
+    "tools_used": [
+      "Power BI",
+      "OA",
+      "Excel",
+      "SAP HR"
+    ]
+  },
+  {
+    "employee_id": "JZ0043",
+    "project_name": "企业内控体系建设",
+    "role": "协调人",
+    "start_date": "2023-11-21",
+    "end_date": "2024-07-22",
+    "description": "参与企业内控体系建设，负责资源协调，涉及风险矩阵等技术应用。",
+    "team_size": 14,
+    "tools_used": [
+      "审计软件",
+      "流程梳理",
+      "风险矩阵",
+      "COSO"
+    ]
+  },
+  {
+    "employee_id": "JZ0043",
+    "project_name": "薪酬体系改革",
+    "role": "协调人",
+    "start_date": "2022-12-23",
+    "end_date": "2024-03-19",
+    "description": "参与薪酬体系改革，负责资源协调，涉及岗评工具等技术应用。",
+    "team_size": 9,
+    "tools_used": [
+      "Excel",
+      "合规审计",
+      "岗评工具",
+      "薪酬调研"
+    ]
+  },
+  {
+    "employee_id": "JZ0044",
+    "project_name": "人力资源数字化平台",
+    "role": "项目负责人",
+    "start_date": "2026-04-28",
+    "end_date": "2026-07-01",
+    "description": "参与人力资源数字化平台，负责资源协调，涉及Power BI等技术应用。",
+    "team_size": 15,
+    "tools_used": [
+      "Excel",
+      "Power BI",
+      "SAP HR",
+      "OA"
+    ]
+  },
+  {
+    "employee_id": "JZ0044",
+    "project_name": "薪酬体系改革",
+    "role": "项目负责人",
+    "start_date": "2022-10-16",
+    "end_date": "2023-07-02",
+    "description": "参与薪酬体系改革，负责资源协调，涉及Excel等技术应用。",
+    "team_size": 8,
+    "tools_used": [
+      "岗评工具",
+      "Excel",
+      "薪酬调研",
+      "合规审计"
+    ]
+  },
+  {
+    "employee_id": "JZ0045",
+    "project_name": "人力资源数字化平台",
+    "role": "协调人",
+    "start_date": "2025-11-20",
+    "end_date": "2026-03-24",
+    "description": "参与人力资源数字化平台，负责流程优化，涉及SAP HR等技术应用。",
+    "team_size": 14,
+    "tools_used": [
+      "SAP HR",
+      "OA",
+      "Excel",
+      "Power BI"
+    ]
+  },
+  {
+    "employee_id": "JZ0045",
+    "project_name": "组织架构优化项目",
+    "role": "核心成员",
+    "start_date": "2026-02-09",
+    "end_date": "2026-07-01",
+    "description": "参与组织架构优化项目，负责报告撰写，涉及战略地图等技术应用。",
+    "team_size": 9,
+    "tools_used": [
+      "360评估",
+      "战略地图",
+      "人才测评",
+      "组织诊断"
+    ]
+  },
+  {
+    "employee_id": "JZ0045",
+    "project_name": "企业内控体系建设",
+    "role": "核心成员",
+    "start_date": "2024-09-08",
+    "end_date": "2026-01-14",
+    "description": "参与企业内控体系建设，负责资源协调，涉及审计软件等技术应用。",
+    "team_size": 4,
+    "tools_used": [
+      "COSO",
+      "风险矩阵",
+      "审计软件",
+      "流程梳理"
+    ]
+  },
+  {
+    "employee_id": "JZ0045",
+    "project_name": "薪酬体系改革",
+    "role": "项目负责人",
+    "start_date": "2023-06-19",
+    "end_date": "2023-11-09",
+    "description": "参与薪酬体系改革，负责流程优化，涉及岗评工具等技术应用。",
+    "team_size": 9,
+    "tools_used": [
+      "岗评工具",
+      "Excel",
+      "薪酬调研",
+      "合规审计"
+    ]
+  },
+  {
+    "employee_id": "JZ0046",
+    "project_name": "企业内控体系建设",
+    "role": "核心成员",
+    "start_date": "2022-03-05",
+    "end_date": "2023-01-09",
+    "description": "参与企业内控体系建设，负责交付管理，涉及审计软件等技术应用。",
+    "team_size": 5,
+    "tools_used": [
+      "COSO",
+      "审计软件",
+      "风险矩阵",
+      "流程梳理"
+    ]
+  },
+  {
+    "employee_id": "JZ0046",
+    "project_name": "薪酬体系改革",
+    "role": "协调人",
+    "start_date": "2023-01-25",
+    "end_date": "2023-11-20",
+    "description": "参与薪酬体系改革，负责流程优化，涉及Excel等技术应用。",
+    "team_size": 6,
+    "tools_used": [
+      "薪酬调研",
+      "合规审计",
+      "岗评工具",
+      "Excel"
+    ]
+  },
+  {
+    "employee_id": "JZ0046",
+    "project_name": "组织架构优化项目",
+    "role": "协调人",
+    "start_date": "2022-11-11",
+    "end_date": "2023-03-08",
+    "description": "参与组织架构优化项目，负责方案设计，涉及战略地图等技术应用。",
+    "team_size": 4,
+    "tools_used": [
+      "360评估",
+      "战略地图",
+      "人才测评",
+      "组织诊断"
+    ]
+  },
+  {
+    "employee_id": "JZ0047",
+    "project_name": "人力资源数字化平台",
+    "role": "协调人",
+    "start_date": "2023-02-28",
+    "end_date": "2023-08-24",
+    "description": "参与人力资源数字化平台，负责方案设计，涉及OA等技术应用。",
+    "team_size": 4,
+    "tools_used": [
+      "Power BI",
+      "Excel",
+      "OA",
+      "SAP HR"
+    ]
+  },
+  {
+    "employee_id": "JZ0048",
+    "project_name": "人力资源数字化平台",
+    "role": "协调人",
+    "start_date": "2024-01-30",
+    "end_date": "2024-11-10",
+    "description": "参与人力资源数字化平台，负责资源协调，涉及OA等技术应用。",
+    "team_size": 3,
+    "tools_used": [
+      "Power BI",
+      "Excel",
+      "OA",
+      "SAP HR"
+    ]
+  },
+  {
+    "employee_id": "JZ0048",
+    "project_name": "薪酬体系改革",
+    "role": "协调人",
+    "start_date": "2023-04-09",
+    "end_date": "2024-09-08",
+    "description": "参与薪酬体系改革，负责交付管理，涉及薪酬调研等技术应用。",
+    "team_size": 5,
+    "tools_used": [
+      "薪酬调研",
+      "合规审计",
+      "岗评工具",
+      "Excel"
+    ]
+  },
+  {
+    "employee_id": "JZ0048",
+    "project_name": "企业内控体系建设",
+    "role": "核心成员",
+    "start_date": "2026-03-30",
+    "end_date": "2026-07-01",
+    "description": "参与企业内控体系建设，负责交付管理，涉及COSO等技术应用。",
+    "team_size": 9,
+    "tools_used": [
+      "审计软件",
+      "流程梳理",
+      "风险矩阵",
+      "COSO"
+    ]
+  },
+  {
+    "employee_id": "JZ0049",
+    "project_name": "组织架构优化项目",
+    "role": "核心成员",
+    "start_date": "2024-10-25",
+    "end_date": "2025-11-11",
+    "description": "参与组织架构优化项目，负责方案设计，涉及战略地图等技术应用。",
+    "team_size": 5,
+    "tools_used": [
+      "人才测评",
+      "组织诊断",
+      "360评估",
+      "战略地图"
+    ]
+  },
+  {
+    "employee_id": "JZ0049",
+    "project_name": "人力资源数字化平台",
+    "role": "项目负责人",
+    "start_date": "2022-03-29",
+    "end_date": "2023-01-29",
+    "description": "参与人力资源数字化平台，负责报告撰写，涉及Excel等技术应用。",
+    "team_size": 13,
+    "tools_used": [
+      "Excel",
+      "Power BI",
+      "OA",
+      "SAP HR"
+    ]
+  },
+  {
+    "employee_id": "JZ0049",
+    "project_name": "全面预算管理系统",
+    "role": "项目负责人",
+    "start_date": "2026-01-29",
+    "end_date": "2026-07-01",
+    "description": "参与全面预算管理系统，负责方案设计，涉及BI报表等技术应用。",
+    "team_size": 11,
+    "tools_used": [
+      "BI报表",
+      "SQL",
+      "Excel",
+      "用友NC"
+    ]
+  },
+  {
+    "employee_id": "JZ0049",
+    "project_name": "薪酬体系改革",
+    "role": "项目负责人",
+    "start_date": "2024-11-30",
+    "end_date": "2025-10-20",
+    "description": "参与薪酬体系改革，负责交付管理，涉及合规审计等技术应用。",
+    "team_size": 4,
+    "tools_used": [
+      "合规审计",
+      "薪酬调研",
+      "Excel",
+      "岗评工具"
+    ]
+  },
+  {
+    "employee_id": "JZ0050",
+    "project_name": "企业内控体系建设",
+    "role": "协调人",
+    "start_date": "2026-05-16",
+    "end_date": "2026-07-01",
+    "description": "参与企业内控体系建设，负责交付管理，涉及流程梳理等技术应用。",
+    "team_size": 9,
+    "tools_used": [
+      "流程梳理",
+      "风险矩阵",
+      "审计软件",
+      "COSO"
+    ]
+  },
+  {
+    "employee_id": "JZ0051",
+    "project_name": "海外市场拓展",
+    "role": "市场负责人",
+    "start_date": "2023-07-19",
+    "end_date": "2024-05-10",
+    "description": "参与海外市场拓展，负责项目管理，涉及本地化等技术应用。",
+    "team_size": 3,
+    "tools_used": [
+      "本地化",
+      "渠道建设",
+      "市场分析",
+      "跨境物流"
+    ]
+  },
+  {
+    "employee_id": "JZ0052",
+    "project_name": "数字化营销转型",
+    "role": "执行人",
+    "start_date": "2023-09-13",
+    "end_date": "2024-05-19",
+    "description": "参与数字化营销转型，负责渠道拓展，涉及SEO/SEM等技术应用。",
+    "team_size": 6,
+    "tools_used": [
+      "CRM",
+      "内容营销",
+      "数据分析",
+      "SEO/SEM"
+    ]
+  },
+  {
+    "employee_id": "JZ0052",
+    "project_name": "新产品上市推广",
+    "role": "协调人",
+    "start_date": "2023-07-06",
+    "end_date": "2024-10-11",
+    "description": "参与新产品上市推广，负责项目管理，涉及竞品分析等技术应用。",
+    "team_size": 6,
+    "tools_used": [
+      "KOL",
+      "竞品分析",
+      "定价策略",
+      "渠道推广"
+    ]
+  },
+  {
+    "employee_id": "JZ0052",
+    "project_name": "品牌战略升级",
+    "role": "执行人",
+    "start_date": "2026-04-05",
+    "end_date": "2026-07-01",
+    "description": "参与品牌战略升级，负责市场分析，涉及品牌定位等技术应用。",
+    "team_size": 4,
+    "tools_used": [
+      "媒体投放",
+      "数据分析",
+      "品牌定位",
+      "市场调研"
+    ]
+  },
+  {
+    "employee_id": "JZ0052",
+    "project_name": "海外市场拓展",
+    "role": "项目负责人",
+    "start_date": "2026-05-18",
+    "end_date": "2026-07-01",
+    "description": "参与海外市场拓展，负责客户调研，涉及渠道建设等技术应用。",
+    "team_size": 6,
+    "tools_used": [
+      "市场分析",
+      "本地化",
+      "跨境物流",
+      "渠道建设"
+    ]
+  },
+  {
+    "employee_id": "JZ0053",
+    "project_name": "数字化营销转型",
+    "role": "执行人",
+    "start_date": "2025-12-14",
+    "end_date": "2026-06-23",
+    "description": "参与数字化营销转型，负责方案定制，涉及内容营销等技术应用。",
+    "team_size": 11,
+    "tools_used": [
+      "内容营销",
+      "数据分析",
+      "SEO/SEM",
+      "CRM"
+    ]
+  },
+  {
+    "employee_id": "JZ0054",
+    "project_name": "数字化营销转型",
+    "role": "市场负责人",
+    "start_date": "2025-05-01",
+    "end_date": "2026-03-15",
+    "description": "参与数字化营销转型，负责渠道拓展，涉及数据分析等技术应用。",
+    "team_size": 8,
+    "tools_used": [
+      "CRM",
+      "内容营销",
+      "SEO/SEM",
+      "数据分析"
+    ]
+  },
+  {
+    "employee_id": "JZ0054",
+    "project_name": "大客户开发专项",
+    "role": "项目负责人",
+    "start_date": "2022-02-26",
+    "end_date": "2022-12-10",
+    "description": "参与大客户开发专项，负责客户调研，涉及方案定制等技术应用。",
+    "team_size": 6,
+    "tools_used": [
+      "方案定制",
+      "商务谈判",
+      "客户调研",
+      "合同管理"
+    ]
+  },
+  {
+    "employee_id": "JZ0055",
+    "project_name": "新产品上市推广",
+    "role": "市场负责人",
+    "start_date": "2024-08-28",
+    "end_date": "2025-02-01",
+    "description": "参与新产品上市推广，负责项目管理，涉及竞品分析等技术应用。",
+    "team_size": 6,
+    "tools_used": [
+      "渠道推广",
+      "KOL",
+      "定价策略",
+      "竞品分析"
+    ]
+  },
+  {
+    "employee_id": "JZ0055",
+    "project_name": "品牌战略升级",
+    "role": "执行人",
+    "start_date": "2024-05-17",
+    "end_date": "2025-02-23",
+    "description": "参与品牌战略升级，负责渠道拓展，涉及媒体投放等技术应用。",
+    "team_size": 6,
+    "tools_used": [
+      "数据分析",
+      "品牌定位",
+      "媒体投放",
+      "市场调研"
+    ]
+  },
+  {
+    "employee_id": "JZ0055",
+    "project_name": "数字化营销转型",
+    "role": "执行人",
+    "start_date": "2022-01-16",
+    "end_date": "2023-01-02",
+    "description": "参与数字化营销转型，负责项目管理，涉及数据分析等技术应用。",
+    "team_size": 7,
+    "tools_used": [
+      "SEO/SEM",
+      "CRM",
+      "内容营销",
+      "数据分析"
+    ]
+  },
+  {
+    "employee_id": "JZ0055",
+    "project_name": "大客户开发专项",
+    "role": "执行人",
+    "start_date": "2023-07-21",
+    "end_date": "2024-09-10",
+    "description": "参与大客户开发专项，负责方案定制，涉及商务谈判等技术应用。",
+    "team_size": 13,
+    "tools_used": [
+      "商务谈判",
+      "客户调研",
+      "合同管理",
+      "方案定制"
+    ]
+  },
+  {
+    "employee_id": "JZ0056",
+    "project_name": "新产品上市推广",
+    "role": "执行人",
+    "start_date": "2024-04-07",
+    "end_date": "2025-06-09",
+    "description": "参与新产品上市推广，负责客户调研，涉及竞品分析等技术应用。",
+    "team_size": 13,
+    "tools_used": [
+      "KOL",
+      "定价策略",
+      "渠道推广",
+      "竞品分析"
+    ]
+  },
+  {
+    "employee_id": "JZ0057",
+    "project_name": "大客户开发专项",
+    "role": "市场负责人",
+    "start_date": "2023-12-04",
+    "end_date": "2025-03-09",
+    "description": "参与大客户开发专项，负责项目管理，涉及合同管理等技术应用。",
+    "team_size": 13,
+    "tools_used": [
+      "商务谈判",
+      "合同管理",
+      "方案定制",
+      "客户调研"
+    ]
+  },
+  {
+    "employee_id": "JZ0057",
+    "project_name": "品牌战略升级",
+    "role": "市场负责人",
+    "start_date": "2025-09-08",
+    "end_date": "2026-07-01",
+    "description": "参与品牌战略升级，负责方案定制，涉及市场调研等技术应用。",
+    "team_size": 10,
+    "tools_used": [
+      "品牌定位",
+      "媒体投放",
+      "数据分析",
+      "市场调研"
+    ]
+  },
+  {
+    "employee_id": "JZ0057",
+    "project_name": "数字化营销转型",
+    "role": "项目负责人",
+    "start_date": "2025-10-24",
+    "end_date": "2026-07-01",
+    "description": "参与数字化营销转型，负责客户调研，涉及数据分析等技术应用。",
+    "team_size": 6,
+    "tools_used": [
+      "数据分析",
+      "CRM",
+      "内容营销",
+      "SEO/SEM"
+    ]
+  },
+  {
+    "employee_id": "JZ0057",
+    "project_name": "新产品上市推广",
+    "role": "执行人",
+    "start_date": "2023-06-18",
+    "end_date": "2024-07-11",
+    "description": "参与新产品上市推广，负责渠道拓展，涉及竞品分析等技术应用。",
+    "team_size": 10,
+    "tools_used": [
+      "竞品分析",
+      "渠道推广",
+      "KOL",
+      "定价策略"
+    ]
+  },
+  {
+    "employee_id": "JZ0058",
+    "project_name": "新产品上市推广",
+    "role": "执行人",
+    "start_date": "2025-10-26",
+    "end_date": "2026-07-01",
+    "description": "参与新产品上市推广，负责渠道拓展，涉及竞品分析等技术应用。",
+    "team_size": 5,
+    "tools_used": [
+      "定价策略",
+      "竞品分析",
+      "KOL",
+      "渠道推广"
+    ]
+  },
+  {
+    "employee_id": "JZ0058",
+    "project_name": "品牌战略升级",
+    "role": "市场负责人",
+    "start_date": "2025-03-12",
+    "end_date": "2026-01-30",
+    "description": "参与品牌战略升级，负责方案定制，涉及品牌定位等技术应用。",
+    "team_size": 15,
+    "tools_used": [
+      "市场调研",
+      "品牌定位",
+      "媒体投放",
+      "数据分析"
+    ]
+  },
+  {
+    "employee_id": "JZ0059",
+    "project_name": "品牌战略升级",
+    "role": "市场负责人",
+    "start_date": "2023-07-15",
+    "end_date": "2024-01-28",
+    "description": "参与品牌战略升级，负责项目管理，涉及品牌定位等技术应用。",
+    "team_size": 10,
+    "tools_used": [
+      "市场调研",
+      "数据分析",
+      "品牌定位",
+      "媒体投放"
+    ]
+  },
+  {
+    "employee_id": "JZ0059",
+    "project_name": "新产品上市推广",
+    "role": "协调人",
+    "start_date": "2024-04-06",
+    "end_date": "2025-02-09",
+    "description": "参与新产品上市推广，负责渠道拓展，涉及竞品分析等技术应用。",
+    "team_size": 3,
+    "tools_used": [
+      "定价策略",
+      "渠道推广",
+      "KOL",
+      "竞品分析"
+    ]
+  },
+  {
+    "employee_id": "JZ0059",
+    "project_name": "海外市场拓展",
+    "role": "市场负责人",
+    "start_date": "2023-10-22",
+    "end_date": "2025-02-10",
+    "description": "参与海外市场拓展，负责市场分析，涉及市场分析等技术应用。",
+    "team_size": 13,
+    "tools_used": [
+      "渠道建设",
+      "市场分析",
+      "本地化",
+      "跨境物流"
+    ]
+  },
+  {
+    "employee_id": "JZ0060",
+    "project_name": "品牌战略升级",
+    "role": "执行人",
+    "start_date": "2024-10-27",
+    "end_date": "2025-11-22",
+    "description": "参与品牌战略升级，负责客户调研，涉及市场调研等技术应用。",
+    "team_size": 3,
+    "tools_used": [
+      "媒体投放",
+      "品牌定位",
+      "数据分析",
+      "市场调研"
+    ]
+  },
+  {
+    "employee_id": "JZ0060",
+    "project_name": "大客户开发专项",
+    "role": "市场负责人",
+    "start_date": "2024-06-07",
+    "end_date": "2025-08-22",
+    "description": "参与大客户开发专项，负责方案定制，涉及合同管理等技术应用。",
+    "team_size": 8,
+    "tools_used": [
+      "方案定制",
+      "客户调研",
+      "合同管理",
+      "商务谈判"
+    ]
+  },
+  {
+    "employee_id": "JZ0061",
+    "project_name": "海外市场拓展",
+    "role": "项目负责人",
+    "start_date": "2023-03-09",
+    "end_date": "2024-06-16",
+    "description": "参与海外市场拓展，负责项目管理，涉及渠道建设等技术应用。",
+    "team_size": 4,
+    "tools_used": [
+      "跨境物流",
+      "本地化",
+      "市场分析",
+      "渠道建设"
+    ]
+  },
+  {
+    "employee_id": "JZ0061",
+    "project_name": "新产品上市推广",
+    "role": "项目负责人",
+    "start_date": "2025-08-04",
+    "end_date": "2026-03-12",
+    "description": "参与新产品上市推广，负责项目管理，涉及竞品分析等技术应用。",
+    "team_size": 13,
+    "tools_used": [
+      "竞品分析",
+      "渠道推广",
+      "KOL",
+      "定价策略"
+    ]
+  },
+  {
+    "employee_id": "JZ0062",
+    "project_name": "大客户开发专项",
+    "role": "项目负责人",
+    "start_date": "2024-06-28",
+    "end_date": "2025-04-08",
+    "description": "参与大客户开发专项，负责项目管理，涉及商务谈判等技术应用。",
+    "team_size": 10,
+    "tools_used": [
+      "方案定制",
+      "客户调研",
+      "商务谈判",
+      "合同管理"
+    ]
+  },
+  {
+    "employee_id": "JZ0063",
+    "project_name": "品牌战略升级",
+    "role": "项目负责人",
+    "start_date": "2024-05-07",
+    "end_date": "2025-10-04",
+    "description": "参与品牌战略升级，负责项目管理，涉及市场调研等技术应用。",
+    "team_size": 7,
+    "tools_used": [
+      "市场调研",
+      "数据分析",
+      "品牌定位",
+      "媒体投放"
+    ]
+  },
+  {
+    "employee_id": "JZ0063",
+    "project_name": "数字化营销转型",
+    "role": "执行人",
+    "start_date": "2025-06-01",
+    "end_date": "2025-12-10",
+    "description": "参与数字化营销转型，负责项目管理，涉及CRM等技术应用。",
+    "team_size": 8,
+    "tools_used": [
+      "内容营销",
+      "CRM",
+      "SEO/SEM",
+      "数据分析"
+    ]
+  },
+  {
+    "employee_id": "JZ0063",
+    "project_name": "大客户开发专项",
+    "role": "市场负责人",
+    "start_date": "2025-01-27",
+    "end_date": "2026-01-06",
+    "description": "参与大客户开发专项，负责渠道拓展，涉及商务谈判等技术应用。",
+    "team_size": 6,
+    "tools_used": [
+      "客户调研",
+      "合同管理",
+      "商务谈判",
+      "方案定制"
+    ]
+  },
+  {
+    "employee_id": "JZ0063",
+    "project_name": "新产品上市推广",
+    "role": "协调人",
+    "start_date": "2025-03-21",
+    "end_date": "2026-05-27",
+    "description": "参与新产品上市推广，负责客户调研，涉及竞品分析等技术应用。",
+    "team_size": 15,
+    "tools_used": [
+      "竞品分析",
+      "渠道推广",
+      "KOL",
+      "定价策略"
+    ]
+  },
+  {
+    "employee_id": "JZ0064",
+    "project_name": "大客户开发专项",
+    "role": "项目负责人",
+    "start_date": "2023-06-25",
+    "end_date": "2024-05-17",
+    "description": "参与大客户开发专项，负责市场分析，涉及方案定制等技术应用。",
+    "team_size": 3,
+    "tools_used": [
+      "商务谈判",
+      "方案定制",
+      "合同管理",
+      "客户调研"
+    ]
+  },
+  {
+    "employee_id": "JZ0064",
+    "project_name": "数字化营销转型",
+    "role": "项目负责人",
+    "start_date": "2026-02-21",
+    "end_date": "2026-07-01",
+    "description": "参与数字化营销转型，负责市场分析，涉及SEO/SEM等技术应用。",
+    "team_size": 5,
+    "tools_used": [
+      "CRM",
+      "内容营销",
+      "数据分析",
+      "SEO/SEM"
+    ]
+  },
+  {
+    "employee_id": "JZ0065",
+    "project_name": "品牌战略升级",
+    "role": "协调人",
+    "start_date": "2023-01-10",
+    "end_date": "2023-06-07",
+    "description": "参与品牌战略升级，负责渠道拓展，涉及数据分析等技术应用。",
+    "team_size": 7,
+    "tools_used": [
+      "数据分析",
+      "媒体投放",
+      "品牌定位",
+      "市场调研"
+    ]
+  },
+  {
+    "employee_id": "JZ0065",
+    "project_name": "数字化营销转型",
+    "role": "市场负责人",
+    "start_date": "2025-08-21",
+    "end_date": "2026-07-01",
+    "description": "参与数字化营销转型，负责市场分析，涉及CRM等技术应用。",
+    "team_size": 14,
+    "tools_used": [
+      "SEO/SEM",
+      "内容营销",
+      "数据分析",
+      "CRM"
+    ]
+  },
+  {
+    "employee_id": "JZ0065",
+    "project_name": "海外市场拓展",
+    "role": "协调人",
+    "start_date": "2025-04-24",
+    "end_date": "2026-03-27",
+    "description": "参与海外市场拓展，负责客户调研，涉及本地化等技术应用。",
+    "team_size": 15,
+    "tools_used": [
+      "跨境物流",
+      "本地化",
+      "市场分析",
+      "渠道建设"
+    ]
+  },
+  {
+    "employee_id": "JZ0066",
+    "project_name": "大客户开发专项",
+    "role": "执行人",
+    "start_date": "2022-04-05",
+    "end_date": "2022-08-05",
+    "description": "参与大客户开发专项，负责方案定制，涉及客户调研等技术应用。",
+    "team_size": 14,
+    "tools_used": [
+      "方案定制",
+      "商务谈判",
+      "合同管理",
+      "客户调研"
+    ]
+  },
+  {
+    "employee_id": "JZ0066",
+    "project_name": "品牌战略升级",
+    "role": "市场负责人",
+    "start_date": "2024-06-05",
+    "end_date": "2025-08-07",
+    "description": "参与品牌战略升级，负责渠道拓展，涉及媒体投放等技术应用。",
+    "team_size": 13,
+    "tools_used": [
+      "数据分析",
+      "市场调研",
+      "媒体投放",
+      "品牌定位"
+    ]
+  },
+  {
+    "employee_id": "JZ0066",
+    "project_name": "海外市场拓展",
+    "role": "协调人",
+    "start_date": "2025-08-10",
+    "end_date": "2026-01-27",
+    "description": "参与海外市场拓展，负责渠道拓展，涉及渠道建设等技术应用。",
+    "team_size": 4,
+    "tools_used": [
+      "本地化",
+      "渠道建设",
+      "市场分析",
+      "跨境物流"
+    ]
+  },
+  {
+    "employee_id": "JZ0066",
+    "project_name": "数字化营销转型",
+    "role": "市场负责人",
+    "start_date": "2023-07-24",
+    "end_date": "2023-11-16",
+    "description": "参与数字化营销转型，负责项目管理，涉及内容营销等技术应用。",
+    "team_size": 9,
+    "tools_used": [
+      "CRM",
+      "SEO/SEM",
+      "内容营销",
+      "数据分析"
+    ]
+  },
+  {
+    "employee_id": "JZ0067",
+    "project_name": "品牌战略升级",
+    "role": "项目负责人",
+    "start_date": "2022-09-01",
+    "end_date": "2023-08-11",
+    "description": "参与品牌战略升级，负责市场分析，涉及数据分析等技术应用。",
+    "team_size": 9,
+    "tools_used": [
+      "市场调研",
+      "媒体投放",
+      "数据分析",
+      "品牌定位"
+    ]
+  },
+  {
+    "employee_id": "JZ0067",
+    "project_name": "大客户开发专项",
+    "role": "执行人",
+    "start_date": "2025-05-22",
+    "end_date": "2026-07-01",
+    "description": "参与大客户开发专项，负责项目管理，涉及方案定制等技术应用。",
+    "team_size": 13,
+    "tools_used": [
+      "合同管理",
+      "方案定制",
+      "商务谈判",
+      "客户调研"
+    ]
+  },
+  {
+    "employee_id": "JZ0067",
+    "project_name": "海外市场拓展",
+    "role": "协调人",
+    "start_date": "2023-04-02",
+    "end_date": "2024-09-05",
+    "description": "参与海外市场拓展，负责方案定制，涉及本地化等技术应用。",
+    "team_size": 14,
+    "tools_used": [
+      "跨境物流",
+      "本地化",
+      "渠道建设",
+      "市场分析"
+    ]
+  },
+  {
+    "employee_id": "JZ0067",
+    "project_name": "数字化营销转型",
+    "role": "市场负责人",
+    "start_date": "2022-07-19",
+    "end_date": "2023-11-09",
+    "description": "参与数字化营销转型，负责市场分析，涉及数据分析等技术应用。",
+    "team_size": 8,
+    "tools_used": [
+      "数据分析",
+      "内容营销",
+      "CRM",
+      "SEO/SEM"
+    ]
+  },
+  {
+    "employee_id": "JZ0068",
+    "project_name": "海外市场拓展",
+    "role": "协调人",
+    "start_date": "2024-10-05",
+    "end_date": "2025-03-15",
+    "description": "参与海外市场拓展，负责市场分析，涉及跨境物流等技术应用。",
+    "team_size": 12,
+    "tools_used": [
+      "渠道建设",
+      "市场分析",
+      "跨境物流",
+      "本地化"
+    ]
+  },
+  {
+    "employee_id": "JZ0069",
+    "project_name": "大客户开发专项",
+    "role": "项目负责人",
+    "start_date": "2026-03-11",
+    "end_date": "2026-07-01",
+    "description": "参与大客户开发专项，负责渠道拓展，涉及客户调研等技术应用。",
+    "team_size": 13,
+    "tools_used": [
+      "客户调研",
+      "方案定制",
+      "商务谈判",
+      "合同管理"
+    ]
+  },
+  {
+    "employee_id": "JZ0069",
+    "project_name": "海外市场拓展",
+    "role": "项目负责人",
+    "start_date": "2025-07-31",
+    "end_date": "2025-10-31",
+    "description": "参与海外市场拓展，负责项目管理，涉及本地化等技术应用。",
+    "team_size": 12,
+    "tools_used": [
+      "本地化",
+      "跨境物流",
+      "市场分析",
+      "渠道建设"
+    ]
+  },
+  {
+    "employee_id": "JZ0070",
+    "project_name": "品牌战略升级",
+    "role": "执行人",
+    "start_date": "2025-09-08",
+    "end_date": "2026-07-01",
+    "description": "参与品牌战略升级，负责项目管理，涉及数据分析等技术应用。",
+    "team_size": 9,
+    "tools_used": [
+      "品牌定位",
+      "数据分析",
+      "媒体投放",
+      "市场调研"
+    ]
+  },
+  {
+    "employee_id": "JZ0070",
+    "project_name": "大客户开发专项",
+    "role": "市场负责人",
+    "start_date": "2023-08-26",
+    "end_date": "2024-07-12",
+    "description": "参与大客户开发专项，负责客户调研，涉及合同管理等技术应用。",
+    "team_size": 12,
+    "tools_used": [
+      "商务谈判",
+      "合同管理",
+      "方案定制",
+      "客户调研"
+    ]
+  },
+  {
+    "employee_id": "JZ0071",
+    "project_name": "海外市场拓展",
+    "role": "市场负责人",
+    "start_date": "2025-11-07",
+    "end_date": "2026-07-01",
+    "description": "参与海外市场拓展，负责客户调研，涉及跨境物流等技术应用。",
+    "team_size": 14,
+    "tools_used": [
+      "市场分析",
+      "渠道建设",
+      "跨境物流",
+      "本地化"
+    ]
+  },
+  {
+    "employee_id": "JZ0071",
+    "project_name": "数字化营销转型",
+    "role": "执行人",
+    "start_date": "2025-10-12",
+    "end_date": "2026-07-01",
+    "description": "参与数字化营销转型，负责渠道拓展，涉及SEO/SEM等技术应用。",
+    "team_size": 11,
+    "tools_used": [
+      "SEO/SEM",
+      "内容营销",
+      "CRM",
+      "数据分析"
+    ]
+  },
+  {
+    "employee_id": "JZ0072",
+    "project_name": "品牌战略升级",
+    "role": "市场负责人",
+    "start_date": "2023-02-14",
+    "end_date": "2023-09-28",
+    "description": "参与品牌战略升级，负责方案定制，涉及媒体投放等技术应用。",
+    "team_size": 5,
+    "tools_used": [
+      "市场调研",
+      "媒体投放",
+      "品牌定位",
+      "数据分析"
+    ]
+  },
+  {
+    "employee_id": "JZ0073",
+    "project_name": "数字化营销转型",
+    "role": "市场负责人",
+    "start_date": "2024-07-15",
+    "end_date": "2024-12-04",
+    "description": "参与数字化营销转型，负责项目管理，涉及内容营销等技术应用。",
+    "team_size": 6,
+    "tools_used": [
+      "数据分析",
+      "内容营销",
+      "SEO/SEM",
+      "CRM"
+    ]
+  },
+  {
+    "employee_id": "JZ0074",
+    "project_name": "大客户开发专项",
+    "role": "执行人",
+    "start_date": "2022-01-27",
+    "end_date": "2023-05-12",
+    "description": "参与大客户开发专项，负责客户调研，涉及合同管理等技术应用。",
+    "team_size": 6,
+    "tools_used": [
+      "商务谈判",
+      "合同管理",
+      "客户调研",
+      "方案定制"
+    ]
+  },
+  {
+    "employee_id": "JZ0074",
+    "project_name": "数字化营销转型",
+    "role": "市场负责人",
+    "start_date": "2023-08-26",
+    "end_date": "2024-07-10",
+    "description": "参与数字化营销转型，负责市场分析，涉及CRM等技术应用。",
+    "team_size": 5,
+    "tools_used": [
+      "SEO/SEM",
+      "CRM",
+      "内容营销",
+      "数据分析"
+    ]
+  },
+  {
+    "employee_id": "JZ0074",
+    "project_name": "新产品上市推广",
+    "role": "执行人",
+    "start_date": "2023-07-26",
+    "end_date": "2024-08-03",
+    "description": "参与新产品上市推广，负责客户调研，涉及定价策略等技术应用。",
+    "team_size": 12,
+    "tools_used": [
+      "渠道推广",
+      "竞品分析",
+      "定价策略",
+      "KOL"
+    ]
+  },
+  {
+    "employee_id": "JZ0074",
+    "project_name": "品牌战略升级",
+    "role": "项目负责人",
+    "start_date": "2025-12-24",
+    "end_date": "2026-06-11",
+    "description": "参与品牌战略升级，负责客户调研，涉及媒体投放等技术应用。",
+    "team_size": 12,
+    "tools_used": [
+      "市场调研",
+      "媒体投放",
+      "品牌定位",
+      "数据分析"
+    ]
+  },
+  {
+    "employee_id": "JZ0075",
+    "project_name": "品牌战略升级",
+    "role": "项目负责人",
+    "start_date": "2023-03-27",
+    "end_date": "2023-09-27",
+    "description": "参与品牌战略升级，负责项目管理，涉及品牌定位等技术应用。",
+    "team_size": 9,
+    "tools_used": [
+      "数据分析",
+      "市场调研",
+      "品牌定位",
+      "媒体投放"
+    ]
+  },
+  {
+    "employee_id": "JZ0075",
+    "project_name": "数字化营销转型",
+    "role": "执行人",
+    "start_date": "2023-03-13",
+    "end_date": "2024-05-15",
+    "description": "参与数字化营销转型，负责方案定制，涉及数据分析等技术应用。",
+    "team_size": 7,
+    "tools_used": [
+      "CRM",
+      "数据分析",
+      "内容营销",
+      "SEO/SEM"
+    ]
+  },
+  {
+    "employee_id": "JZ0075",
+    "project_name": "大客户开发专项",
+    "role": "执行人",
+    "start_date": "2022-08-23",
+    "end_date": "2023-10-29",
+    "description": "参与大客户开发专项，负责渠道拓展，涉及方案定制等技术应用。",
+    "team_size": 13,
+    "tools_used": [
+      "方案定制",
+      "客户调研",
+      "合同管理",
+      "商务谈判"
+    ]
+  },
+  {
+    "employee_id": "JZ0076",
+    "project_name": "新业务孵化AI+",
+    "role": "投资分析师",
+    "start_date": "2023-06-10",
+    "end_date": "2024-06-10",
+    "description": "参与新业务孵化AI+，负责可行性研究，涉及MVP等技术应用。",
+    "team_size": 11,
+    "tools_used": [
+      "融资对接",
+      "商业模式画布",
+      "AI技术",
+      "MVP"
+    ]
+  },
+  {
+    "employee_id": "JZ0077",
+    "project_name": "数字化转型咨询",
+    "role": "项目负责人",
+    "start_date": "2022-07-16",
+    "end_date": "2023-01-07",
+    "description": "参与数字化转型咨询，负责可行性研究，涉及流程再造等技术应用。",
+    "team_size": 13,
+    "tools_used": [
+      "流程再造",
+      "数字化",
+      "变革管理",
+      "咨询方法论"
+    ]
+  },
+  {
+    "employee_id": "JZ0077",
+    "project_name": "低空经济产业研究",
+    "role": "孵化负责人",
+    "start_date": "2023-02-26",
+    "end_date": "2024-02-26",
+    "description": "参与低空经济产业研究，负责可行性研究，涉及可行性分析等技术应用。",
+    "team_size": 3,
+    "tools_used": [
+      "商业模型",
+      "政策研究",
+      "可行性分析",
+      "行业调研"
+    ]
+  },
+  {
+    "employee_id": "JZ0078",
+    "project_name": "低空经济产业研究",
+    "role": "投资分析师",
+    "start_date": "2024-06-12",
+    "end_date": "2024-12-10",
+    "description": "参与低空经济产业研究，负责技术评估，涉及行业调研等技术应用。",
+    "team_size": 12,
+    "tools_used": [
+      "可行性分析",
+      "商业模型",
+      "政策研究",
+      "行业调研"
+    ]
+  },
+  {
+    "employee_id": "JZ0079",
+    "project_name": "新业务孵化AI+",
+    "role": "项目负责人",
+    "start_date": "2024-03-08",
+    "end_date": "2025-05-16",
+    "description": "参与新业务孵化AI+，负责技术评估，涉及AI技术等技术应用。",
+    "team_size": 13,
+    "tools_used": [
+      "AI技术",
+      "MVP",
+      "融资对接",
+      "商业模式画布"
+    ]
+  },
+  {
+    "employee_id": "JZ0079",
+    "project_name": "产业孵化器运营",
+    "role": "项目负责人",
+    "start_date": "2024-01-03",
+    "end_date": "2024-12-15",
+    "description": "参与产业孵化器运营，负责资源对接，涉及资源对接等技术应用。",
+    "team_size": 12,
+    "tools_used": [
+      "孵化器管理",
+      "项目评估",
+      "资源对接",
+      "创业辅导"
+    ]
+  },
+  {
+    "employee_id": "JZ0079",
+    "project_name": "新能源技术评估",
+    "role": "项目负责人",
+    "start_date": "2024-03-20",
+    "end_date": "2025-08-12",
+    "description": "参与新能源技术评估，负责项目孵化，涉及市场预测等技术应用。",
+    "team_size": 11,
+    "tools_used": [
+      "市场预测",
+      "技术评估",
+      "专家访谈",
+      "投资分析"
+    ]
+  },
+  {
+    "employee_id": "JZ0079",
+    "project_name": "低空经济产业研究",
+    "role": "投资分析师",
+    "start_date": "2025-07-22",
+    "end_date": "2026-01-01",
+    "description": "参与低空经济产业研究，负责资源对接，涉及行业调研等技术应用。",
+    "team_size": 11,
+    "tools_used": [
+      "可行性分析",
+      "行业调研",
+      "政策研究",
+      "商业模型"
+    ]
+  },
+  {
+    "employee_id": "JZ0080",
+    "project_name": "产业孵化器运营",
+    "role": "投资分析师",
+    "start_date": "2026-03-13",
+    "end_date": "2026-07-01",
+    "description": "参与产业孵化器运营，负责商业分析，涉及创业辅导等技术应用。",
+    "team_size": 13,
+    "tools_used": [
+      "项目评估",
+      "孵化器管理",
+      "资源对接",
+      "创业辅导"
+    ]
+  },
+  {
+    "employee_id": "JZ0080",
+    "project_name": "低空经济产业研究",
+    "role": "投资分析师",
+    "start_date": "2025-06-17",
+    "end_date": "2026-07-01",
+    "description": "参与低空经济产业研究，负责商业分析，涉及行业调研等技术应用。",
+    "team_size": 5,
+    "tools_used": [
+      "行业调研",
+      "政策研究",
+      "可行性分析",
+      "商业模型"
+    ]
+  },
+  {
+    "employee_id": "JZ0080",
+    "project_name": "新能源技术评估",
+    "role": "项目负责人",
+    "start_date": "2023-08-19",
+    "end_date": "2024-10-25",
+    "description": "参与新能源技术评估，负责资源对接，涉及技术评估等技术应用。",
+    "team_size": 6,
+    "tools_used": [
+      "专家访谈",
+      "市场预测",
+      "投资分析",
+      "技术评估"
+    ]
+  },
+  {
+    "employee_id": "JZ0080",
+    "project_name": "新业务孵化AI+",
+    "role": "研究员",
+    "start_date": "2025-10-06",
+    "end_date": "2026-07-01",
+    "description": "参与新业务孵化AI+，负责可行性研究，涉及MVP等技术应用。",
+    "team_size": 12,
+    "tools_used": [
+      "AI技术",
+      "融资对接",
+      "商业模式画布",
+      "MVP"
+    ]
+  },
+  {
+    "employee_id": "JZ0081",
+    "project_name": "数字化转型咨询",
+    "role": "投资分析师",
+    "start_date": "2025-03-04",
+    "end_date": "2026-03-19",
+    "description": "参与数字化转型咨询，负责资源对接，涉及变革管理等技术应用。",
+    "team_size": 5,
+    "tools_used": [
+      "咨询方法论",
+      "流程再造",
+      "变革管理",
+      "数字化"
+    ]
+  },
+  {
+    "employee_id": "JZ0081",
+    "project_name": "产业孵化器运营",
+    "role": "孵化负责人",
+    "start_date": "2025-12-29",
+    "end_date": "2026-07-01",
+    "description": "参与产业孵化器运营，负责资源对接，涉及资源对接等技术应用。",
+    "team_size": 5,
+    "tools_used": [
+      "资源对接",
+      "项目评估",
+      "创业辅导",
+      "孵化器管理"
+    ]
+  },
+  {
+    "employee_id": "JZ0081",
+    "project_name": "新业务孵化AI+",
+    "role": "投资分析师",
+    "start_date": "2024-01-05",
+    "end_date": "2025-05-05",
+    "description": "参与新业务孵化AI+，负责项目孵化，涉及AI技术等技术应用。",
+    "team_size": 5,
+    "tools_used": [
+      "AI技术",
+      "商业模式画布",
+      "融资对接",
+      "MVP"
+    ]
+  },
+  {
+    "employee_id": "JZ0081",
+    "project_name": "低空经济产业研究",
+    "role": "项目负责人",
+    "start_date": "2023-06-24",
+    "end_date": "2024-10-01",
+    "description": "参与低空经济产业研究，负责可行性研究，涉及行业调研等技术应用。",
+    "team_size": 11,
+    "tools_used": [
+      "行业调研",
+      "政策研究",
+      "可行性分析",
+      "商业模型"
+    ]
+  },
+  {
+    "employee_id": "JZ0082",
+    "project_name": "产业孵化器运营",
+    "role": "孵化负责人",
+    "start_date": "2023-06-18",
+    "end_date": "2024-06-20",
+    "description": "参与产业孵化器运营，负责商业分析，涉及资源对接等技术应用。",
+    "team_size": 9,
+    "tools_used": [
+      "项目评估",
+      "资源对接",
+      "创业辅导",
+      "孵化器管理"
+    ]
+  },
+  {
+    "employee_id": "JZ0083",
+    "project_name": "产业孵化器运营",
+    "role": "研究员",
+    "start_date": "2024-10-25",
+    "end_date": "2025-01-28",
+    "description": "参与产业孵化器运营，负责技术评估，涉及项目评估等技术应用。",
+    "team_size": 15,
+    "tools_used": [
+      "项目评估",
+      "创业辅导",
+      "孵化器管理",
+      "资源对接"
+    ]
+  },
+  {
+    "employee_id": "JZ0083",
+    "project_name": "低空经济产业研究",
+    "role": "研究员",
+    "start_date": "2025-03-05",
+    "end_date": "2026-03-19",
+    "description": "参与低空经济产业研究，负责项目孵化，涉及政策研究等技术应用。",
+    "team_size": 3,
+    "tools_used": [
+      "可行性分析",
+      "商业模型",
+      "行业调研",
+      "政策研究"
+    ]
+  },
+  {
+    "employee_id": "JZ0083",
+    "project_name": "新能源技术评估",
+    "role": "研究员",
+    "start_date": "2023-06-26",
+    "end_date": "2024-03-31",
+    "description": "参与新能源技术评估，负责可行性研究，涉及市场预测等技术应用。",
+    "team_size": 11,
+    "tools_used": [
+      "投资分析",
+      "市场预测",
+      "专家访谈",
+      "技术评估"
+    ]
+  },
+  {
+    "employee_id": "JZ0083",
+    "project_name": "数字化转型咨询",
+    "role": "投资分析师",
+    "start_date": "2022-04-06",
+    "end_date": "2022-07-25",
+    "description": "参与数字化转型咨询，负责可行性研究，涉及数字化等技术应用。",
+    "team_size": 14,
+    "tools_used": [
+      "数字化",
+      "变革管理",
+      "咨询方法论",
+      "流程再造"
+    ]
+  },
+  {
+    "employee_id": "JZ0084",
+    "project_name": "数字化转型咨询",
+    "role": "孵化负责人",
+    "start_date": "2024-02-10",
+    "end_date": "2024-09-01",
+    "description": "参与数字化转型咨询，负责资源对接，涉及数字化等技术应用。",
+    "team_size": 10,
+    "tools_used": [
+      "变革管理",
+      "数字化",
+      "咨询方法论",
+      "流程再造"
+    ]
+  },
+  {
+    "employee_id": "JZ0084",
+    "project_name": "低空经济产业研究",
+    "role": "研究员",
+    "start_date": "2024-06-19",
+    "end_date": "2024-12-10",
+    "description": "参与低空经济产业研究，负责可行性研究，涉及政策研究等技术应用。",
+    "team_size": 6,
+    "tools_used": [
+      "可行性分析",
+      "行业调研",
+      "政策研究",
+      "商业模型"
+    ]
+  },
+  {
+    "employee_id": "JZ0084",
+    "project_name": "产业孵化器运营",
+    "role": "项目负责人",
+    "start_date": "2025-05-17",
+    "end_date": "2026-07-01",
+    "description": "参与产业孵化器运营，负责商业分析，涉及创业辅导等技术应用。",
+    "team_size": 15,
+    "tools_used": [
+      "资源对接",
+      "创业辅导",
+      "孵化器管理",
+      "项目评估"
+    ]
+  },
+  {
+    "employee_id": "JZ0084",
+    "project_name": "新能源技术评估",
+    "role": "孵化负责人",
+    "start_date": "2025-10-14",
+    "end_date": "2026-07-01",
+    "description": "参与新能源技术评估，负责商业分析，涉及市场预测等技术应用。",
+    "team_size": 13,
+    "tools_used": [
+      "专家访谈",
+      "技术评估",
+      "投资分析",
+      "市场预测"
+    ]
+  },
+  {
+    "employee_id": "JZ0085",
+    "project_name": "产业孵化器运营",
+    "role": "项目负责人",
+    "start_date": "2022-10-03",
+    "end_date": "2023-11-19",
+    "description": "参与产业孵化器运营，负责技术评估，涉及项目评估等技术应用。",
+    "team_size": 3,
+    "tools_used": [
+      "项目评估",
+      "创业辅导",
+      "孵化器管理",
+      "资源对接"
+    ]
+  },
+  {
+    "employee_id": "JZ0085",
+    "project_name": "新能源技术评估",
+    "role": "项目负责人",
+    "start_date": "2025-05-12",
+    "end_date": "2026-05-25",
+    "description": "参与新能源技术评估，负责资源对接，涉及技术评估等技术应用。",
+    "team_size": 6,
+    "tools_used": [
+      "专家访谈",
+      "投资分析",
+      "市场预测",
+      "技术评估"
+    ]
+  },
+  {
+    "employee_id": "JZ0086",
+    "project_name": "新能源技术评估",
+    "role": "研究员",
+    "start_date": "2025-05-15",
+    "end_date": "2025-10-25",
+    "description": "参与新能源技术评估，负责技术评估，涉及投资分析等技术应用。",
+    "team_size": 5,
+    "tools_used": [
+      "投资分析",
+      "市场预测",
+      "技术评估",
+      "专家访谈"
+    ]
+  },
+  {
+    "employee_id": "JZ0086",
+    "project_name": "新业务孵化AI+",
+    "role": "研究员",
+    "start_date": "2024-02-14",
+    "end_date": "2024-11-27",
+    "description": "参与新业务孵化AI+，负责可行性研究，涉及AI技术等技术应用。",
+    "team_size": 6,
+    "tools_used": [
+      "融资对接",
+      "AI技术",
+      "MVP",
+      "商业模式画布"
+    ]
+  },
+  {
+    "employee_id": "JZ0087",
+    "project_name": "产业孵化器运营",
+    "role": "研究员",
+    "start_date": "2022-07-10",
+    "end_date": "2023-06-11",
+    "description": "参与产业孵化器运营，负责技术评估，涉及孵化器管理等技术应用。",
+    "team_size": 15,
+    "tools_used": [
+      "创业辅导",
+      "资源对接",
+      "项目评估",
+      "孵化器管理"
+    ]
+  },
+  {
+    "employee_id": "JZ0087",
+    "project_name": "低空经济产业研究",
+    "role": "孵化负责人",
+    "start_date": "2022-03-30",
+    "end_date": "2023-06-20",
+    "description": "参与低空经济产业研究，负责商业分析，涉及商业模型等技术应用。",
+    "team_size": 15,
+    "tools_used": [
+      "商业模型",
+      "可行性分析",
+      "行业调研",
+      "政策研究"
+    ]
+  },
+  {
+    "employee_id": "JZ0087",
+    "project_name": "数字化转型咨询",
+    "role": "孵化负责人",
+    "start_date": "2022-10-02",
+    "end_date": "2023-05-10",
+    "description": "参与数字化转型咨询，负责商业分析，涉及咨询方法论等技术应用。",
+    "team_size": 7,
+    "tools_used": [
+      "变革管理",
+      "流程再造",
+      "咨询方法论",
+      "数字化"
+    ]
+  },
+  {
+    "employee_id": "JZ0087",
+    "project_name": "新业务孵化AI+",
+    "role": "项目负责人",
+    "start_date": "2025-12-23",
+    "end_date": "2026-07-01",
+    "description": "参与新业务孵化AI+，负责技术评估，涉及AI技术等技术应用。",
+    "team_size": 11,
+    "tools_used": [
+      "AI技术",
+      "商业模式画布",
+      "融资对接",
+      "MVP"
+    ]
+  },
+  {
+    "employee_id": "JZ0088",
+    "project_name": "数字化转型咨询",
+    "role": "投资分析师",
+    "start_date": "2025-08-27",
+    "end_date": "2026-07-01",
+    "description": "参与数字化转型咨询，负责资源对接，涉及变革管理等技术应用。",
+    "team_size": 12,
+    "tools_used": [
+      "数字化",
+      "变革管理",
+      "流程再造",
+      "咨询方法论"
+    ]
+  },
+  {
+    "employee_id": "JZ0088",
+    "project_name": "低空经济产业研究",
+    "role": "孵化负责人",
+    "start_date": "2026-03-27",
+    "end_date": "2026-07-01",
+    "description": "参与低空经济产业研究，负责技术评估，涉及商业模型等技术应用。",
+    "team_size": 5,
+    "tools_used": [
+      "政策研究",
+      "商业模型",
+      "可行性分析",
+      "行业调研"
+    ]
+  },
+  {
+    "employee_id": "JZ0088",
+    "project_name": "新业务孵化AI+",
+    "role": "投资分析师",
+    "start_date": "2023-09-21",
+    "end_date": "2024-10-10",
+    "description": "参与新业务孵化AI+，负责项目孵化，涉及商业模式画布等技术应用。",
+    "team_size": 13,
+    "tools_used": [
+      "AI技术",
+      "MVP",
+      "融资对接",
+      "商业模式画布"
+    ]
+  },
+  {
+    "employee_id": "JZ0088",
+    "project_name": "新能源技术评估",
+    "role": "研究员",
+    "start_date": "2026-05-23",
+    "end_date": "2026-07-01",
+    "description": "参与新能源技术评估，负责可行性研究，涉及市场预测等技术应用。",
+    "team_size": 11,
+    "tools_used": [
+      "专家访谈",
+      "市场预测",
+      "技术评估",
+      "投资分析"
+    ]
+  },
+  {
+    "employee_id": "JZ0089",
+    "project_name": "低空经济产业研究",
+    "role": "项目负责人",
+    "start_date": "2025-05-14",
+    "end_date": "2026-03-22",
+    "description": "参与低空经济产业研究，负责可行性研究，涉及政策研究等技术应用。",
+    "team_size": 6,
+    "tools_used": [
+      "政策研究",
+      "行业调研",
+      "商业模型",
+      "可行性分析"
+    ]
+  },
+  {
+    "employee_id": "JZ0089",
+    "project_name": "产业孵化器运营",
+    "role": "投资分析师",
+    "start_date": "2024-03-31",
+    "end_date": "2025-05-09",
+    "description": "参与产业孵化器运营，负责技术评估，涉及孵化器管理等技术应用。",
+    "team_size": 15,
+    "tools_used": [
+      "项目评估",
+      "资源对接",
+      "创业辅导",
+      "孵化器管理"
+    ]
+  },
+  {
+    "employee_id": "JZ0089",
+    "project_name": "新业务孵化AI+",
+    "role": "投资分析师",
+    "start_date": "2022-01-22",
+    "end_date": "2022-08-03",
+    "description": "参与新业务孵化AI+，负责商业分析，涉及AI技术等技术应用。",
+    "team_size": 15,
+    "tools_used": [
+      "商业模式画布",
+      "MVP",
+      "AI技术",
+      "融资对接"
+    ]
+  },
+  {
+    "employee_id": "JZ0089",
+    "project_name": "新能源技术评估",
+    "role": "项目负责人",
+    "start_date": "2024-01-07",
+    "end_date": "2024-08-06",
+    "description": "参与新能源技术评估，负责商业分析，涉及技术评估等技术应用。",
+    "team_size": 7,
+    "tools_used": [
+      "专家访谈",
+      "市场预测",
+      "投资分析",
+      "技术评估"
+    ]
+  },
+  {
+    "employee_id": "JZ0090",
+    "project_name": "产业孵化器运营",
+    "role": "项目负责人",
+    "start_date": "2026-02-18",
+    "end_date": "2026-07-01",
+    "description": "参与产业孵化器运营，负责可行性研究，涉及资源对接等技术应用。",
+    "team_size": 14,
+    "tools_used": [
+      "资源对接",
+      "项目评估",
+      "创业辅导",
+      "孵化器管理"
+    ]
+  },
+  {
+    "employee_id": "JZ0090",
+    "project_name": "低空经济产业研究",
+    "role": "孵化负责人",
+    "start_date": "2025-05-26",
+    "end_date": "2025-12-01",
+    "description": "参与低空经济产业研究，负责项目孵化，涉及行业调研等技术应用。",
+    "team_size": 7,
+    "tools_used": [
+      "可行性分析",
+      "商业模型",
+      "行业调研",
+      "政策研究"
+    ]
+  },
+  {
+    "employee_id": "JZ0091",
+    "project_name": "数字化转型咨询",
+    "role": "投资分析师",
+    "start_date": "2023-06-12",
+    "end_date": "2024-12-01",
+    "description": "参与数字化转型咨询，负责项目孵化，涉及变革管理等技术应用。",
+    "team_size": 12,
+    "tools_used": [
+      "变革管理",
+      "咨询方法论",
+      "流程再造",
+      "数字化"
+    ]
+  },
+  {
+    "employee_id": "JZ0091",
+    "project_name": "低空经济产业研究",
+    "role": "项目负责人",
+    "start_date": "2025-10-27",
+    "end_date": "2026-07-01",
+    "description": "参与低空经济产业研究，负责项目孵化，涉及行业调研等技术应用。",
+    "team_size": 7,
+    "tools_used": [
+      "行业调研",
+      "可行性分析",
+      "商业模型",
+      "政策研究"
+    ]
+  },
+  {
+    "employee_id": "JZ0091",
+    "project_name": "产业孵化器运营",
+    "role": "投资分析师",
+    "start_date": "2023-10-09",
+    "end_date": "2024-08-05",
+    "description": "参与产业孵化器运营，负责技术评估，涉及孵化器管理等技术应用。",
+    "team_size": 14,
+    "tools_used": [
+      "资源对接",
+      "孵化器管理",
+      "项目评估",
+      "创业辅导"
+    ]
+  },
+  {
+    "employee_id": "JZ0092",
+    "project_name": "数字化转型咨询",
+    "role": "投资分析师",
+    "start_date": "2024-09-02",
+    "end_date": "2025-05-10",
+    "description": "参与数字化转型咨询，负责商业分析，涉及数字化等技术应用。",
+    "team_size": 5,
+    "tools_used": [
+      "流程再造",
+      "变革管理",
+      "咨询方法论",
+      "数字化"
+    ]
+  },
+  {
+    "employee_id": "JZ0092",
+    "project_name": "低空经济产业研究",
+    "role": "投资分析师",
+    "start_date": "2026-02-15",
+    "end_date": "2026-07-01",
+    "description": "参与低空经济产业研究，负责商业分析，涉及可行性分析等技术应用。",
+    "team_size": 6,
+    "tools_used": [
+      "可行性分析",
+      "政策研究",
+      "商业模型",
+      "行业调研"
+    ]
+  },
+  {
+    "employee_id": "JZ0092",
+    "project_name": "产业孵化器运营",
+    "role": "项目负责人",
+    "start_date": "2026-05-15",
+    "end_date": "2026-07-01",
+    "description": "参与产业孵化器运营，负责可行性研究，涉及创业辅导等技术应用。",
+    "team_size": 12,
+    "tools_used": [
+      "孵化器管理",
+      "资源对接",
+      "创业辅导",
+      "项目评估"
+    ]
+  },
+  {
+    "employee_id": "JZ0092",
+    "project_name": "新业务孵化AI+",
+    "role": "投资分析师",
+    "start_date": "2024-01-31",
+    "end_date": "2025-03-13",
+    "description": "参与新业务孵化AI+，负责项目孵化，涉及MVP等技术应用。",
+    "team_size": 10,
+    "tools_used": [
+      "商业模式画布",
+      "MVP",
+      "融资对接",
+      "AI技术"
+    ]
+  },
+  {
+    "employee_id": "JZ0093",
+    "project_name": "产业孵化器运营",
+    "role": "孵化负责人",
+    "start_date": "2022-04-21",
+    "end_date": "2023-04-15",
+    "description": "参与产业孵化器运营，负责项目孵化，涉及孵化器管理等技术应用。",
+    "team_size": 11,
+    "tools_used": [
+      "资源对接",
+      "项目评估",
+      "孵化器管理",
+      "创业辅导"
+    ]
+  },
+  {
+    "employee_id": "JZ0093",
+    "project_name": "新能源技术评估",
+    "role": "孵化负责人",
+    "start_date": "2022-09-04",
+    "end_date": "2023-11-25",
+    "description": "参与新能源技术评估，负责资源对接，涉及技术评估等技术应用。",
+    "team_size": 3,
+    "tools_used": [
+      "市场预测",
+      "专家访谈",
+      "技术评估",
+      "投资分析"
+    ]
+  },
+  {
+    "employee_id": "JZ0094",
+    "project_name": "产业孵化器运营",
+    "role": "研究员",
+    "start_date": "2025-01-28",
+    "end_date": "2025-09-09",
+    "description": "参与产业孵化器运营，负责资源对接，涉及创业辅导等技术应用。",
+    "team_size": 12,
+    "tools_used": [
+      "资源对接",
+      "项目评估",
+      "孵化器管理",
+      "创业辅导"
+    ]
+  },
+  {
+    "employee_id": "JZ0094",
+    "project_name": "数字化转型咨询",
+    "role": "孵化负责人",
+    "start_date": "2024-05-18",
+    "end_date": "2024-12-01",
+    "description": "参与数字化转型咨询，负责资源对接，涉及数字化等技术应用。",
+    "team_size": 9,
+    "tools_used": [
+      "数字化",
+      "流程再造",
+      "咨询方法论",
+      "变革管理"
+    ]
+  },
+  {
+    "employee_id": "JZ0094",
+    "project_name": "低空经济产业研究",
+    "role": "研究员",
+    "start_date": "2025-03-25",
+    "end_date": "2026-06-09",
+    "description": "参与低空经济产业研究，负责可行性研究，涉及政策研究等技术应用。",
+    "team_size": 15,
+    "tools_used": [
+      "可行性分析",
+      "政策研究",
+      "商业模型",
+      "行业调研"
+    ]
+  },
+  {
+    "employee_id": "JZ0095",
+    "project_name": "新能源技术评估",
+    "role": "项目负责人",
+    "start_date": "2024-08-26",
+    "end_date": "2026-01-10",
+    "description": "参与新能源技术评估，负责商业分析，涉及专家访谈等技术应用。",
+    "team_size": 10,
+    "tools_used": [
+      "市场预测",
+      "投资分析",
+      "专家访谈",
+      "技术评估"
+    ]
+  },
+  {
+    "employee_id": "JZ0095",
+    "project_name": "产业孵化器运营",
+    "role": "项目负责人",
+    "start_date": "2023-09-07",
+    "end_date": "2024-04-12",
+    "description": "参与产业孵化器运营，负责项目孵化，涉及孵化器管理等技术应用。",
+    "team_size": 14,
+    "tools_used": [
+      "项目评估",
+      "孵化器管理",
+      "资源对接",
+      "创业辅导"
+    ]
+  },
+  {
+    "employee_id": "JZ0096",
+    "project_name": "低空经济产业研究",
+    "role": "投资分析师",
+    "start_date": "2024-10-13",
+    "end_date": "2025-07-14",
+    "description": "参与低空经济产业研究，负责技术评估，涉及政策研究等技术应用。",
+    "team_size": 8,
+    "tools_used": [
+      "行业调研",
+      "可行性分析",
+      "商业模型",
+      "政策研究"
+    ]
+  },
+  {
+    "employee_id": "JZ0096",
+    "project_name": "新业务孵化AI+",
+    "role": "研究员",
+    "start_date": "2024-06-10",
+    "end_date": "2025-06-30",
+    "description": "参与新业务孵化AI+，负责资源对接，涉及MVP等技术应用。",
+    "team_size": 8,
+    "tools_used": [
+      "融资对接",
+      "MVP",
+      "商业模式画布",
+      "AI技术"
+    ]
+  },
+  {
+    "employee_id": "JZ0096",
+    "project_name": "数字化转型咨询",
+    "role": "投资分析师",
+    "start_date": "2025-06-18",
+    "end_date": "2026-07-01",
+    "description": "参与数字化转型咨询，负责项目孵化，涉及流程再造等技术应用。",
+    "team_size": 5,
+    "tools_used": [
+      "数字化",
+      "流程再造",
+      "变革管理",
+      "咨询方法论"
+    ]
+  },
+  {
+    "employee_id": "JZ0096",
+    "project_name": "新能源技术评估",
+    "role": "投资分析师",
+    "start_date": "2023-10-09",
+    "end_date": "2024-03-29",
+    "description": "参与新能源技术评估，负责商业分析，涉及投资分析等技术应用。",
+    "team_size": 8,
+    "tools_used": [
+      "投资分析",
+      "专家访谈",
+      "市场预测",
+      "技术评估"
+    ]
+  },
+  {
+    "employee_id": "JZ0097",
+    "project_name": "新业务孵化AI+",
+    "role": "孵化负责人",
+    "start_date": "2025-04-17",
+    "end_date": "2026-04-08",
+    "description": "参与新业务孵化AI+，负责项目孵化，涉及商业模式画布等技术应用。",
+    "team_size": 5,
+    "tools_used": [
+      "AI技术",
+      "融资对接",
+      "MVP",
+      "商业模式画布"
+    ]
+  },
+  {
+    "employee_id": "JZ0097",
+    "project_name": "数字化转型咨询",
+    "role": "项目负责人",
+    "start_date": "2026-03-04",
+    "end_date": "2026-07-01",
+    "description": "参与数字化转型咨询，负责商业分析，涉及流程再造等技术应用。",
+    "team_size": 9,
+    "tools_used": [
+      "咨询方法论",
+      "变革管理",
+      "数字化",
+      "流程再造"
+    ]
+  },
+  {
+    "employee_id": "JZ0097",
+    "project_name": "产业孵化器运营",
+    "role": "项目负责人",
+    "start_date": "2025-01-28",
+    "end_date": "2025-05-25",
+    "description": "参与产业孵化器运营，负责项目孵化，涉及孵化器管理等技术应用。",
+    "team_size": 4,
+    "tools_used": [
+      "资源对接",
+      "创业辅导",
+      "孵化器管理",
+      "项目评估"
+    ]
+  },
+  {
+    "employee_id": "JZ0098",
+    "project_name": "数字化转型咨询",
+    "role": "研究员",
+    "start_date": "2024-06-26",
+    "end_date": "2025-08-10",
+    "description": "参与数字化转型咨询，负责商业分析，涉及流程再造等技术应用。",
+    "team_size": 3,
+    "tools_used": [
+      "咨询方法论",
+      "数字化",
+      "流程再造",
+      "变革管理"
+    ]
+  },
+  {
+    "employee_id": "JZ0098",
+    "project_name": "新能源技术评估",
+    "role": "投资分析师",
+    "start_date": "2024-09-02",
+    "end_date": "2025-07-28",
+    "description": "参与新能源技术评估，负责技术评估，涉及专家访谈等技术应用。",
+    "team_size": 5,
+    "tools_used": [
+      "市场预测",
+      "投资分析",
+      "专家访谈",
+      "技术评估"
+    ]
+  },
+  {
+    "employee_id": "JZ0098",
+    "project_name": "低空经济产业研究",
+    "role": "投资分析师",
+    "start_date": "2024-12-08",
+    "end_date": "2026-01-29",
+    "description": "参与低空经济产业研究，负责资源对接，涉及商业模型等技术应用。",
+    "team_size": 11,
+    "tools_used": [
+      "可行性分析",
+      "行业调研",
+      "商业模型",
+      "政策研究"
+    ]
+  },
+  {
+    "employee_id": "JZ0098",
+    "project_name": "新业务孵化AI+",
+    "role": "投资分析师",
+    "start_date": "2024-01-20",
+    "end_date": "2024-11-16",
+    "description": "参与新业务孵化AI+，负责商业分析，涉及MVP等技术应用。",
+    "team_size": 3,
+    "tools_used": [
+      "AI技术",
+      "MVP",
+      "融资对接",
+      "商业模式画布"
+    ]
+  },
+  {
+    "employee_id": "JZ0099",
+    "project_name": "新业务孵化AI+",
+    "role": "孵化负责人",
+    "start_date": "2024-10-04",
+    "end_date": "2026-01-23",
+    "description": "参与新业务孵化AI+，负责资源对接，涉及AI技术等技术应用。",
+    "team_size": 15,
+    "tools_used": [
+      "融资对接",
+      "商业模式画布",
+      "AI技术",
+      "MVP"
+    ]
+  },
+  {
+    "employee_id": "JZ0099",
+    "project_name": "低空经济产业研究",
+    "role": "研究员",
+    "start_date": "2025-01-27",
+    "end_date": "2025-11-04",
+    "description": "参与低空经济产业研究，负责项目孵化，涉及商业模型等技术应用。",
+    "team_size": 9,
+    "tools_used": [
+      "可行性分析",
+      "行业调研",
+      "商业模型",
+      "政策研究"
+    ]
+  },
+  {
+    "employee_id": "JZ0099",
+    "project_name": "数字化转型咨询",
+    "role": "项目负责人",
+    "start_date": "2023-03-28",
+    "end_date": "2023-11-07",
+    "description": "参与数字化转型咨询，负责项目孵化，涉及流程再造等技术应用。",
+    "team_size": 11,
+    "tools_used": [
+      "数字化",
+      "流程再造",
+      "变革管理",
+      "咨询方法论"
+    ]
+  },
+  {
+    "employee_id": "JZ0100",
+    "project_name": "低空经济产业研究",
+    "role": "项目负责人",
+    "start_date": "2022-10-07",
+    "end_date": "2023-06-02",
+    "description": "参与低空经济产业研究，负责项目孵化，涉及商业模型等技术应用。",
+    "team_size": 7,
+    "tools_used": [
+      "商业模型",
+      "行业调研",
+      "可行性分析",
+      "政策研究"
+    ]
+  },
+  {
+    "employee_id": "JZ0100",
+    "project_name": "新能源技术评估",
+    "role": "项目负责人",
+    "start_date": "2022-11-08",
+    "end_date": "2023-03-03",
+    "description": "参与新能源技术评估，负责商业分析，涉及技术评估等技术应用。",
+    "team_size": 7,
+    "tools_used": [
+      "投资分析",
+      "技术评估",
+      "市场预测",
+      "专家访谈"
+    ]
+  }
+]

@@ -1,0 +1,8 @@
+{
+    "age_range": [30, 45],
+    "political_status": ["中共党员"],
+    "major_keywords": ["计算机", "软件", "电子", "通信", "自动化"],
+    "min_years_of_service": 3,
+    "level_range": ["P4", "P8"],
+    "min_performance": "B"
+}
