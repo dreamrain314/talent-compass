@@ -129,3 +129,22 @@
 **边界澄清（防下游混淆）：**
 - Agent② **只产员工侧 `sfia_level`，不算 T1 得分** —— T1 得分公式 `Σ w_i × SFIA_diff` 是 Agent④ 职责（需 Agent③ 要求侧 SFIA）
 - 实现时 config 常量待加：`SFIA_MAX_LEVEL=7` / `SFIA_CAP_EXCESS=2` / `LABEL_CONFIDENCE_THRESHOLD=0.6` 等（D2 单一来源，详见文档 §7）
+
+---
+
+## [VERIFIED] — 2026-07-26（第 2 周准备 · Step 3: Embedding demo + 框架选型）
+
+**变更文件:** `scripts/embedding_demo.py`（新建）+ `requirements.txt`（加 fastembed）+ `docs/plan-profile-agent-schema.md`（加 §8）
+**状态:** demo 验证脚本（非核心逻辑，不触发 V1 闸门；已跑通验证 6/6 top-1 命中）
+
+**选型决策:**
+- 框架: `fastembed` + `BAAI/bge-small-zh-v1.5`（ONNX 后端, 无 torch, 离线, ~95MB）
+- 理由: DeepSeek/Paratera 无 embedding API；OpenAI key 未配置；本地唯一可行；竞赛现场离线稳
+
+**验证结果:** 6 查询 top-1 排序 6/6 命中预期（Java微服务→Java开发 sim=0.89 强映射；其余 0.59-0.69）
+
+**⚠ 阈值标定发现（07.31 实现前必须解决）:**
+- 原四档 `0.6/0.75/0.85/0.95` 为 OpenAI 标定，对 bge 过严（几乎全落 <0.60 pending）
+- 现象: 词汇重叠高 sim 高（Java 0.89）；语义近用词异 sim 低（带团队→团队管理 0.59）
+- 07.31 建议: top-1 + 相对 margin 判定（不依赖绝对值）+ 绝对下限兜底
+- 详见 `docs/plan-profile-agent-schema.md` §8

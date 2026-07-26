@@ -68,7 +68,7 @@
 |---|------|------|------|------|
 | 2.1.10 | 07.26 | **certificates 字段 + RAW_DIR D2 合规** — H1Filter 数据来源 + 消除手动 cp | ✅ | 见 `change-log.md` Step1+1.5；231/231 测试全绿 |
 | 2.1.11 | 07.26 | Agent② JSON Schema 定义（T1/T2/T3/证据/置信度/成长曲线） | ✅ | `docs/plan-profile-agent-schema.md` 定稿，决策点已用户确认 |
-| 2.1.12 | 07.26-27 | Embedding demo + 框架选型 | ⏳ | 07.31 标准标签映射用 |
+| 2.1.12 | 07.26 | Embedding demo + 框架选型 | ✅ | fastembed+bge-small-zh，6/6 top-1 命中；阈值标定发现见 schema §8 |
 
 ### 第 2 周（07.28 – 08.03）：Agent② 画像生成（核心难点）
 

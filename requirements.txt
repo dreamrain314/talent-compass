@@ -4,6 +4,7 @@ plotly>=5.0.0
 openai>=1.0.0
 python-dotenv>=1.0.0
 scikit-learn>=1.5.0
+fastembed>=0.8.0  # Agent② 标准标签映射 embedding（ONNX 后端, 无 torch, 离线可用）
 jsonschema>=4.20.0
 numpy>=1.24.0
 pytest>=8.0.0

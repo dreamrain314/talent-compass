@@ -210,3 +210,30 @@ Agent① 融合JSON ─→ Agent② 画像生成 ─→ Agent③ 岗位分析 �
 | `LABEL_LIBRARY_VERSION` | "1.0" | Agent② metadata.data_lineage.label_library_version |
 
 > 实现代码时从 config import，禁止在 agents/profile_generation.py 内联硬编码（D2/F1）。
+
+---
+
+## 8. Embedding 框架选型 + 阈值标定（Demo 验证，2026-07-26）
+
+### 8.1 框架决策
+- **选型**: `fastembed` + `BAAI/bge-small-zh-v1.5`
+- **理由**:
+  - 离线可用（首次下载 ~95MB 后无网络也能跑，竞赛现场稳）
+  - ONNX 后端，无 torch 依赖（~几十 MB vs sentence-transformers ~2GB）
+  - bge-small-zh 是中文专用 embedding 模型，标签库为中文
+  - DeepSeek/Paratera 不提供 embedding API，OpenAI key 未配置 → 本地是唯一可行方案
+- **验证脚本**: `scripts/embedding_demo.py`（流程跑通，6 查询 top-1 排序 **6/6 命中预期**）
+
+### 8.2 ⚠ 阈值标定发现（07.31 实现前必须解决）
+- **问题**: 原四档阈值 `0.6/0.75/0.85/0.95` 是为 OpenAI embedding 标定；bge-small-zh 相似度绝对值普遍偏低（top-1 多在 0.59-0.69），几乎全部落入 `<0.60` pending。
+- **现象**: 词汇高度重叠（"Java微服务后端"→"Java开发" sim=0.8962）sim 高；语义相近但用词不同（"带团队打硬仗"→"团队管理" sim=0.5973）sim 低。
+- **07.31 实现时的两个选项**:
+  - 选项 A: 为 bge 重新标定阈值（如 `0.50/0.60/0.70/0.85`）—— 需用真实员工标签数据标定
+  - 选项 B: 改用 `top-1 + 相对 margin`（top1-top2 > Δ）判定 —— 不依赖绝对值，更鲁棒
+- **建议**: 选项 B（margin 判定）+ 选项 A（绝对下限兜底）混合，07.31 用真实员工数据验证后定稿。
+
+### 8.3 实现路径（07.31 Agent② 步骤 2.7）
+- 复用 `scripts/embedding_demo.py` 的 `load_label_corpus` + `cosine_sim` 逻辑
+- 抽到 `utils/label_embedding.py`（D2 单一来源，供 Agent② + UI 复用）
+- `config.py` 加 `EMBEDDING_MODEL_NAME = "BAAI/bge-small-zh-v1.5"` + 阈值常量（标定后）
+- 模型单例缓存（首次加载 ~2s，避免每次 Agent② 调用重新加载 — F4 单例每次访问检查配置变化）

@@ -1,5 +1,36 @@
 # progress.md — Bug修复进度
 
+## 📐 第2周准备 Step3: Embedding demo + 框架选型 (2026-07-26)
+
+**状态**: [VERIFIED]（demo 验证脚本，非核心逻辑，已跑通）
+
+### 完成内容
+
+| 文件 | 操作 | 说明 |
+|------|------|------|
+| `scripts/embedding_demo.py` | 新建 | fastembed + bge-small-zh 最小 demo：自由文本→35 标签余弦相似度→top-3→四档阈值 |
+| `requirements.txt` | 修改 | 加 `fastembed>=0.8.0`（ONNX, 无 torch, 离线可用） |
+| `docs/plan-profile-agent-schema.md` | 修改 | 加 §8 embedding 选型 + 阈值标定发现 + 07.31 实现路径 |
+
+### 框架选型决策
+
+- **选型**: `fastembed` + `BAAI/bge-small-zh-v1.5`
+- **理由**: DeepSeek/Paratera 无 embedding API；OpenAI key 未配置；本地 ONNX 是唯一可行方案；离线可用竞赛现场稳
+
+### 验证结果
+
+- 6 查询 top-1 排序 **6/6 命中预期标签**（Java微服务→Java开发 0.89 强映射；带团队→团队管理 0.59；学新东西→学习敏捷性 0.59 等）
+- 模型离线可用（首次下载 ~95MB 后无网络也能跑）
+
+### ⚠ 阈值标定发现（07.31 实现前必须解决）
+
+- 原四档 `0.6/0.75/0.85/0.95` 为 OpenAI embedding 标定，对 bge 过严
+- bge top-1 sim 多在 0.59-0.69，几乎全落 `<0.60` pending
+- 现象: 词汇重叠高（Java→Java 0.89）sim 高；语义近用词异（带团队→团队管理 0.59）sim 低
+- 07.31 建议: **top-1 + 相对 margin 判定**（不依赖绝对值）+ 绝对下限兜底
+
+---
+
 ## 📐 第2周准备 Step2: Agent② 输出 JSON Schema 定稿 (2026-07-26)
 
 **状态**: [定稿]（设计文档，非代码，不触发 V1 闸门）
