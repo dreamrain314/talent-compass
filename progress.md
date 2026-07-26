@@ -60,3 +60,51 @@
 4. **截图产出未 git add** — 测试脚本生成的 32 张截图未纳入版本管理
 
 → 详见[防不同步流程改进方案]（本文件末尾）
+
+---
+
+## [VERIFIED] — 2026-07-26（第 2 周准备 · Step 1: certificates 字段）
+
+**变更文件:** `scripts/generate_mock_data.py`
+**变更摘要:** 为 H1Filter 数据来源做准备 —— employees 新增 `certificates` 字段
+
+具体修改：
+1. 新增 `SEQ_CERTS` 证书池（4 个岗位序列各 4-6 个序列相关证书，PMP 跨序列通用）
+2. 新增 `_gen_certificates(seq, level_num)` —— 权重：~55% 无 / ~30% 持 1 个 / ~15% 持 2 个；高职级上浮 15% 但保留 ≥30% 无证书下限
+3. `gen_emps` 的 `rows.append` 增加 `certificates=_gen_certificates(sq, lv)`
+4. `generate_all` 的 `wcsv("employees.csv", ...)` fieldnames 增加 `certificates`
+5. 新增 certificates 校验块：空值检查 + 序列一致性 + 分序列持证率统计
+6. **关键隔离**：用独立 `_CERT_RNG = random.Random(2026)`，不污染主 `random.seed(42)` 链路 → 保证 perf/proj/train/eval360 baseline 可重复
+
+**验证结果（V2 闸门通过）：**
+- [x] 跑生成脚本 → certificates 55/100 持证 (55%)、无空值、序列一致性通过；分序列持证：技术研发 10/25 / 管理职能 19/25 / 市场业务 12/25 / 新业务创新 14/25
+- [x] 独立 RNG 隔离成功 → perf/proj/train hash 与 baseline **完全一致**（`performance.csv`/`projects.json`/`training.csv` 三文件 hash 未变）
+- [x] `data/raw/employees.csv` 已同步 certificates 列（cp 自 `scripts/raw`），其余 4 文件 hash 不变
+- [x] `pytest tests/ -v -W error::FutureWarning` → **231/231 passed**（14.75s）
+- [x] 对抗审查：`_gen_certificates` 9 个边界值推演通过（未知序列/level=1,9,5,6/pool 长度=1/random=0.0/PMP 不重复/证书无 `;`）
+
+**发现的既存问题（不在本任务范围，记录备修）：**
+1. `evaluation_360.csv` baseline 与当前脚本输出不一致（hash `96c92946` vs `6ca9590f`）——用 HEAD 版本（无 certificates）跑脚本仍不一致，证明 baseline 过时、与 certificates 修改**无关**。建议单独任务重新生成 eval360 baseline。
+2. `generate_mock_data.py` 的 `RAW_DIR = Path(__file__).parent / "raw"` 硬编码为 `scripts/raw`，违反 D2（config.py 已定义 `RAW_DATA_DIR = data/raw`）。当前靠手动 cp `scripts/raw/*` 同步 `data/raw`。建议改用 `config.RAW_DATA_DIR` 一劳永逸。
+
+---
+
+## [VERIFIED] — 2026-07-26（第 2 周准备 · Step 1.5: 修既存 D2 违规 + eval360 baseline 同步）
+
+**变更文件:** `scripts/generate_mock_data.py`
+**变更摘要:** 修 RAW_DIR 硬编码（D2 合规）+ 重新生成 data/raw 让 eval360 baseline 与脚本同步
+
+具体修改：
+1. import: `from config import EVALUATOR_MIN_SAMPLE_SIZE` → 加 `RAW_DATA_DIR`
+2. `RAW_DIR = Path(__file__).resolve().parent / "raw"` → `RAW_DIR = RAW_DATA_DIR`（直接写 data/raw，消除手动 cp）
+
+**附带操作:** 跑脚本重新生成 data/raw 全部 5 文件 → eval360 baseline 与脚本重新同步（解决既存问题①）
+
+**验证结果（V2 闸门通过）：**
+- [x] 脚本直接写 data/raw —— `scripts/raw` 不再产生（D2 合规达成，消除手动 cp）
+- [x] perf/proj/train hash 与之前 baseline **完全一致**（`5a7ad6bc`/`cd853969`/`7c034dc5`，独立 RNG 仍隔离）
+- [x] employees.csv 含 certificates 列（JZ0001=无，持证率 55/100）
+- [x] eval360 重新生成 → hash `96c92946`→`6ca9590f`（baseline 与脚本同步，既存问题①解决）
+- [x] `pytest tests/ -v -W error::FutureWarning` → **231/231 passed**（9.14s，eval360 baseline 变化不破坏测试——下游只测结构/异常检测逻辑，不依赖具体 score 值）
+
+**对抗审查（边界推演）：** RAW_DATA_DIR 是 config 绝对路径 → 脚本从任意 cwd 跑都写 data/raw ✅；`mkdir(exist_ok=True)` data/raw 已存在不报错 ✅；import 失败风险排除（config 已定义且他模块已用）✅

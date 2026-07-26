@@ -1,5 +1,37 @@
 # progress.md — Bug修复进度
 
+## 🔧 第2周准备 Step1+1.5: certificates 字段 + RAW_DIR D2 合规 (2026-07-26)
+
+**状态**: [VERIFIED]
+
+### 完成内容
+
+| 文件 | 操作 | 说明 |
+|------|------|------|
+| `scripts/generate_mock_data.py` | 修改 | 新增 `SEQ_CERTS` 证书池（4 序列各 4-6 证书，PMP 跨序列通用）+ `_gen_certificates`（权重 55%无/30%单/15%双，高职级上浮）+ 校验块 |
+| `scripts/generate_mock_data.py` | 修改 | `RAW_DIR` 改用 `config.RAW_DATA_DIR`（D2 合规，消除手动 cp `scripts/raw`→`data/raw`） |
+| `data/raw/employees.csv` | 重新生成 | 新增 `certificates` 列（55/100 持证，序列一致，无空值） |
+| `data/raw/evaluation_360.csv` | 重新生成 | baseline 与脚本重新同步（既存过时问题修复） |
+
+### 关键决策
+
+- **独立 RNG 隔离**：`_CERT_RNG = random.Random(2026)` 独立于主 `random.seed(42)`，避免 certificates 生成污染 perf/proj/train/eval360 的 baseline 可重复性。验证：perf/proj/train hash 与 baseline **完全一致**（隔离铁证）。
+
+### 发现并修复的既存问题
+
+| 问题 | 根因 | 修复 |
+|------|------|------|
+| eval360 baseline 与脚本不一致 | baseline 过时（非当前脚本生成），与 certificates 无关 | 重新生成，hash `96c92946`→`6ca9590f` |
+| `RAW_DIR` 硬编码 `scripts/raw` | D2 违规（config 已有 `RAW_DATA_DIR`） | 改用 `config.RAW_DATA_DIR` |
+
+### 验证
+
+- [x] 测试: 231/231 PASSED（`-W error::FutureWarning`，9.14s）
+- [x] perf/proj/train hash 与 baseline 一致（独立 RNG 隔离铁证）
+- [x] certificates: 55/100 持证、序列一致、无空值
+
+---
+
 ## 🔧 Day6: 词典编写 + 前端对抗检验 + 修复 (2026-07-26)
 
 **状态**: [VERIFIED]

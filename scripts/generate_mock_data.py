@@ -16,10 +16,12 @@ from pathlib import Path
 _sys_path_added = str(Path(__file__).resolve().parent.parent)
 if _sys_path_added not in sys.path:
     sys.path.insert(0, _sys_path_added)
-from config import EVALUATOR_MIN_SAMPLE_SIZE  # noqa: E402 — 需要 sys.path 注入
+from config import EVALUATOR_MIN_SAMPLE_SIZE, RAW_DATA_DIR  # noqa: E402 — 需要 sys.path 注入
 
 random.seed(42)
-RAW_DIR = Path(__file__).resolve().parent / "raw"
+# 🔴 D2 单一来源：用 config.RAW_DATA_DIR，禁硬编码 __file__/raw（原硬编码写 scripts/raw，
+#    需手动 cp 同步 data/raw，违反单一来源；改后直接写 data/raw baseline）
+RAW_DIR = RAW_DATA_DIR
 RAW_DIR.mkdir(parents=True, exist_ok=True)
 
 SN = ["王","李","张","刘","陈","杨","黄","赵","周","吴","徐","孙","马","朱","胡","郭","何","高","林","罗","郑","梁","谢","宋","唐","韩","曹","许","邓","冯","彭","曾","肖","田","董","潘","袁","蔡","蒋","余","于","杜","叶","程","苏","魏","吕","丁","任","沈","姚","卢","姜","崔","钟","谭","陆","汪","范","金","石","廖","贾","夏","韦","付","方","白","邹","孟","熊","秦","邱","江","尹","薛","闫","段","雷","侯","龙","史","陶","黎","贺","顾","毛","郝","龚","邵","万","钱","严","覃","武","戴","莫","孔","向","汤"]
@@ -69,6 +71,54 @@ SEQ_PROJECTS = {
 }
 
 
+# ── 岗位序列感知的资质证书池 ──
+# H1Filter 数据来源：certificates 字段用 ";" 分隔，无证书记 "无"。
+# 设计依据（开题报告/五层匹配评分体系细化方案_2026-07-24.md §3.1）：
+# H1 通过"证书标准名称映射表"精确匹配，故证书名称须用规范全称。
+# PMP 刻意放入全部 4 个序列池 —— 它是跨序列通用项目管理证书，贴近真实。
+SEQ_CERTS = {
+    "技术研发类": ["系统架构设计师", "信息系统项目管理师", "软件设计师", "网络工程师", "PMP"],
+    "管理职能类": ["CPA", "中级会计师", "高级会计师", "税务师", "HR管理师", "PMP"],
+    "市场业务类": ["PMP", "营销师", "数据分析师", "商务英语"],
+    "新业务创新型": ["CFA", "投资顾问", "PMP", "产业规划师"],
+}
+
+# 独立 RNG —— certificates 生成不得污染主 random 状态。
+# 主链路（gen_perf/gen_proj/gen_train/gen_360）已有 seed=42 baseline 输出，
+# 在 gen_emps 循环中插入 random 调用会推进全局 state → 改变后续所有字段值，
+# 破坏 baseline 可重复性（C7：数据生成含跨字段断言，baseline 必须可复现）。
+_CERT_RNG = random.Random(2026)
+
+
+def _gen_certificates(seq: str, level_num: int) -> str:
+    """生成员工资质证书字段。
+
+    权重设计（D4 列假阳性 —— 以下合法分布必须能被生成到）：
+    - 约 55% 员工无证书 → 覆盖 H1 required 不满足→直接排除 的测试场景
+    - 约 30% 持 1 个证书 + 约 15% 持 2 个 → 覆盖 H1 preferred 满足→加分 场景
+    - 高职级（level>=6）有证书概率上浮 15% → 贴近真实（资深者多持证），
+      但保留 ≥30% 无证书下限，避免"高职级必有证"的伪强相关
+    - 证书全部取自 SEQ_CERTS[seq]，保证岗位序列一致性（D2 跨表一致）
+    - 使用独立 _CERT_RNG，不污染主 random 链路（baseline 可重复）
+
+    Args:
+        seq: 岗位序列名（如"技术研发类"）
+        level_num: 职级数字（current_level 去 P 后的 int）
+
+    Returns:
+        ";" 分隔的证书字符串；无证书返回 "无"。
+    """
+    pool = SEQ_CERTS.get(seq, SEQ_CERTS["技术研发类"])
+    no_p = 0.55 - (0.15 if level_num >= 6 else 0.0)
+    no_p = max(0.30, no_p)  # 即使高职级也保留 30% 无证书下限
+
+    if _CERT_RNG.random() < no_p:
+        return "无"
+    n = 2 if _CERT_RNG.random() < 0.20 else 1  # 有证者中约 20% 持 2 个
+    certs = _CERT_RNG.sample(pool, min(n, len(pool)))
+    return ";".join(certs)
+
+
 def gen_emps():
     rows=[]
     cfgs=[("技术研发类",DT,PT,MT,(25,40)),("管理职能类",DM,PM,MM,(35,55)),("市场业务类",DK,PK,MK,(28,45)),("新业务创新型",DI,PI,MI,(28,48))]
@@ -88,7 +138,8 @@ def gen_emps():
                          major=p(ma), department=p(de), job_sequence=sq,
                          current_position=p(po), current_level=f"P{lv}",
                          hire_date=hd.strftime("%Y-%m-%d"),
-                         years_of_service=actual_yos))
+                         years_of_service=actual_yos,
+                         certificates=_gen_certificates(sq, lv)))
     return rows
 
 
@@ -499,6 +550,7 @@ def generate_all():
         "employee_id", "name", "age", "gender", "political_status",
         "education", "major", "department", "job_sequence",
         "current_position", "current_level", "hire_date", "years_of_service",
+        "certificates",
     ])
 
     print("\n[2/5] performance...")
@@ -612,6 +664,44 @@ def generate_all():
     print(f"[INFO] 评价者样本量: min={min(evaluator_counts.values())}, "
           f"max={max(evaluator_counts.values())}, "
           f"median={sorted(evaluator_counts.values())[len(evaluator_counts)//2]}")
+
+    # certificates 字段校验（H1Filter 数据来源）
+    empty_certs = [e for e in emps
+                   if not e.get("certificates") or e["certificates"] == ""]
+    if empty_certs:
+        print(f"[FAIL] certificates 空值: {len(empty_certs)} 人（应为 '无' 而非空）")
+    else:
+        with_certs = [e for e in emps if e["certificates"] != "无"]
+        pct = len(with_certs) * 100 // len(emps)
+        print(f"[OK] certificates: {len(with_certs)}/{len(emps)} 持证 ({pct}%)，"
+              f"无空值")
+
+        # 序列一致性：每个证书须在其员工岗位序列的证书池内
+        seq_violations = []
+        for e in emps:
+            if e["certificates"] == "无":
+                continue
+            pool = set(SEQ_CERTS.get(e["job_sequence"], []))
+            for c in e["certificates"].split(";"):
+                if c not in pool:
+                    seq_violations.append(
+                        (e["employee_id"], c, e["job_sequence"]))
+        if seq_violations:
+            print(f"[WARN] 证书跨序列池: {len(seq_violations)} 条 "
+                  f"(示例: {seq_violations[:3]})")
+        else:
+            print("[OK] certificates 全部在岗位序列池内（序列一致）")
+
+        # 持证率分序列统计（H1Filter 测试需覆盖各序列）
+        by_seq = {}
+        for e in emps:
+            sq = e["job_sequence"]
+            by_seq.setdefault(sq, {"total": 0, "with": 0})
+            by_seq[sq]["total"] += 1
+            if e["certificates"] != "无":
+                by_seq[sq]["with"] += 1
+        for sq, st in by_seq.items():
+            print(f"[INFO] {sq}: 持证 {st['with']}/{st['total']}")
 
 
 if __name__ == "__main__":
