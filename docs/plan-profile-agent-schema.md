@@ -15,7 +15,7 @@ Agent① 融合JSON ─→ Agent② 画像生成 ─→ Agent③ 岗位分析 �
 ```
 
 - **输入**: Agent① 融合 JSON（员工基础数据 + 360 加权得分 + 文本摘要 + certificates）
-- **输出**: 员工画像 JSON（H1 资质 + T0 显性 + T1/T2/T3 标签 + 成长曲线 + 大五）
+- **输出**: 员工画像 JSON（**H0 + H1 + T1/T2/T3** 标签 + 成长曲线 + 大五；**T0 已融合进 T1**，五层方案 §0）
 - **下游契约**: Agent③ 产出**要求侧** SFIA/权重；Agent④ 用 Agent② 的**员工侧** sfia_level + Agent③ 的**要求侧** sfia_required 算 `SFIA_diff`
 
 **关键边界（防混淆）**: Agent② 只产出**员工 SFIA 等级**（0-7），**不算最终 T1 得分**——T1 得分公式 `Σ w_i × SFIA_diff` 是 Agent④ 的职责（需要 Agent③ 的要求侧 SFIA）。
@@ -29,14 +29,17 @@ Agent① 融合JSON ─→ Agent② 画像生成 ─→ Agent③ 岗位分析 �
   "status": "success|degraded|error",
   "data": {
     "employee_id": "JZ0001",
-    "h1_credentials": ["PMP", "系统架构设计师"],
-    "t0_explicit": {
-      "tools": ["Java", "Spring Cloud", "Docker"],
-      "industries": ["智能制造"],
-      "knowledge_domains": ["微服务架构"]
+    "h0_profile": {
+      "age": 39,
+      "political_status": "共青团员",
+      "major": "人工智能",
+      "years_of_service": 16,
+      "current_level": "P6"
     },
+    "h1_credentials": ["PMP", "系统架构设计师"],
     "t1_professional": [
       {
+        "category": "skill",
         "standard_label": "Java开发",
         "free_labels": ["Java微服务", "Spring体系后端开发"],
         "sfia_level": 5,
@@ -47,6 +50,26 @@ Agent① 融合JSON ─→ Agent② 画像生成 ─→ Agent③ 岗位分析 �
           {"source": "2025绩效评语", "text": "主导...攻克Java微服务技术难题"}
         ],
         "mapping_similarity": 0.92
+      },
+      {
+        "category": "tool",
+        "standard_label": "Spring Cloud",
+        "free_labels": ["Spring Cloud"],
+        "sfia_level": 4,
+        "ability_score": 65,
+        "confidence": 0.80,
+        "evidence": [{"source": "2025项目:智慧园区平台", "text": "...Spring Cloud..."}],
+        "mapping_similarity": 0.88
+      },
+      {
+        "category": "domain",
+        "standard_label": "智能制造",
+        "free_labels": ["工业互联网"],
+        "sfia_level": 3,
+        "ability_score": 55,
+        "confidence": 0.70,
+        "evidence": [{"source": "项目经历", "text": "...智能制造..."}],
+        "mapping_similarity": 0.75
       }
     ],
     "t2_behavioral": [
@@ -112,10 +135,11 @@ Agent① 融合JSON ─→ Agent② 画像生成 ─→ Agent③ 岗位分析 �
 |---|---|---|---|
 | `status` | str | success/degraded/error（C1 对称） | — |
 | `data.employee_id` | str | 员工 ID | 输入透传 |
+| `data.h0_profile` | obj | **H0 结构化硬条件**——age/political_status/major/years_of_service/current_level（透传 employees.csv，供 Agent④ 算 H0 preferred 加分） | 输入透传 |
 | `data.h1_credentials` | list[str] | H1 资质档案——certificates 字段 `;` 分隔解析 | 2.1a |
-| `data.t0_explicit` | obj | T0 显性条件——工具/行业/知识体系（从 `t0_registries.json` 映射） | 2.1a |
-| `data.t1_professional` | list[obj] | T1 专业能力标签（种子库 13 个，每个员工命中若干） | 2.1b/2.5/2.7 |
-| └ `standard_label` | str | 标准标签名（来自 `standard_label_library_v1.json`） | 2.7 映射 |
+| `data.t1_professional` | list[obj] | **T1 专业能力层（原 T0+T1 融合，五层方案 §0）**——含 skill/tool/domain/knowledge 四类 | 2.1a/2.1b/2.5/2.7 |
+| └ `category` | str | 能力项类型：`skill`(技能)/`tool`(工具)/`domain`(领域)/`knowledge`(知识)，区分原 T0/T1 来源 | — |
+| └ `standard_label` | str | 标准标签名（skill←`standard_label_library_v1.json`；tool/domain/knowledge←`t0_registries.json`） | 2.7 映射 |
 | └ `free_labels` | list[str] | LLM 抽取的自由文本标签（映射前） | 2.1b 抽取 |
 | └ `sfia_level` | int 0-7 | **员工侧 SFIA 等级**（Agent④ 算差值用） | 2.5 评定 |
 | └ `ability_score` | int 0-100 | 标签能力评分（给 HR 直观展示） | 2.5 评定 |
@@ -135,8 +159,9 @@ Agent① 融合JSON ─→ Agent② 画像生成 ─→ Agent③ 岗位分析 �
 
 ## 4. 设计决策记录
 
-### D1: T1 用 SFIA 0-7，T2/T3 用 0-100 分（不混用 SFIA）
-- **依据**: SFIA = Skills Framework for Information Age，针对 IT/数字技能。T2 行为能力（跨部门协调/团队管理）和 T3 潜力（领导力潜质/成长型思维）不在 SFIA 范畴，强套会失真。
+### D1: T1 用 SFIA 0-7（含原 T0 工具/领域/知识），T2/T3 用 0-100 分（不混用 SFIA）
+- **依据（T0+T1 融合）**: 五层方案 §0"T0+T1 融合层整体命名为 T1"——原 T0（工具/领域/知识）+ 原 T1（技术技能）**统一用 SFIA 0-7**，用 `category` 字段区分来源（不再单独输出 t0_explicit）。
+- **依据（T2/T3 不用 SFIA）**: SFIA = Skills Framework for Information Age，针对 IT/数字技能。T2 行为能力（跨部门协调/团队管理）和 T3 潜力（领导力潜质/成长型思维）不在 SFIA 范畴，强套会失真。
 - **T1 双指标**: `sfia_level`（给 Agent④ 算差值）+ `ability_score`（给 HR 直观）。
 
 ### D2: ability_score 与 sfia_level 双字段
@@ -171,14 +196,17 @@ Agent① 融合JSON ─→ Agent② 画像生成 ─→ Agent③ 岗位分析 �
 
 ### 上游（Agent① 输入消费）
 - 员工基础数据（employees.csv 字段）+ 360 加权得分（Agent① 输出）+ 文本摘要（llm_summarizer）
+- H0 字段（age/political_status/major/years_of_service/current_level）→ `h0_profile`（透传，供 Agent④ 算 H0 preferred 加分）
 - `certificates` 字段 → `h1_credentials`（`;` 分隔 → list）
-- T0 词典（`t0_registries.json`）→ `t0_explicit` 映射
+- T0 词典（`t0_registries.json` 工具/领域/知识）+ T1 标签库（`standard_label_library_v1.json` T1_专业能力）→ `t1_professional`（`category` 区分来源，统一 SFIA）
 
 ### 下游（Agent③④ 消费）
 | 消费者 | 用 Agent② 哪些字段 | 用途 |
 |---|---|---|
 | Agent③ | t1_professional[].standard_label | 对照岗位需求提取要求侧 SFIA |
+| Agent③ | h0_profile, h1_credentials | 提取岗位 H0 要求（age 范围/政治面貌/专业/年限/职级）+ H1 要求证书 |
 | Agent④ | t1_professional[].sfia_level | 算 `SFIA_diff = max(min(员工-要求,+2),-7)/7` → T1 得分 |
+| Agent④ | h0_profile, h1_credentials | 算 H0/H1 preferred 加分（满足优先项数 × k_h0/k_h1，二元条件，五层方案 §2.4） |
 | Agent④ | t2_behavioral[].ability_score, t3_potential[].ability_score | T2/T3 层得分 |
 | Agent④ | growth_curve, big_five | T3 综合判断 + BEI 追问依据 |
 | Agent④ | evidence[] | 生成证据链 + 反事实解释 |

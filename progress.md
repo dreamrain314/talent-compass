@@ -148,3 +148,19 @@
 - 现象: 词汇重叠高 sim 高（Java 0.89）；语义近用词异 sim 低（带团队→团队管理 0.59）
 - 07.31 建议: top-1 + 相对 margin 判定（不依赖绝对值）+ 绝对下限兜底
 - 详见 `docs/plan-profile-agent-schema.md` §8
+
+---
+
+## [修正] — 2026-07-26（Schema 五层结构修正：补 H0 + T0 融合进 T1）
+
+用户指出 Schema 五层结构错误：应为 **H0+H1+T1/T2/T3**（T0 融合进 T1），原 Schema 写成 H1+T0+T1/T2/T3（缺 H0、多独立 T0）。
+
+**修正 docs/plan-profile-agent-schema.md：**
+- §1 输出: `H1+T0+T1/T2/T3` → `H0+H1+T1/T2/T3`（T0 融合 T1）
+- §2 JSON: 加 `h0_profile`（age/political_status/major/years_of_service/current_level 透传）；去 `t0_explicit`；`t1_professional` 加 `category` 字段（skill/tool/domain/knowledge）+ tool/domain 示例
+- §3 字段表: 加 `h0_profile` 行，去 `t0_explicit` 行，t1 加 `category` 行
+- §4 D1: 加"T0+T1 融合统一 SFIA"依据（五层方案 §0）
+- §5 上游: H0 字段→h0_profile；T0 词典+T1 标签库→t1_professional（category 区分）
+- §5 下游表: 加 Agent③ 提取 H0/H1 要求 + Agent④ 算 H0/H1 preferred 加分
+
+**依据:** 五层方案 §0"T0+T1 融合层整体命名为 T1" + §1 流程图 H0→H1→T1/T2/T3 + §2.4 优先项加分含 H0加分+H1加分

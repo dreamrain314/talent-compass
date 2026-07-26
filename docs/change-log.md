@@ -1,5 +1,28 @@
 # progress.md — Bug修复进度
 
+## 🔧 第2周准备 Step2.1: Schema 五层结构修正 (2026-07-26)
+
+**状态**: [修正]（用户指出五层结构错误后修正）
+
+### 问题
+
+原 Schema 写成 `H1+T0+T1/T2/T3`（缺 H0、多独立 T0），与五层方案 §0"T0+T1 融合层整体命名为 T1"矛盾。正确应为 **H0+H1+T1/T2/T3**（T0 融合进 T1）。
+
+### 修正内容（`docs/plan-profile-agent-schema.md`）
+
+| 章节 | 修正 |
+|------|------|
+| §1 输出 | `H1+T0+T1/T2/T3` → `H0+H1+T1/T2/T3`（T0 融合 T1） |
+| §2 JSON | 加 `h0_profile`（age/political_status/major/years_of_service/current_level 透传）；去 `t0_explicit`；`t1_professional` 加 `category`（skill/tool/domain/knowledge）+ tool/domain 示例 |
+| §3 字段表 | 加 `h0_profile` 行，去 `t0_explicit` 行，t1 加 `category` 行 |
+| §4 D1 | 加"T0+T1 融合统一 SFIA"依据 |
+| §5 上游 | H0 字段→h0_profile；T0 词典+T1 标签库→t1_professional（category 区分） |
+| §5 下游表 | 加 Agent③ 提取 H0/H1 要求 + Agent④ 算 H0/H1 preferred 加分 |
+
+**依据**: 五层方案 §0 + §1 流程图 H0→H1→T1/T2/T3 + §2.4 优先项加分含 H0加分+H1加分
+
+---
+
 ## 📐 第2周准备 Step3: Embedding demo + 框架选型 (2026-07-26)
 
 **状态**: [VERIFIED]（demo 验证脚本，非核心逻辑，已跑通）
