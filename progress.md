@@ -108,3 +108,24 @@
 - [x] `pytest tests/ -v -W error::FutureWarning` → **231/231 passed**（9.14s，eval360 baseline 变化不破坏测试——下游只测结构/异常检测逻辑，不依赖具体 score 值）
 
 **对抗审查（边界推演）：** RAW_DATA_DIR 是 config 绝对路径 → 脚本从任意 cwd 跑都写 data/raw ✅；`mkdir(exist_ok=True)` data/raw 已存在不报错 ✅；import 失败风险排除（config 已定义且他模块已用）✅
+
+---
+
+## [定稿] — 2026-07-26（第 2 周准备 · Step 2: Agent② 输出 JSON Schema）
+
+**变更文件:** `docs/plan-profile-agent-schema.md`（新建，设计文档非代码，不触发 V1 闸门）
+
+**设计内容：**
+- Agent② 输出 JSON Schema：H1 资质 + T0 显性 + T1/T2/T3 标签 + 成长曲线 + 大五 + summary
+- 包装在 BaseAgent 契约（`status`/`data`/`metadata`，C1 对称）
+- 7 条设计决策（D1-D7）+ §6 决策点定稿 + §7 config 常量清单
+
+**关键决策（用户 2026-07-26 确认）：**
+- D2: T1 双字段 `ability_score`(0-100) + `sfia_level`(0-7)
+- 大五: 0-100（与 ability_score 对齐）
+- summary: 保留（约束仅基于已抽标签，防幻觉）
+- D4: Demo 期跳过聚类（第四阶段扩展，向前兼容）
+
+**边界澄清（防下游混淆）：**
+- Agent② **只产员工侧 `sfia_level`，不算 T1 得分** —— T1 得分公式 `Σ w_i × SFIA_diff` 是 Agent④ 职责（需 Agent③ 要求侧 SFIA）
+- 实现时 config 常量待加：`SFIA_MAX_LEVEL=7` / `SFIA_CAP_EXCESS=2` / `LABEL_CONFIDENCE_THRESHOLD=0.6` 等（D2 单一来源，详见文档 §7）

@@ -1,5 +1,32 @@
 # progress.md — Bug修复进度
 
+## 📐 第2周准备 Step2: Agent② 输出 JSON Schema 定稿 (2026-07-26)
+
+**状态**: [定稿]（设计文档，非代码，不触发 V1 闸门）
+
+### 完成内容
+
+| 文件 | 操作 | 说明 |
+|------|------|------|
+| `docs/plan-profile-agent-schema.md` | 新建 | Agent② 输出 JSON Schema 完整设计：H1+T0+T1/T2/T3+成长曲线+大五+summary，包装在 BaseAgent 契约 |
+
+### 关键决策（用户 2026-07-26 确认）
+
+| 决策 | 结论 |
+|------|------|
+| D2 T1 评分字段 | 双字段 `ability_score`(0-100 整数) + `sfia_level`(0-7) |
+| 大五范围 | 0-100（与 ability_score 对齐） |
+| summary 字段 | 保留（LLM 仅基于已抽标签生成，防幻觉） |
+| D4 聚类 | Demo 期跳过（第四阶段扩展） |
+| ability_score 粒度 | 整数 0-100 |
+
+### 边界澄清（防下游混淆）
+
+- **Agent② 只产员工侧 `sfia_level`，不算 T1 得分** —— T1 得分公式 `Σ w_i × SFIA_diff` 是 Agent④ 职责（需 Agent③ 要求侧 SFIA）
+- 实现时 config 常量待加：`SFIA_MAX_LEVEL=7` / `SFIA_CAP_EXCESS=2` / `LABEL_CONFIDENCE_THRESHOLD=0.6` 等（D2 单一来源，详见文档 §7）
+
+---
+
 ## 🔧 第2周准备 Step1+1.5: certificates 字段 + RAW_DIR D2 合规 (2026-07-26)
 
 **状态**: [VERIFIED]
