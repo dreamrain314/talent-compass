@@ -17,7 +17,7 @@
 - ⚠️ 已知现象：5 周冷启动后**首跑** 12 failed（全部 test_experiment.py）+ 7 skipped + 87s（含模型加载）；随后单跑 test_experiment.py 13/13 过 + 连跑 3 次全绿。判定为冷缓存瞬态非真实回归；若换机器/清缓存后首跑复红，先复跑再排查
 - [x] 清除 stale 闸门：07-27 `[AWAITING_VERIFY] Step 8c` 实际已完成（rerank_cross_encoder 已实现并被"cross-encoder 加载缓存 + exact 锁死修复"条目覆盖验证），标记改 VERIFIED，0.2 编码闸门解除
 
-**commit:** `<hash 提交后补>`
+**commit:** `79a5fa0`（两周工作 checkpoint + tracking 同步 + 重新基线，一并入库）
 
 ---
 
