@@ -40,9 +40,9 @@ logger = logging.getLogger(__name__)
 
 # ── 必填列定义（D2: 单一来源） ──────────────────────────────────────
 REQUIRED_COLUMNS = {
-    "employees": {"employee_id", "name", "age", "gender", "education", "major",
+    "employees": {"employee_id", "name", "age", "gender", "political_status", "education", "major",
                   "job_sequence", "current_position", "current_level",
-                  "hire_date", "years_of_service"},
+                  "hire_date", "years_of_service", "certificates"},
     "performance": {"employee_id", "year", "performance_grade", "performance_comment"},
     "projects": {"employee_id", "project_name", "role", "description", "tools_used"},
     "training": {"employee_id", "course_name", "completion_date", "status", "score"},
@@ -766,12 +766,14 @@ class DataUnderstanding(BaseAgent):
                 "name": self._safe_val(emp, "name"),
                 "age": self._safe_val(emp, "age", 0),
                 "gender": self._safe_val(emp, "gender"),
+                "political_status": self._safe_val(emp, "political_status"),
                 "education": self._safe_val(emp, "education"),
                 "major": self._safe_val(emp, "major"),
                 "job_sequence": self._safe_val(emp, "job_sequence"),
                 "current_position": self._safe_val(emp, "current_position"),
                 "current_level": self._safe_val(emp, "current_level"),
                 "years_of_service": self._safe_val(emp, "years_of_service", 0),
+                "certificates": self._safe_val(emp, "certificates"),
             }
 
             emp_perf = perf_df[perf_df["employee_id"] == emp_id]
@@ -805,8 +807,10 @@ class DataUnderstanding(BaseAgent):
             train_records = []
             for _, t in emp_train.iterrows():
                 score = t.get("score")
+                cd = t.get("completion_date")
                 train_records.append({
                     "course_name": str(t.get("course_name", "")),
+                    "completion_date": str(cd) if pd.notna(cd) else None,
                     "status": str(t.get("status", "")),
                     "score": int(score) if pd.notna(score) and score != "" else None,
                 })

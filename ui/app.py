@@ -30,7 +30,8 @@ _REQUIRED_COLUMNS: dict[str, set[str]] = {
     "employees.csv": {
         "employee_id", "name", "age", "gender", "political_status",
         "education", "major", "department", "job_sequence",
-        "current_position", "current_level", "hire_date", "years_of_service",
+        "current_position", "current_level", "hire_date",
+        "years_of_service", "certificates",
     },
     "performance.csv": {
         "employee_id", "year", "performance_grade", "performance_comment",

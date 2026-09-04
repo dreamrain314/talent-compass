@@ -76,27 +76,32 @@ Agent① 融合JSON ─→ Agent② 画像生成 ─→ Agent③ 岗位分析 �
       {
         "standard_label": "跨部门协调",
         "free_labels": ["跨部门沟通顺畅"],
+        "sfia_level": 4,
         "ability_score": 80,
         "confidence": 0.78,
         "evidence": [{"source": "2025绩效评语", "text": "..."}]
       }
     ],
-    "t3_potential": [
-      {
-        "standard_label": "领导力潜质",
-        "free_labels": ["有带团队潜力"],
-        "ability_score": 65,
-        "confidence": 0.62,
-        "evidence": [{"source": "360下属评价", "text": "给予充分信任..."}],
-        "growth_data": {"slope": 0.15, "trend": "上升", "years": [2024,2025,2026], "scores": [60,65,72]}
+    "t3_potential": {
+      "learning_speed": 72,
+      "career_diversity": 65,
+      "growth_orientation": 80,
+      "growth_signals_360": 70,
+      "confidence": 0.78,
+      "evidence": {
+        "learning_speed": [{"source": "技能时间线", "text": "3年内新增Docker/K8s/Spring Cloud"}],
+        "career_diversity": [{"source": "简历经历", "text": "研发→架构→技术管理"}],
+        "growth_orientation": [{"source": "认证记录", "text": "PMP/系统架构设计师/云原生认证"}],
+        "growth_signals_360": [{"source": "360评价", "text": "主动学习新技术，乐于接受反馈"}]
       }
-    ],
+    },
     "big_five": {
       "openness": 72,
       "conscientiousness": 80,
       "extraversion": 55,
       "agreeableness": 68,
-      "neuroticism": 40
+      "neuroticism": 40,
+      "validation_note": "仅验证对比用，不参与评分权重"
     },
     "growth_curve": {
       "years": [2024, 2025, 2026],
@@ -146,10 +151,14 @@ Agent① 融合JSON ─→ Agent② 画像生成 ─→ Agent③ 岗位分析 �
 | └ `confidence` | float 0-1 | 置信度，<0.6 → 进 `labels_pending_review` | 2.5 评定 |
 | └ `evidence` | list[{source,text}] | 证据锚点（可追溯到原文） | 2.5 锚点 |
 | └ `mapping_similarity` | float 0-1 | embedding 相似度（标准映射置信） | 2.7 映射 |
-| `data.t2_behavioral` | list[obj] | T2 行为能力标签（无 SFIA，用 ability_score） | 2.1b/2.5 |
-| `data.t3_potential` | list[obj] | T3 发展潜力标签（含 growth_data） | 2.4/2.5 |
-| └ `growth_data` | obj | 单标签成长数据 {slope, trend, years, scores} | 2.6 建模 |
-| `data.big_five` | obj | 大五人格 5 维度 0-100（T3 推断依据） | 2.4 推断 |
+| `data.t2_behavioral` | list[obj] | T2 行为能力标签（与 T1 统一用 SFIA 双字段：sfia_level + ability_score） | 2.1b/2.5 |
+| `data.t3_potential` | obj | T3 发展潜力（四维代理指标：learning_speed/career_diversity/growth_orientation/growth_signals_360） | 2.4/2.5 |
+| └ `learning_speed` | int 0-100 | 学习速度：新技能数量/职业年限，反映学习新技术速率 | 2.5 聚合 |
+| └ `career_diversity` | int 0-100 | 职业多样性：不同职能/行业角色数，反映跨领域适应能力 | 2.5 聚合 |
+| └ `growth_orientation` | int 0-100 | 成长导向：主动参与的培训/认证/学历提升数量 | 2.5 聚合 |
+| └ `growth_signals_360` | int 0-100 | 360成长信号："接受反馈"+"主动性"相关表述语义评分 | 2.5 聚合 |
+| └ `evidence` | obj | 各代理指标的证据锚点，按维度分组 | 2.5 锚点 |
+| `data.big_five` | obj | 大五人格 5 维度 0-100（仅验证对比用，不参与评分权重） | 2.4 对比 |
 | `data.growth_curve` | obj | 绩效成长曲线（步骤 2.6，员工级） | 2.6 建模 |
 | `data.labels_pending_review` | list[str] | 置信度<0.6 的标签（待 HR 审核） | 2.5 汇总 |
 | `data.summary` | str | 员工资深画像摘要 | 2.9 汇总 |
@@ -159,19 +168,21 @@ Agent① 融合JSON ─→ Agent② 画像生成 ─→ Agent③ 岗位分析 �
 
 ## 4. 设计决策记录
 
-### D1: T1 用 SFIA 0-7（含原 T0 工具/领域/知识），T2/T3 用 0-100 分（不混用 SFIA）
+### D1: T1/T2 用 SFIA 0-7，T3 用代理指标聚合（2026-07-26 更新）
 - **依据（T0+T1 融合）**: 五层方案 §0"T0+T1 融合层整体命名为 T1"——原 T0（工具/领域/知识）+ 原 T1（技术技能）**统一用 SFIA 0-7**，用 `category` 字段区分来源（不再单独输出 t0_explicit）。
-- **依据（T2/T3 不用 SFIA）**: SFIA = Skills Framework for Information Age，针对 IT/数字技能。T2 行为能力（跨部门协调/团队管理）和 T3 潜力（领导力潜质/成长型思维）不在 SFIA 范畴，强套会失真。
-- **T1 双指标**: `sfia_level`（给 Agent④ 算差值）+ `ability_score`（给 HR 直观）。
+- **T2 改用 SFIA（2026-07-26 更新）**: 五层方案 §2.4 决定 T2 复用 T1 的 SFIA_diff 公式，评分逻辑完全对称。T2 标签增加 `sfia_level` 字段（与 T1 双字段方案一致）。
+- **T3 用代理指标聚合（2026-07-26 更新）**: 五层方案 §2.5 决定 T3 不采用 SFIA，改用四维代理指标（学习速度/职业多样性/成长导向/360成长信号），结构为 `{learning_speed, career_diversity, growth_orientation, growth_signals_360}`。
+- **T1/T2 双指标**: `sfia_level`（给 Agent④ 算差值）+ `ability_score`（给 HR 直观）。
 
 ### D2: ability_score 与 sfia_level 双字段
 - `ability_score` (0-100): LLM 评定的标签能力强度，连续值，给 HR 直观展示 + 排序参考。
 - `sfia_level` (0-7): 离散标准化等级，给 Agent④ 算 `SFIA_diff = max(min(员工-要求,+2),-7)/7`。
 - 两者**相关但独立**——SFIA 离散、ability_score 连续；映射关系不硬编码（避免 D2 违规），由 LLM 同时评定。
 
-### D3: 大五人格独立输出（big_five 字段）
-- T3 标签里含大五相关标签（开放性/尽责性），但 5 维度分数独立输出，作为 T3 推断的**可审计依据**（BEI 追问会引用）。
-- 范围 0-100（与 ability_score 对齐，便于 HR 滑动条调权时统一尺度）。
+### D3: 大五人格独立输出（big_five 字段，仅验证对比）
+- 大五人格 5 维度分数独立输出，**不参与评分权重计算**（五层方案 §2.9）。
+- 仅作为 Agent④ 的**独立验证信号**：当大五预测方向与 T2 评分结果系统性偏离时，标记"建议复核"。
+- 范围 0-100（与 ability_score 对齐，便于 HR 统一尺度）。
 
 ### D4: Demo 期跳过聚类（步骤 2.8）
 - 五层方案"Demo 期降级等权兜底"，聚类可视化在第四阶段（12 强赛，task-plan 4.1）。
@@ -185,10 +196,9 @@ Agent① 融合JSON ─→ Agent② 画像生成 ─→ Agent③ 岗位分析 �
 - 行为逻辑文档定义: `{"标签":"...","证据":[{"来源":"...","原文":"..."}]}`。
 - 本 Schema 扁平化为 `evidence: [{source, text}]`（标签名在外层 standard_label，不重复），下游 Agent④ 生成证据链时重组。
 
-### D7: growth_curve 与 t3.growth_data 双层
-- `growth_curve`（员工级）: 绩效时间序列 + 综合分斜率，用于 T3 整体趋势判断。
-- `t3_potential[].growth_data`（标签级）: 单个 T3 标签的成长数据（如"领导力潜质"的成长斜率）。
-- 两者数据源不同：员工级用绩效分，标签级用该维度 360/证据时间序列。
+### D7: growth_curve 保留，T3 改为代理指标聚合（2026-07-26 更新）
+- `growth_curve`（员工级）: 绩效时间序列 + 综合分斜率，作为 T3 代理指标之一（growth_orientation 的参考源）。
+- **T3 结构改为代理指标聚合（2026-07-26）**: 移除原 `t3_potential[].growth_data` 逐标签结构，改为顶层四维指标 `{learning_speed, career_diversity, growth_orientation, growth_signals_360}`。
 
 ---
 
@@ -206,9 +216,10 @@ Agent① 融合JSON ─→ Agent② 画像生成 ─→ Agent③ 岗位分析 �
 | Agent③ | t1_professional[].standard_label | 对照岗位需求提取要求侧 SFIA |
 | Agent③ | h0_profile, h1_credentials | 提取岗位 H0 要求（age 范围/政治面貌/专业/年限/职级）+ H1 要求证书 |
 | Agent④ | t1_professional[].sfia_level | 算 `SFIA_diff = max(min(员工-要求,+2),-7)/7` → T1 得分 |
-| Agent④ | h0_profile, h1_credentials | 算 H0/H1 preferred 加分（满足优先项数 × k_h0/k_h1，二元条件，五层方案 §2.4） |
-| Agent④ | t2_behavioral[].ability_score, t3_potential[].ability_score | T2/T3 层得分 |
-| Agent④ | growth_curve, big_five | T3 综合判断 + BEI 追问依据 |
+| Agent④ | h0_profile, h1_credentials | 算 H0/H1 preferred 加分（满足优先项数 × k_h0/k_h1，二元条件，五层方案 §2.6） |
+| Agent④ | t2_behavioral[].sfia_level | 算 `SFIA_diff` → T2 得分（与 T1 同公式，五层方案 §2.4） |
+| Agent④ | t3_potential.{learning_speed, career_diversity, growth_orientation, growth_signals_360} | 四维代理指标加权聚合 → T3 得分（五层方案 §2.5） |
+| Agent④ | big_five | 大五验证对比：检测 T2 评分是否系统性偏离大五预测方向，标记"建议复核"（五层方案 §2.9） |
 | Agent④ | evidence[] | 生成证据链 + 反事实解释 |
 | Agent④ | labels_pending_review | 跳过这些标签的匹配（置信度不足） |
 
@@ -234,8 +245,14 @@ Agent① 融合JSON ─→ Agent② 画像生成 ─→ Agent③ 岗位分析 �
 | `SFIA_CAP_EXCESS` | 2 | Agent④ SFIA_diff 上限（cap+2，文献 Ge & Sekiguchi 2026） |
 | `LABEL_CONFIDENCE_THRESHOLD` | 0.6 | Agent② labels_pending_review 收集阈值 |
 | `ABILITY_SCORE_MIN/MAX` | 0/100 | Agent② ability_score 范围 |
-| `BIG_FIVE_DIMENSIONS` | ["openness","conscientiousness","extraversion","agreeableness","neuroticism"] | Agent② big_five 字段 |
+| `BIG_FIVE_DIMENSIONS` | ["openness","conscientiousness","extraversion","agreeableness","neuroticism"] | Agent② big_five 字段（仅验证对比） |
+| `T3_PROXY_WEIGHTS` | {"learning_speed": 0.25, "career_diversity": 0.25, "growth_orientation": 0.25, "growth_signals_360": 0.25} | Agent④ T3 代理指标等权（Demo 期，HR 可调） |
 | `LABEL_LIBRARY_VERSION` | "1.0" | Agent② metadata.data_lineage.label_library_version |
+| `LABEL_RECALL_TOP_K` | 3 | Stage 2 embedding 召回候选数（utils/label_matching.recall_top_k） |
+| `LABEL_RERANK_MAX_TOKENS` | 2048 | Stage 3 重排 JSON 输出上限（rerank_label_llm） |
+| `LABEL_RERANK_TIMEOUT` | 30 | Stage 3 重排单次 LLM 超时（per-employee） |
+| `LABEL_RERANK_CONFIDENCE_THRESHOLD` | 0.7 | 低于此 → pending_review 人工复核 |
+| `LABEL_NEW_LABEL_MAX_PER_EMP` | 2 | 新标签防滥上限（超限降级选 top1） |
 
 > 实现代码时从 config import，禁止在 agents/profile_generation.py 内联硬编码（D2/F1）。
 
@@ -265,3 +282,85 @@ Agent① 融合JSON ─→ Agent② 画像生成 ─→ Agent③ 岗位分析 �
 - 抽到 `utils/label_embedding.py`（D2 单一来源，供 Agent② + UI 复用）
 - `config.py` 加 `EMBEDDING_MODEL_NAME = "BAAI/bge-small-zh-v1.5"` + 阈值常量（标定后）
 - 模型单例缓存（首次加载 ~2s，避免每次 Agent② 调用重新加载 — F4 单例每次访问检查配置变化）
+
+---
+
+## 9. 三阶段标签匹配（架构反转，2026-07-26）
+
+### 9.1 背景：旧架构的问题
+
+原 `verify_mapping`（utils/label_embedding.py:124）让 embedding（bge-small-zh，便宜低精度、不看上下文）**自动纠正** LLM（DeepSeek-V4-Pro，贵高精度、看员工简历）的标签选择。5 员工真实实验实测**净负**：
+- embedding 纠正器 5 次把 LLM 本已答对的纠正成错的（Java开发→Python开发、Java→MySQL、PowerBI→ANSYS、团队管理→尽责性、执行推进→尽责性），仅 1 次纠正帮对
+- 信 LLM 原始提议命中 GT **31.4%** > 经 embedding 纠正后 23.5%
+- 根因：bge-small-zh 对短英文技术名（Java/Python/MySQL）和词面重叠中文词（尽责性/负责人）靠字面重叠打分，不分上下文
+
+### 9.2 新架构：embedding 召回 + LLM 精排
+
+业界共识（BLINK / TGRE [ICWSM 2025] / GoldenMatch / mariia080693 ESCO 管线 / BGE 官方两阶段）：**embedding 只做召回，LLM/cross-encoder 做精排，绝不让 embedding 覆盖 LLM**。
+
+```
+Stage 1 抽取（_llm_extract，已有）：
+  LLM 看员工简历 + 标签库(94 项 name+category)
+  → 每项 {concept, standard_label, category, sfia_level, ability_score, confidence, evidence[]}
+                    ↓
+Stage 2 召回（recall_top_k，utils/label_matching.py）：
+  embedding 从 corpus 取 top-K=3 候选名（复用 encode_labels LRU + _cosine_batch）
+                    ↓
+快路径：standard_label 精确匹配 corpus name → 跳过 Stage 3
+  mapping_source="exact_name_match", match_confidence=1.0
+                    ↓ 否则
+Stage 3 精排（rerank_label_llm，utils/label_matching.py）：
+  LLM 看 concept + top-3 候选名 + 员工上下文
+  → 每项 {matched_label | "NEW", match_confidence, rationale}
+  批量：一员工所有 t1+t2 项单次 LLM 调用（省成本）
+                    ↓
+  match_confidence < 0.7 → pending_review（人工复核，Plan B 的 Top-3 候选）
+  LLM 返回 "NEW" → is_new_label=True（每员工上限 2，超限降级选 top1）
+                    ↓
+compute_t3_scores（utils/t3_scorer.py）
+```
+
+**关键反转**：embedding 退回召回角色，LLM 顶上精排角色。`verify_mapping` 的 Phase B 自动纠正（`embedding_corrected` 用 `corrected_label` 覆盖）退役；Phase A 精确名匹配演化为快路径。
+
+### 9.3 t1/t2 每项新增字段（注入，不改 LLM 输出契约）
+
+| 字段 | 类型 | 说明 |
+|------|------|------|
+| `matched_label` | str | 最终匹配标签（new 时=concept） |
+| `is_new_label` | bool | LLM 判定无合适候选且 confidence≥阈值 |
+| `mapping_source` | str | 见下枚举 |
+| `match_confidence` | float | LLM 重排置信度 [0,1] |
+| `rerank_candidates` | list[str] | Stage 2 召回的 top-3 候选名 |
+| `rerank_rationale` | str | LLM 重排理由 |
+
+`mapping_source` 枚举：
+- `exact_name_match` / `exact_name_match_dup` — 快路径精确名匹配（dup=corpus 重名）
+- `llm_rerank` — Stage 3 LLM 从候选里选，confidence≥阈值
+- `new_label` — LLM 判 NEW 且 confidence≥阈值
+- `pending_review` — confidence<阈值，走人工复核
+- `offline_skipped` — offline 模式跳过 Stage 2+3
+- `rerank_failed_trust_llm` — Stage 3 LLM 失败，确定性降级信任 standard_label（D6 不重试）
+- `new_label_capped_trust_top1` — 新标签超额，降级选 candidates[0]
+- `corpus_load_failed_trust_llm` — corpus 加载失败，信任 standard_label
+
+### 9.4 D6 决策（防雪崩）
+
+- Stage 3 LLM 失败（解析失败/非 dict/异常）= **确定性故障**，不重试，trust standard_label + `rerank_failures` 审计
+- offline 短路在 `_llm_extract` 入口（profile_generation.py:180），Stage 2+3 仅在 `not offline_skipped and error is None` 时执行
+- corpus 加载失败 → 跳 Stage 2+3，所有项 `corpus_load_failed_trust_llm`
+
+### 9.5 文献依据
+
+- **BLINK**（Wu et al. 2020）：bi-encoder 召回 top-10 → cross-encoder 重排选 1
+- **TGRE**（ICWSM 2025）：LLM 推理 + embedding 取 top-K → LLM 重排，P@1=0.81，省 72% 成本
+- **GoldenMatch**（Benzsevern 2026）：embedding 召回 + 三档（≥0.95 自动 / 0.75-0.95 LLM 判 / <0.75 拒），精度 35.5%→95.4%
+- **mariia080693/skill-extraction**：Ollama 抽技能 → ChromaDB top-3 → LLM-as-Judge 逐个判 True/False
+- **BGE 官方**："用 bge embedding 召回 top 100，再用 bge reranker 重排得 top-3"
+
+### 9.6 验证实验
+
+5 员工三方对比（scripts/experiment_embedding_vs_llm.py）：
+- Path A（旧纠正器）：final_correct_rate（含统计 bug 修复后 ~23.5%）
+- Path B（纯 embedding top-3）：43.1%
+- Path C（Stage 3 LLM 重排）：**验收判据 ≥ Path B top3**，且 Path C 把 Java开发/Java/PowerBI 等纠正器搞错的案例改对
+

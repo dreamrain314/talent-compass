@@ -81,6 +81,7 @@ def call_llm(
     temperature: float = 0.0,
     response_format: dict | None = None,
     max_tokens: int = 4096,
+    timeout: float | None = None,
 ) -> dict:
     """调用 LLM 获取文本响应。
 
@@ -91,6 +92,10 @@ def call_llm(
 
     model 默认值从 os.environ 动态读取（而非导入时冻结），以支持 Streamlit 侧边栏
     运行时切换模型。若未指定 model 且环境变量为空，回退到 config.DEEPSEEK_MODEL。
+
+    timeout: 单次调用超时（秒），None=用客户端默认 LLM_API_TIMEOUT。用于 Agent②
+      汇总 LLM 调用（输入含全员标签，需比单员工 30s 更长）。per-call 覆盖，不影响
+      客户端单例与 Agent① 调用。
     """
     if model is None:
         model = (os.getenv("DEEPSEEK_MODEL") or "").strip() or DEEPSEEK_MODEL
@@ -114,6 +119,9 @@ def call_llm(
     }
     if response_format:
         kwargs["response_format"] = response_format
+    if timeout is not None:
+        # OpenAI SDK 支持 .create(timeout=...) per-call 覆盖客户端默认 timeout
+        kwargs["timeout"] = timeout
 
     try:
         resp = client.chat.completions.create(**kwargs)
@@ -180,6 +188,7 @@ def call_llm_json(
     temperature: float = 0.0,
     json_schema: dict | None = None,
     max_tokens: int = 4096,
+    timeout: float | None = None,
 ) -> dict:
     json_prompt = prompt + "\n\n请严格按照上述 JSON 格式输出，不要添加任何额外的解释文字。"
     json_system = system_prompt + "\n你必须且只能输出有效的 JSON，不要包含 markdown 代码块标记。"
@@ -191,6 +200,7 @@ def call_llm_json(
         temperature=temperature,
         response_format=None,  # 不传 response_format：DeepSeek-V4-Pro 代理不支持
         max_tokens=max_tokens,
+        timeout=timeout,
     )
 
     # ── 自动重试：空内容或 finish_reason 异常 → 降级为更短 prompt ──
@@ -204,6 +214,7 @@ def call_llm_json(
             temperature=temperature,
             response_format=None,
             max_tokens=max_tokens,
+            timeout=timeout,
         )
 
     if result.get("error") is not None:

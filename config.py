@@ -120,3 +120,122 @@ PLACEHOLDER_SUMMARY_LEN = 150  # 摘要截取原文前 N 字
 PLACEHOLDER_ANCHOR_LEN = 10    # 锚点截取原文前 N 字
 
 # ── 目录创建已移至 main.py（避免 import 时因磁盘满/无权限崩溃）──
+
+# ── Embedding ────────────────────────────────────────────────
+EMBEDDING_MODEL_NAME = "BAAI/bge-small-zh-v1.5"
+EMBEDDING_BACKEND = "fastembed"       # fastembed（ONNX）或 sentence-transformers
+EMBEDDING_MIN_SIM = 0.50              # 绝对下限：低于此值 → 纠正或 pending
+EMBEDDING_MARGIN = 0.12               # top1-top2 最小差值
+EMBEDDING_CONFIDENCE_PENALTY = 0.15   # 纠正路径的置信度扣减
+EMBEDDING_CACHE_SIZE = 4096           # LRU 缓存容量
+
+# ── SFIA ─────────────────────────────────────────────────────
+SFIA_MAX_LEVEL = 7                    # SFIA 0-7
+SFIA_CAP_EXCESS = 2                   # SFIA_diff 上限 cap+2
+
+# ── 标签置信度 ────────────────────────────────────────────────
+LABEL_CONFIDENCE_THRESHOLD = 0.6      # 低于此值 → labels_pending_review
+LABEL_LIBRARY_VERSION = "1.0"         # 当前标签库版本
+LABEL_LIBRARY_PATH = DATA_DIR / "standard_label_library_v1.json"
+# T0 显性条件注册表（工具/行业领域/知识体系），供 Agent② load_label_corpus 合并
+# Day 2（2026-07-28）：扩展 corpus 覆盖 tool/domain/knowledge category
+T0_REGISTRIES_PATH = DATA_DIR / "t0_registries.json"
+
+# ── ability_score 范围（Schema §7，T1/T2 标签能力评分，整数尺度）──
+ABILITY_SCORE_MIN = 0
+ABILITY_SCORE_MAX = 100
+
+# ── 能力等级双框架（双层三通道方案 §2.3，Step 1.2）──────────────
+# IT 类 T1 标签用 SFIA（0-7）→ ability_score = sfia_level × (100/7)
+# 非 IT 类 T1 标签用通用能力等级（1-5：新手/基础/熟练/资深/专家）→ ability_score = (level-1) × 25
+# T2 沿用 SFIA（0-7）。T3 不挂等级。
+# D2 单一来源：IT 标签集合在此定义，映射函数在 utils/label_embedding.ability_score_from_level
+GENERAL_ABILITY_MAX_LEVEL = 5            # 通用能力等级 1-5
+GENERAL_ABILITY_LEVELS = ["新手", "基础", "熟练", "资深", "专家"]  # 等级 1-5 对应名
+# IT 类 T1 标签名集合（用 SFIA 0-7）；其余 T1 标签走通用能力等级 1-5
+# 口径：SFIA 是 Information Age 信息技术框架，仅覆盖软件/数据/算法/数字嵌入式/网络安全。
+# 机械/光学/模具/工艺/制造/硬件电路/通信/系统工程/研发管理等工程虽带技术成分但非 SFIA 范畴 → 走通用能力。
+# 标签名须与 data/standard_label_library_v1.json T1 项严格一致（防幽灵标签）。
+IT_T1_TAG_NAMES = frozenset({
+    # 软件开发/测试
+    "Java开发", "Python开发", "前端开发", "Android开发", "全栈开发", "软件测试",
+    # 算法/数据
+    "算法工程", "AI算法", "数据分析", "数据工程",
+    # 数字嵌入式
+    "嵌入式开发", "FPGA开发",
+    # 网络安全/运维
+    "网络安全", "运维工程",
+})
+
+# ── T3 代理指标 ────────────────────────────────────────────────
+# ⚠ 预校准默认值，需在 Day 2 实验（5 员工对比）后用真实数据调整
+T3_PROXY_WEIGHTS = {
+    "learning_speed": 0.25, "career_diversity": 0.25,
+    "growth_orientation": 0.25, "growth_signals_360": 0.25,
+}
+T3_CONFIDENCE_BASELINE = 0.7
+T3_CONFIDENCE_DEGRADED = 0.3
+T3_LEARNING_SPEED_SCALE = 50          # 原 300 → 预校准：1 项活动/年 ≈ 50 分
+T3_CAREER_DIVERSITY_SCALE = 15        # 原 20 → 预校准：7 角色触顶
+T3_GROWTH_EVIDENCE_SCALE = 8          # 原 15 → 预校准
+T3_TRAINING_SCALE = 5                 # 原 10 → 预校准
+T3_FEEDBACK_SCALE = 12                # 原 25 → 预校准
+
+# ── 大五人格 ──────────────────────────────────────────────────
+BIG_FIVE_DIMENSIONS = [
+    "openness", "conscientiousness", "extraversion",
+    "agreeableness", "neuroticism",
+]
+# 大五 ↔ T3 标签交叉验证映射（T3 标签名 → 大五维度）
+# 仅验证对比用，不参与评分权重
+BIG_FIVE_LABEL_MAP = {
+    "开放性": "openness",
+    "尽责性": "conscientiousness",
+}
+
+# ── 成长曲线 ──────────────────────────────────────────────────
+GROWTH_CURVE_MIN_POINTS = 2          # 线性回归最少数据点数，不足时 trend="insufficient_data"
+# 绩效等级 → 数值映射（与 PERFORMANCE_ORDINAL 保持同步，D2 单一来源）
+PERFORMANCE_GRADE_SCORE = {"S": 100, "A": 90, "B": 75, "C": 60, "D": 45}
+
+# ── Agent② 超时（50 人 × (5s LLM + 1s overhead) / W=5 + 余量 ≈ 80s）──
+AGENT_PROFILE_TIMEOUT = 120
+# Agent② Step F 汇总 LLM 单次调用超时：输入含全员标签，比单员工 LLM_API_TIMEOUT=30 长。
+# 消费者：utils/llm_client.call_llm_json(timeout=SUMMARY_LLM_TIMEOUT)（per-call 覆盖）
+SUMMARY_LLM_TIMEOUT = 60
+# Agent② _llm_extract 单员工 LLM 调用超时：输出结构化 JSON（T1/T2 数组 × evidence），
+# 比 Agent① summary 输出重（summary 仅 3 段文本 ~600 tokens，_llm_extract 多标签 + 锚点 ~1500+ tokens 生成）。
+# LLM_API_TIMEOUT=30 实测对 _llm_extract 偏紧（Paratera 代理按 token 计延迟，长 JSON 生成超 30s）。
+# 消费者：agents/profile_generation._llm_extract → call_llm_json(timeout=PROFILE_EXTRACT_LLM_TIMEOUT)
+# Day 3 注意：per-employee 90s × 50 员工 / W=5 = 900s，需配合调高 AGENT_PROFILE_TIMEOUT 或 W
+PROFILE_EXTRACT_LLM_TIMEOUT = 90
+# Agent② _llm_extract 单次 LLM 最大输出 token。
+# DeepSeek-V4-Pro 是推理模型，thinking tokens 计入 max_tokens；4096 实测被推理
+# 吃光致 finish_reason=length → 空内容 → 触发 call_llm_json short-prompt 重试
+# （截断 prompt 丢 JSON schema）→ 假性"成功"返回空标签数组。8192 给 thinking+JSON 留够。
+# 消费者：agents/profile_generation._llm_extract → call_llm_json(max_tokens=PROFILE_EXTRACT_MAX_TOKENS)
+PROFILE_EXTRACT_MAX_TOKENS = 8192
+
+# ── 三阶段标签匹配（Stage 2 召回 + Stage 3 LLM 重排）──
+# 架构反转：旧 verify_mapping 让 embedding 自动纠正 LLM（5 害 1 助，净负 4）；
+# 新设计 embedding 只召回 top-K 候选，LLM 从候选里拍板或判新标签。
+# 消费者：utils/label_matching.recall_top_k / rerank_label_llm；
+#         agents/profile_generation.execute Phase 1 串联。
+LABEL_RECALL_TOP_K = 20                     # Stage 2 embedding 召回候选数（corpus 94 项，k=20 覆盖足够候选，原 3 太低致 GT 常不在候选内）
+LABEL_RERANK_MAX_TOKENS = 2048              # Stage 3 重排 JSON 小，2048 充裕
+LABEL_RERANK_TIMEOUT = 180                  # Stage 3 重排比抽取轻（qwen3:14b 本地冷启动 ~50s，设 180 安全）
+LABEL_RERANK_CONFIDENCE_THRESHOLD = 0.7     # 低于此 → pending_review 人工复核
+LABEL_NEW_LABEL_MAX_PER_EMP = 2             # 新标签防滥上限（超限降级选 top1）
+
+# ── Stage 3 cross-encoder 精排（Step 8c，替换 zero-shot LLM 重排）──
+# 文献依据：BLINK/BGE 90%+ 靠 fine-tuned cross-encoder 联合编码 (query, doc) pair，
+#   精度远高于 bi-encoder 召回 + zero-shot LLM。BGE-Reranker-v2-m3 多语言含中文。
+# 消费者：utils/label_matching.rerank_cross_encoder。
+# 降级：加载失败 → rerank_label_llm（zero-shot LLM fallback，D6 确定性降级不重试）。
+RERANKER_MODEL_NAME = "BAAI/bge-reranker-v2-m3"        # cross-encoder 多语言
+# 本地模型路径（git clone 下载，优先于 HF hub 下载，省网络）。
+# None → 走 HF hub cache（需 HF_ENDPOINT=hf-mirror）；非 None → 直接加载本地目录。
+RERANKER_LOCAL_PATH = "D:/workplace/bge-reranker-v2-m3"
+RERANKER_FALLBACK_TO_LLM = True                        # 加载/推理失败 → zero-shot LLM
+RERANKER_NEW_LABEL_THRESHOLD = 0.15                    # top1 score < 此 → is_new_label（Step 1.10：0.3→0.15，BGE 对中文抽象词打分偏低，0.15-0.3 区间应收为 pending_review 而非判新标签）
+RERANKER_CONFIDENCE_THRESHOLD = 0.5                    # score < 此且 ≥ new 阈值 → pending_review

@@ -1,5 +1,341 @@
 # progress.md — Bug修复进度
 
+## 🏗️ Week 2 Day 3: 双层三通道重构 Step 1.7-1.9 GT 扩展 + Path C 覆盖 T3 + C1 对称修复 (2026-07-27)
+
+**状态**: [VERIFIED] Step 1.7-1.9（461 tests 绿）。Workflow 4 agent + 主循环清闸门修 HIGH finding。
+
+### 修改内容
+
+| 文件 | 操作 | 说明 |
+|------|------|------|
+| `data/experiment/ground_truth_5.json` | 修改 | Step 1.7 新增 7 个 T1 标签（JZ0001 质量工程 / JZ0003 FPGA开发 / JZ0004 嵌入式开发+项目管理 / JZ0033 法务审计 / JZ0050 法务审计+人力资源管理），grep 核对标签库无幽灵；_meta 加 t1_extension 字段；status 仍 [AWAITING_USER_REVIEW] |
+| `scripts/experiment_embedding_vs_llm.py` | 修改 | Step 1.8 pairs/rerank_items 循环加 "t3_labels"（对齐生产 _collect_rerank_items）；emp_result 加 t3_count；**主循环修对抗审查 HIGH**：error 路径 per_employee 3 key→12 key 对称成功路径 |
+| `tests/test_experiment.py` | 修改 | +test_t3_labels_flow_through_pairs_and_rerank（9 断言，防假绿）+ test_t3_labels_recall_at_gt_delta（4 断言）+ test_error_path_per_employee_key_symmetry（锁定 C1 修复）；扩展 test_returns_key_symmetry |
+
+### 变更摘要
+
+1. **解锁 recall@GT 70.6% 天花板**：T3 concept 进入 pairs/rerank_items 循环走完整三阶段，GT 的 7 个 T3 标签不再全 miss（此前 rerank 只处理 t1/t2）
+2. **GT 证据驱动扩展**：7 新增 T1 标签均有项目/绩效/证书/岗位原文依据，宁缺勿滥（5 个候选因证据不足被拒，如 JZ0001 Python开发仅培训 score 62 无项目证据）
+3. **C1 对称修复**：对抗审查抓到 error 路径 per_employee 项只有 {employee_id, error, model}，缺成功路径 9 key → 下游迭代读 t3_count/path_c 遇 error 员工 KeyError。潜伏因现有测试只查 summary 顶层不查 per_employee 结构（对应记忆「审查盲区：正常路径思维」+ E 节错误路径等价性）
+
+### 验证
+
+- [x] 定向测试: 13/13 passed（test_experiment）
+- [x] 全量测试: 461/461 passed（-W error::FutureWarning，11.36s）
+- [x] offline 冒烟: 脚本不崩，INVALID 决策正确
+- [x] GT 幽灵标签独立复核: 35 GT 标签全部在 corpus 62 项中
+- [x] 对抗审查 6 维度逐项推演通过
+
+### 待续
+
+- Step 1.10：真实 5 员工实验验证 recall@GT ≥ 70%（需 DeepSeek API + 本地 Ollama）
+- GT 用户复核：7 新增 T1 标签合理性，复核后改 status [VERIFIED]
+
+---
+
+## 🏗️ Week 2 Day 3: 双层三通道重构 Step 1.3-1.6 三通道独立抽取 + T3 升级 (2026-07-27)
+
+**状态**: [VERIFIED] Step 1.3-1.6（458 tests 绿，含 T3 通道测试 + 双框架接线）
+
+### 变更摘要
+
+T3 从"只抽 t3_raw 信号→compute_t3_scores 确定性算分"升级为"LLM 抽 T3 标签（concept→standard_label）+ t3_raw 补充"。三通道 prompt 单次调用分块引导（T1/T2/T3 独立段落 + T3 证据模式 5 类 + T3 few-shot），成本不增。T3 项进 rerank 走完整三阶段，GT 的 T3 标签不再全 miss（解锁 recall@GT 29% 天花板）。
+
+### 新增/修改文件
+
+| 文件 | 类型 | 说明 |
+|------|------|------|
+| `agents/profile_generation.py` | 修改 | `_empty_extract`+`_build_user_prompt` 加 t3_labels 字段；`_build_system_prompt` 三通道分块；`_collect_rerank_items`/`_mark_corpus_failed` 加 t3_labels；profile 三路径加 t3_labels；`_clamp_extract_ranges` 覆盖 T3 + 接线 ability_score_from_level + D2 去重 |
+| `utils/label_embedding.py` | 修改 | +公共 `clamp_int(v,lo,hi)`（D2 单一来源） |
+| `tests/test_profile_generation.py` | 修改 | mock 加 t3_labels + T3 通道断言 + 双框架接线测试 + 三通道 prompt 结构测试 |
+
+### 关键设计决策
+
+1. **T3 升级为标签抽取（最大变更）**：T3 = LLM 抽 t3_labels（concept→标准标签，同 T1/T2 结构）+ t3_raw 信号补充；rerank 覆盖 T3 通道；compute_t3_scores 保留（t3_raw 仍算 4 维分数作 confidence 补充）
+2. **三通道独立 = prompt 引导非 3 次调用**：单次 LLM 调用，prompt 内三通道分块（成本不增，token 4.03% 128K）
+3. **T3 不挂等级**：t3_labels 项无 sfia_level/ability_score，用 confidence 表达（§2.3）；_clamp 对 T3 只夹紧 confidence
+4. **ability_score 接线**：LLM 已给 ability_score 仅夹紧不重算（保 LLM 判断）；缺 ability_score 但有 level → 用 ability_score_from_level 映射补全（T2 强制 SFIA、T1 据 IT_T1_TAG_NAMES 判框架）
+5. **D2 去重**：删 `_clamp_extract_ranges` 内嵌 `_clamp_int`，复用 label_embedding.clamp_int
+
+### 验收结果
+
+- 458/458 tests 绿（含 2 新增：双框架接线 + 三通道 prompt 结构）
+- offline 冒烟：t3_labels 字段就位（空占位），不崩，t3_potential confidence=0.3
+- 对抗审查 10 项通过（C1 对称 content/profile、T3 通道空/降级/cancel、rerank idx 对齐、_clamp T3、ability_score 接线、D2 去重、G 守卫、数据一致性）
+
+### 待续（Step 1.7-1.10）
+
+- Step 1.7: GT 扩展（T1 新增标签类评审，T3 标签已存在）
+- Step 1.8: 实验脚本 Path C 覆盖 T3（pairs 收集加 t3_labels，recall@GT 分母含 T3）
+- Step 1.9-1.10: 真实 5 员工实验验证 recall@GT ≥ 70% + tracking
+
+计划文件：`C:\Users\Long\.claude\plans\hierarchical-three-channel-extraction.md`
+
+---
+
+## 🏗️ Week 2 Day 3: 双层三通道重构 Step 1.2 能力等级双框架 + 复盘修复 (2026-07-27)
+
+**状态**: [VERIFIED] Step 1.2 + 复盘修复（456 tests 绿，含 19 映射 + 2 完整性回归）
+
+### 变更摘要
+
+双层三通道方案 §2.3 落地——T1 能力评分不再单一 SFIA。IT 类标签走 SFIA 0-7→×(100/7) 取整；非 IT 类走通用能力等级 1-5（新手/基础/熟练/资深/专家）→(level-1)×25。T2 沿用 SFIA（调用方传 is_it_label=True 强制）。T3 不挂等级。
+
+公共函数 `ability_score_from_level(label_name, sfia_level, general_level, is_it_label)`：框架选择 `is_it_label` 显式 > `IT_T1_TAG_NAMES` 集合查表；缺失 level 回退另一框架；全空/G 类型异常返回 0 不崩。
+
+### 复盘发现并修复的 bug（首版漏网）
+
+| Bug | 描述 | 根因 | 修复 |
+|-----|------|------|------|
+| **A** | T2 `is_it_label=False` 注释语义反了，max-level 撞值掩盖中间值错误（sfia=4 应 57 却得 75） | 注释与实现矛盾 + 测试用 max-level 未暴露 | 注释正名 + 测试改 sfia=4→57 真验证（对抗审查首版已抓） |
+| **B** | IT 集合凭印象写 `测试开发`/`运维开发`，标签库实际名 `软件测试`/`运维工程` → 这两个 IT 标签永不命中 | 写集合未读标签库核对真实名（输入结构假设） | 名修对；新增 `TestItTagSetIntegrity` 回归守卫（IT 集合须是 T1 skill 子集） |
+| **C** | 10 项工程标签（结构/模具/光学/信号处理/硬件研发/电路/射频/硬件测试/系统工程/研发工程/通信）误归 IT/SFIA | 把"工程"等同于"IT"，SFIA 实不覆盖机械/光学/硬件电路 | 用户拍板保守口径，10 项移出 IT → 通用能力框架 |
+
+**共同根因**：写 IT 集合时假设了标签名和分类口径，未先读标签库；对抗审查只测集合内映射公式，未测集合↔标签库一致性 → 审查盲区：测行为不测数据完整性。对应记忆 [[root-cause-input-structure-assumption]] / [[review-blind-spot-input-structure]]。
+
+### 新增/修改文件
+
+| 文件 | 类型 | 说明 |
+|------|------|------|
+| `config.py` | 修改 | +`GENERAL_ABILITY_MAX_LEVEL=5`/`GENERAL_ABILITY_LEVELS`/`IT_T1_TAG_NAMES`(frozenset **14 项**，复盘后收紧口径) |
+| `utils/label_embedding.py` | 修改 | +`_clamp_int` +`ability_score_from_level`（双框架映射，G 守卫） |
+| `tests/test_label_embedding.py` | 修改 | +`TestItTagSetIntegrity`(2) +`TestAbilityScoreMapping`(19)；import config |
+
+### 待续（Step 1.3-1.10）
+
+- Step 1.3-1.6: 三通道独立抽取 prompt 重构 + T3 升级为标签抽取 + `_clamp_extract_ranges` 复用 ability_score_from_level（整合内嵌 `_clamp_int` 消 D2 双存）
+- Step 1.7-1.8: GT 扩展 + 实验脚本 Path C 覆盖 T3
+- Step 1.9-1.10: 测试 + 对抗审查 + 真实 5 员工实验验证 recall@GT ≥ 70%
+
+计划文件：`C:\Users\Long\.claude\plans\hierarchical-three-channel-extraction.md`
+
+---
+
+## 🏗️ Week 2 Day 2: Step 8 命中率提升（cross-encoder + metric 修正）(2026-07-27)
+
+**状态**: [VERIFIED] Step 8a-b（419 tests 绿）；[PENDING] Step 8c-f 待 Step 0 环境准备
+
+### 变更摘要
+
+文献调研确认 90%+ 命中率靠 fine-tuned cross-encoder（BLINK/BGE）/ entity augmentation + fine-tuned LLM（UniMEL），非 zero-shot LLM。GoldenMatch 95.4% 是 precision（拒假阳性），F1 仅 66.3%，recall 反降。当前 Path C 32.1% 是 recall@1（分母 53 含 LLM 合理抽取但 GT 没有的标签），公平口径 recall@GT = 17/29 = **58.6%**（Path A 48.3%，+10.3pp）。
+
+**Step 8a**: metric 修正 + 误导指标修复。`rerank_calls=5` 是入口计数，实际 LLM 触发 0 次（53 项全 exact_name_match 快路径）。新增 `llm_rerank_actual_calls`（项级真实触发数）+ `recall@GT`（公平口径，分母=GT 总标签数）。
+**Step 8b**: Stage 1 prompt 加 definition + keywords + few-shot。根因：`_build_system_prompt` 只给 LLM 标签 name 列表，LLM 盲选 name（如选"物联网"而非"智能制造"）。token 预算 ~3395（128K 窗口 <3%）。
+
+### 新增/修改文件
+
+| 文件 | 类型 | 说明 |
+|------|------|------|
+| `scripts/experiment_embedding_vs_llm.py` | 修改 | +recall@GT（path_a/b/c）+llm_rerank_actual_calls+cross_encoder_actual_calls；print_summary 显示新指标 |
+| `agents/profile_generation.py` | 修改 | `_build_system_prompt` 每标签加 definition+keywords+few-shot 示例 |
+| `tests/test_experiment.py` | 修改 | +test_recall_at_gt_fair_metric +actual_calls 断言 +key_symmetry 扩展 |
+| `tests/test_profile_generation.py` | 修改 | +test_build_system_prompt_includes_definition_and_few_shot +import load_label_corpus |
+
+### 待续（Step 8c-f，依赖 Step 0 环境准备）
+
+- **Step 0**（用户操作）：装 torch + sentence-transformers + 下载 BGE-Reranker-v2-m3（hf-mirror）
+- **Step 8c**: `utils/label_matching.py` 新增 `rerank_cross_encoder`（cross-encoder 精排替换 zero-shot LLM，降级到 rerank_label_llm）
+- **Step 8d**: `agents/profile_generation.py` execute Phase 1 接线 cross-encoder
+- **Step 8e**: 真实 5 员工实验验证 recall@GT ≥ 70%（目标 85%+）
+- **Step 8f**: schema §9 + tracking 三件套
+
+计划文件：`C:\Users\Long\.claude\plans\cross-encoder-rerank-85.md`
+
+---
+
+## 🏗️ Week 2 Day 2: 三阶段标签匹配重构（架构反转）(2026-07-26)
+
+**状态**: [VERIFIED] Step 1-6（417 tests 绿 + offline 冒烟）；[PENDING] Step 7 真实 LLM 实验验证 Path C ≥ Path B top3
+
+### 变更摘要
+
+5 员工真实实验发现旧 `verify_mapping` 架构反了——让 embedding（bge-small-zh，便宜低精度、不看上下文）**自动纠正** LLM（DeepSeek-V4-Pro，贵高精度）的标签选择，实测**5 害 1 助**（Java开发→Python开发、Java→MySQL、PowerBI→ANSYS、团队管理→尽责性、执行推进→尽责性），净负 4。信 LLM 原始提议命中 31.4% > 纠正后 23.5%。据业界共识（BLINK/TGRE/GoldenMatch/ESCO 管线/BGE 官方两阶段）重构为 **embedding 召回 + LLM 精排**，demo 期落地。
+
+### 新增/修改文件
+
+| 文件 | 类型 | 说明 |
+|------|------|------|
+| `utils/label_matching.py` | 新建 | `recall_top_k`（Stage 2 召回）+ `rerank_label_llm`（Stage 3 批量精排）+ `_apply_exact_match`（快路径）+ 降级/新标签防滥辅助 |
+| `agents/profile_generation.py` | 修改 | execute Phase 0 加 corpus 预编码；Phase 1 占位替换为 ThreadPoolExecutor(max_workers=3) 三阶段串联；+6 辅助方法 |
+| `config.py` | 修改 | +5 常量（LABEL_RECALL_TOP_K=3 / LABEL_RERANK_MAX_TOKENS=2048 / LABEL_RERANK_TIMEOUT=30 / LABEL_RERANK_CONFIDENCE_THRESHOLD=0.7 / LABEL_NEW_LABEL_MAX_PER_EMP=2） |
+| `scripts/experiment_embedding_vs_llm.py` | 修改 | 修统计 bug（pending 漏数 in_gt，15.7%→23.5%）；+path_a_pending_correct 审计字段；删本地 _cosine（F1）；Path C 调 rerank_label_llm 三方对比 |
+| `tests/test_label_matching.py` | 新建 | 28 断言（recall 14 + rerank 14：C1 对称/D6 防雪崩 V8/批量/快路径/新标签 cap/边界） |
+| `tests/test_profile_generation.py` | 修改 | TestExecute 改 offline 模式；+TestPhase1Integration（mock Stage1/2/3 验证串联 + error/cancel 降级） |
+| `tests/test_experiment.py` | 修改 | +autouse mock rerank（hermetic）；+path_c key 断言 + test_path_c_counts_rerank_results |
+| `docs/plan-profile-agent-schema.md` | 修改 | §7 补 5 常量；+§9 三阶段匹配（背景/架构/字段/D6/文献/验证） |
+
+### 关键设计决策
+
+1. **架构反转**：embedding 退回召回角色（Stage 2 取 top-3 候选），LLM 顶上精排角色（Stage 3 从候选里拍板或判 NEW）。`verify_mapping` 的自动纠正退役，Phase A 精确名匹配演化为快路径
+2. **批量重排省成本**：一员工所有 t1+t2 项单次 LLM 调用（TGRE 实测两阶段省 72%）
+3. **D6 防雪崩**：Stage 3 LLM 失败=确定性故障，不重试，trust standard_label + rerank_failures 审计
+4. **新标签防滥**：LLM 返回 NEW 且 confidence≥0.7 才算新标签；每员工上限 2，超限降级选 top1
+5. **F3 线程风险点**：ThreadPoolExecutor(max_workers=3) + cancel_event 进 worker 即查 + 超时 future.result(timeout)+cancel 不重试；stats 主线程聚合
+6. **统计 bug 修复**：else 分支漏数 in_gt 致 15.7% 虚低，真实 23.5%，不改 Plan B 决策
+
+### 验收结果
+
+- 417/417 tests 绿（+28 test_label_matching + 3 TestPhase1Integration + 1 test_path_c）
+- offline 冒烟通过（5 员工加载、corpus 94 项、Path C 字段就位、JSON 持久化）
+- 真实 LLM 实验待跑：验收判据 Path C ≥ Path B top3(43.1%)，验证 Java开发/PowerBI 等纠正器搞错的案例改对
+
+---
+
+## 🔧 Week 2 Day 2: Agent② _llm_extract + 5 员工对比实验 (2026-07-28)
+
+**状态**: [VERIFIED] 代码侧（381 tests 绿 + offline 冒烟 + mock path 逻辑验证）；[AWAITING_USER_REVIEW] ground truth；[PENDING] 真实 LLM 实验运行（待 GT 复核）
+
+### 变更摘要
+
+Day 2 实现 Agent② `_llm_extract()`（单员工 LLM 抽取 T1/T2/T3 raw + 大五），扩展 corpus 合并 T0（tool/domain/knowledge），起草 5 员工 ground truth，编写双路径对比实验脚本定稿 Embedding 阈值。**不**修改 execute() 串联并行池（Day 3）、**不**做 Phase 2 成长曲线/汇总摘要（Day 3）。
+
+### 新增/修改文件
+
+| 文件 | 类型 | 说明 |
+|------|------|------|
+| `config.py` | 修改 | +`T0_REGISTRIES_PATH` / `ABILITY_SCORE_MIN/MAX`（D2 单一来源） |
+| `utils/label_embedding.py` | 修改 | `load_label_corpus` 合并 T0（+`_load_t0_corpus` 辅助），默认路径合并 / 显式 path 隔离 |
+| `agents/profile_generation.py` | 修改 | +`_llm_extract` + 4 辅助（`_empty_extract`/`_build_system_prompt`/`_build_user_prompt`/`_clamp_extract_ranges`） |
+| `data/experiment/ground_truth_5.json` | 新建 | 5 员工 29 标签 ground truth（[AWAITING_USER_REVIEW]） |
+| `scripts/experiment_embedding_vs_llm.py` | 新建 | 双路径对比实验脚本（Path A verify/correct vs Path B 纯 embedding top-k） |
+| `tests/test_label_embedding.py` | 修改 | +4 T0 断言 + 修正 2 校准断言（Java case 因 T0 ITIL "服务" 词面重叠降为 low_margin） |
+| `tests/test_profile_generation.py` | 修改 | +`TestLlmExtract` class（11 断言：offline/降级/防雪崩/范围守卫/C1 对称） |
+| `tests/test_experiment.py` | 新建 | 6 断言锁定 path A/B 分类 + 决策阈值 |
+
+### 关键设计决策
+
+1. **T0 合并策略**：`load_label_corpus(path=None)` 默认合并 T0，显式 path（测试 fixture）不合并 → 测试隔离 + 生产覆盖 4 类 category
+2. **_llm_extract 降级（D6/F7）**：解析失败 → 确定性占位（model="degraded-placeholder"），**禁第 2 次 LLM**（防雪崩）；认证/网络错误 → 返回 error 给调用方退避
+3. **Path B 复用 concept**：不另起"自由 prompt"，避免 2× LLM 成本；两路径差异仅在映射阶段（LLM labeling+verify/correct vs 纯 embedding），这正是对比核心
+4. **范围守卫**：ability_score [0,100]、sfia_level [0,7]、confidence [0,1]、big_five [0,100] — LLM 越界值夹紧，不丢弃数据（C4/C8）
+
+### 对抗审查发现
+
+| 项 | 发现 | 处理 |
+|----|------|------|
+| T0/T1 词面重叠 | "Java微服务后端"→"Java开发" 从 verified 降为 low_margin（T0 "ITIL" text 含"服务"逼近 top-1） | 更新 test_java_verified 断言新行为 + 新增 test_t2_behavioral_clean_verified 干净锚点；记录为 Day 2 实验需定稿阈值的预期问题 |
+| corpus 重复名 | "智能制造" 同时在 T1 skill + T0 domain → verify_mapping 同名不同 corpus 项致 corrected 而非 verified | 不影响 hit-checking（按名比对），轻微低估 verified 率，记录为已知数据 quirk |
+| _llm_extract 效率 | `_build_system_prompt` 每次调 load_label_corpus（94 项 ~ms） | Day 2 实验 5 员工可接受；Day 3 execute Phase 0 已加载 corpus 一次，将重构传入复用 |
+
+### 验收结果
+
+- **全量测试**: `pytest tests/ -W error::FutureWarning` → **381/381 passed**（360 基线 + 21 新增，11.09s）
+- **offline 冒烟**: `TC_OFFLINE=1 python scripts/experiment_embedding_vs_llm.py` → 骨架跑通，5 员工加载 + corpus 94 项 + JSON 持久化
+- **mock path 逻辑**: Path A verified/corrected_correct/corrected_wrong/pending 分类正确；Path B top-1/top-3 命中正确；决策阈值触发正确
+- **ground truth 校验**: 29 标签全部存在于合并后 corpus（94 项），verify_mapping 可达
+
+### 待办（用户驱动）
+
+1. **复核 ground truth**（`data/experiment/ground_truth_5.json`）— 标签选择/evidence 依据是否合理，复核后改 [VERIFIED]
+2. **运行真实 LLM 实验**（需 DeepSeek API key）— `python scripts/experiment_embedding_vs_llm.py --from-phase1 data/intermediate/phase1_output.json --ground-truth data/experiment/ground_truth_5.json`
+3. **据实验结果定决策**写回 change-log：定稿 threshold=0.50/margin=0.12 或 Plan B
+4. **task-plan.md** 2.2.2 状态推进
+
+### 不在 Day 2 范围
+
+- execute() 串联并行池（Day 3 Phase 1）
+- verify_mapping / compute_t3_scores 在 execute 中集成（Day 3）
+- 成长曲线 + 汇总摘要 LLM（Day 3 Phase 2）
+- 证据锚点校验 _verify_evidence_anchor（Day 3 Step D）
+- PERFORMANCE_ORDINAL 补 "S"（Day 3 growth_curve）
+- run_pipeline_phase2.py（Day 4）
+
+---
+
+## 🔧 Week 2 Day 1: Agent② 基础设施落地 (2026-07-27)
+
+**状态**: [VERIFIED] — 全部 5 模块通过 V2 闸门（pytest 定向+全量 + 对抗审查）
+
+### 变更摘要
+
+Day 1 铺设 Agent② 画像生成基础设施：证书解析 + T3 确定性打分器 + Embedding 验证器/纠正器 + Agent② 骨架。为 Day 2-3 的 LLM Prompt 和并行池串联做地基。每模块按 C1/V1 闸门流程（写 [AWAITING_VERIFY] → pytest → 对抗审查 → [VERIFIED]）独立验收。
+
+### 新增文件
+
+| 文件 | 说明 | 测试数 |
+|------|------|--------|
+| `utils/certificate_parser.py` | `parse_certificates()` 证书解析（半角/全角分隔符 + 哨兵集过滤） | 35 |
+| `utils/t3_scorer.py` | `compute_t3_scores()` T3 四项代理指标确定性计算 | 29 |
+| `utils/label_embedding.py` | `get_embedding_model`/`encode_labels`/`verify_mapping`/`load_label_corpus` 四函数 | 35 |
+| `agents/profile_generation.py` | `ProfileGeneration(BaseAgent)` 骨架（_adapt_input + validate_input 双格式 + execute Phase 0-1 占位） | 30 |
+| `tests/test_certificate_parser.py` | 哨兵/混合/非 str 守卫边界 | — |
+| `tests/test_t3_scorer.py` | 极端工龄/None 元素/不可哈希/公式走查 | — |
+| `tests/test_label_embedding.py` | fake embedder 逻辑路径 + 真实模型集成（Java→Java开发 verified, →Python开发 corrected） | — |
+| `tests/test_profile_generation.py` | 双格式校验 + _adapt_input 映射 + execute 骨架 | — |
+
+### 修改文件
+
+| 文件 | 变更 |
+|------|------|
+| `requirements.txt` | 追加 `cachetools>=5.0.0`（encode_labels 线程安全 LRU 缓存） |
+| `progress.md` | Task 1.1 核对备注 + 1.2/1.4/1.3/1.5 [VERIFIED] 条目 |
+| `docs/task-plan.md` | 2.2.1 标 ✅，2.2.2-2.2.5 描述对齐 Week 2 指南 Day 2-5 |
+
+### 两个实现期决策点
+
+1. **encode_labels 线程安全缓存** → `cachetools.LRUCache` + `threading.Lock`（用户建议方案）。理由：Agent② W=5 并发触达 encode_labels，cachetools+Lock 显式保证读写互斥。
+2. **load_label_corpus category 推导** → 实现关键词判定逻辑但本周为占位。当前 13 个 T1 标签 keywords 不含触发词（工具/框架/领域/行业/知识/理论），全 fallback 到 `skill`，与"T0 融合留待 Week 3"预期一致。
+
+### 对抗审查发现并修复的 Bug
+
+| 模块 | Bug | 修复 |
+|------|-----|------|
+| certificate_parser | 非 str 输入（int/float/list）在 `.strip()` 崩 | 加 `isinstance(cert_str, str)` 守卫 |
+| t3_scorer | `years_of_service=None`（键存在值 None）`max(None,1)` 崩 | `or 0` 兜底 |
+| t3_scorer | `set(career_roles)` 遇不可哈希 dict 元素崩 | `str(r)` 守卫 |
+| label_embedding | 单字符串 `tuple("AAA")` 逐字符拆分 | `isinstance(str)` 包单元素 |
+| label_embedding | `test_cache_hit` 跨 session 缓存污染 | 加 `_cache.clear()` |
+| profile_generation | `_corpus_size` 诊断字段污染输出 data（F6） | 移除，corpus 加载由 execute 不崩溃隐式验证 |
+
+### 验收结果
+
+- **全量测试**: `pytest tests/ -W error::FutureWarning` → **360/360 passed**（231 基线 + 129 新增，9.59s）
+- **模型冒烟**: `embedding_demo.py` 跑通，bge 模型离线可用，6/5 top-1 命中（第 6 个为已知 bge 绝对阈值问题，由 verify_mapping 相对 margin 判定覆盖）
+- **Agent② 骨架可导入**: `ProfileGeneration().validate_input({})` = False（缺 employees），timeout=120s
+- **numpy 类型清洗**: `compute_t3_scores` 返回值 `json.dumps` 不抛 TypeError，无 NaN/Infinity 字符串
+- **指南验收断言全绿**: `verify_mapping("Java微服务后端","Java开发")` → verified + `llm_proposed:verified`；`("Java微服务后端","Python开发")` → `embedding_corrected` + `corrected_label=="Java开发"`
+
+### 不在本次范围
+
+- Day 2: `_llm_extract()` LLM Prompt + 5 员工对比实验
+- Day 3: Phase 1 并行池串联 + Phase 2 成长曲线/汇总摘要
+- H1Filter / T0 融合进 T1 标签库：Week 3
+
+---
+
+## 🔧 第2周准备 Step2.2: 五层方案设计细化更新 (2026-07-26)
+
+**状态**: [更新]（用户逐项讨论确认后更新设计文档及关联文件）
+
+### 变更摘要
+
+本次更新涉及 4 个文件，覆盖 T2/T3 评分方法、W1/W2/W3 权重、备选池排序、大五角色等 8 项设计决策。
+
+### 更新文件清单
+
+| 文件 | 变更类型 | 说明 |
+|------|---------|------|
+| `开题报告/五层匹配评分体系细化方案_2026-07-24.md` | 内容更新 | 新增 §2.4 T2/T3/§2.8 W1/W2/W3/§2.9 大五/§5 备选池/§6 Demo 验证 |
+| `docs/plan-profile-agent-schema.md` | 设计决策更新 | D1: T2 改用 SFIA；T3 改为代理指标聚合；D3: 大五降为验证角色 |
+| `docs/plan-candidate-pool.md` | 完全重写 | 四象限 + 综合推荐指数 + 主池参考排名（替代旧二分类+阈值） |
+| `docs/task-plan.md` | 任务描述更新 | 2.2.2/2.2.3/2.3.3 任务描述对齐新设计；新增 2.3.8 Demo 验证画像 |
+
+### 关键设计决策（2026-07-26 确认）
+
+| 决策 | 结论 |
+|------|------|
+| T2 评分 | SFIA_diff 复用（与 T1 同公式），双源融合（简历语义+360校准） |
+| T3 评分 | 代理指标聚合（学习速度+职业多样性+成长导向+360成长信号） |
+| W1/W2/W3 权重 | 四类职业权重矩阵 + 单条双滑块 HR 可调 |
+| 大五人格 | 不参与评分权重，仅验证/校准 |
+| 备选池排序 | 四象限（A/B/C/D）+ 综合推荐指数（deficit 0.40+T1 0.25+T3 0.25+T2 0.10） |
+| 备选池 Demo 期 | 仅标记"考虑录用"，不做自动排序变更 |
+| Demo 验证 | 7 画像 + 三角雷达图 + 9 项验证检查点 |
+
+**依据**: 五层方案 §2.4-§2.9 + §5 + §6（2026-07-26 更新版）
+
+---
+
 ## 🔧 第2周准备 Step2.1: Schema 五层结构修正 (2026-07-26)
 
 **状态**: [修正]（用户指出五层结构错误后修正）
@@ -754,3 +1090,40 @@ training: 400 ✅ | eval360: 2500 ✅
 - [x] 对抗审查: 6 边界值 + C4 穷举验证通过
 - [ ] 基线对比: 待执行（需要完整 pipeline 运行）
 - [ ] 端到端验证: 待执行（需要完整 pipeline 运行）
+
+---
+
+## [VERIFIED] 2026-07-26 — Agent① training merge NameError 修复
+
+- **文件**: `agents/data_understanding.py`
+- **变更**: `_merge_records` training 循环 L808-815 增补 `cd = t.get("completion_date")` 定义；原代码引用未定义变量 `cd`（NameError），导致 Agent① execute 整体 error，且 PipelineRunner error 路径把 `phase1_output.json` 覆盖为输入路径 dict（非员工记录）。
+- **影响面**: ① Agent① 联调无法产出有效 phase1_output；② 第二周 `--from-phase1` 路径加载到路径字符串而非员工数据；③ 单元测试未触发该路径（test_data_understanding 未覆盖 training merge 真实分支），故 213/213 假绿。
+- **待验证**: `pytest tests/test_data_understanding.py tests/test_pipeline.py -v` + 重跑 run_pipeline_phase1.py 确认 status=success 且 structured 含 political_status/certificates、training 含 completion_date。
+- **验证结果**: ✅ 全量 `pytest tests/ -v -W error::FutureWarning` 通过；重跑 `run_pipeline_phase1.py --offline --max-employees 50` status=success，structured 含 political_status/certificates，training 含 completion_date。
+
+---
+
+## [VERIFIED] 2026-07-26 — call_llm_json 加 timeout 形参 + SUMMARY_LLM_TIMEOUT 常量
+
+- **文件**: `utils/llm_client.py`（call_llm + call_llm_json 加 `timeout: float | None = None` 形参，per-call 覆盖客户端默认；None=不覆盖=用 LLM_API_TIMEOUT，向后兼容）、`config.py`（新增 `SUMMARY_LLM_TIMEOUT = 60`，D2 单一来源）
+- **变更原因**: 第二周指南 Step F 汇总 LLM 调用输入含全员标签，需比单员工 30s 更长超时；原指南写"传递 SUMMARY_LLM_TIMEOUT=60"但 call_llm_json 无 timeout 形参、config 无该常量，不可实现。
+- **F8 签名核实**: OpenAI SDK `chat.completions.create(timeout=...)` 支持 per-call 覆盖客户端默认（已核实），call_llm 内 retry 路径复用 kwargs 自动带 timeout。
+- **影响面**: ① Agent① 调用 call_llm_json 不传 timeout，行为不变（None 分支）；② Agent② Step F 传 timeout=SUMMARY_LLM_TIMEOUT；③ test_llm_client/test_llm_summarizer 既有断言不涉及 timeout 字段。
+- **验证结果**: ✅ 定向 40/40 + 全量 `pytest tests/ -W error::FutureWarning` 231/231 通过；Agent① 调用未传 timeout（None 分支）行为不变。
+
+## [VERIFIED] 2026-09-04 — 重新基线 + 07-26~07-29 未入库工作 checkpoint 提交
+
+### 背景
+竞赛逾期，"做完"重定义为 2.3.x 端到端闭环；git 停在 07-26（b520191），之后两周工作全部悬在工作区（13 修改 + 7 新文件未提交），本次一并入库。
+
+### 提交内容
+- Agent② Phase 1 完整实现：`agents/profile_generation.py`（三通道抽取 + 三阶段匹配接线）、`utils/label_matching.py`（召回/重排/LLM 兜底）、`utils/label_embedding.py` 扩展
+- 实验轨道：`scripts/experiment_embedding_vs_llm.py`、`data/experiment/ground_truth_5.json`（GT 5 员工 35 标签）
+- argmax 框架：`docs/plan_argmax_implementation.md` + `docs/plan_argmax_e_verify.md` + `scripts/verify_argmax_routing.py`（模拟验证完成，落地 PAUSED 待 T1 方案）
+- 能力盘点：`docs/talent-compass-capability-assessment.md`
+- Day6/7 前端修复、certificates 字段、S4 守卫等已 VERIFIED 条目对应改动
+
+### 决策记录
+1. 做完 = 端到端闭环（2.3.x）；2.4.x 打磨做基础版；竞赛第三/四/五阶段降级 backlog
+2. 下一步 = T1 硬技能 recall 优化（25-37.5%，方向候选：LLM 兜底接线 / 接受现状后置）
+3. 测试 461/461 ×3 全绿；冷启动首跑 12 failed 瞬态记录于 progress.md

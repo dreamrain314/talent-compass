@@ -1,0 +1,76 @@
+{
+  "_meta": {
+    "status": "[AWAITING_USER_REVIEW]",
+    "created": "2026-07-28",
+    "created_by": "Claude draft (Day 2 Step 4)",
+    "purpose": "5 员工对比实验 ground truth 标准标签基准",
+    "source_phase1": "data/intermediate/phase1_output.json",
+    "corpus": "standard_label_library_v1.json (T1/T2/T3) + t0_registries.json (T0 tool/domain/knowledge)",
+    "note": "Claude 基于员工 text_summaries + performance + scores_360 起草，需用户复核后定稿。每员工 5-7 个标签，覆盖 T1 skill / T2 behavior / T3 potential / T0 tool|domain|knowledge 四类。证据依据列在 _evidence 字段供复核。",
+    "t1_extension_2026-07-27": "Step 1.7 评审：新增 7 个 T1 标签，复核后删除 1 个（JZ0003 FPGA开发——员工是 FPGA工程师但项目全是软件，prompt 不传 current_position → LLM 不可达，保留会虚低 recall@GT）。最终新增 6 个：JZ0001 质量工程；JZ0004 嵌入式开发、项目管理；JZ0033 法务审计；JZ0050 法务审计、人力资源管理。另修正 JZ0033 法务审计 evidence 文本（原误引 JZ0050 的「企业内控体系建设」项目，改为 JZ0033 真实证据：法学专业+薪酬体系改革合规审计+中级会计师+perf2026合规提升）。评审范围：基于 phase1_output.json 中 projects/performance/certificates/text_summaries 原文证据，对照扩展后 40 标签库的 T1 tier。所有新增标签均经 _build_user_prompt 实测确认 LLM 可达。status 仍为 AWAITING_USER_REVIEW，待用户复核定稿。"
+  },
+  "JZ0001": {
+    "name": "周诗涵",
+    "profile": "P6 / 16年 / 技术研发类 / 绩效 B→C→A（资深翻盘，隐形高潜）",
+    "labels": [
+      {"label": "智能制造", "category": "skill", "tier": "T1", "evidence": "工业IoT管理平台、智慧园区平台（项目摘要）"},
+      {"label": "质量工程", "category": "skill", "tier": "T1", "evidence": "岗位：质量工程师；培训：质量管理体系ISO9001（score 91，高分通过）"},
+      {"label": "跨部门协调", "category": "behavior", "tier": "T2", "evidence": "360: 跨部门沟通顺畅、协作态度好"},
+      {"label": "团队管理", "category": "behavior", "tier": "T2", "evidence": "360: 自然承担leader角色、承担过负责人角色、具备基层管理能力"},
+      {"label": "质量导向", "category": "behavior", "tier": "T2", "evidence": "360: 质量意识强、分内工作尽责到位"},
+      {"label": "领导力潜质", "category": "potential", "tier": "T3", "evidence": "360: leader角色、为下属争取资源、关键时刻能兜底"},
+      {"label": "成长型思维", "category": "potential", "tier": "T3", "evidence": "绩效 B→C→A 翻盘 + 360: 主动学习、技术视野开阔"}
+    ]
+  },
+  "JZ0003": {
+    "name": "孟华",
+    "profile": "P1 / 2年 / 技术研发类 / 绩效 C→C→A（年轻爆发，P1显领导潜质）",
+    "labels": [
+      {"label": "智能制造", "category": "skill", "tier": "T1", "evidence": "数字孪生可视化平台、工业IoT管理平台（项目摘要）"},
+      {"label": "数据分析", "category": "skill", "tier": "T1", "evidence": "绩效: 工业大数据分析中部分节点延迟（2025）"},
+      {"label": "沟通表达", "category": "behavior", "tier": "T2", "evidence": "360: 口头表达清晰、沟通直接高效"},
+      {"label": "执行推进", "category": "behavior", "tier": "T2", "evidence": "360: 非常靠谱、分内工作尽责到位、态度端正"},
+      {"label": "领导力潜质", "category": "potential", "tier": "T3", "evidence": "360: 有带团队潜力、自然承担leader角色（P1即显潜质）"},
+      {"label": "自驱力", "category": "potential", "tier": "T3", "evidence": "360: 主动承担责任、2026 产品迭代V3 发挥关键作用"}
+    ]
+  },
+  "JZ0004": {
+    "name": "贺峰",
+    "profile": "P3 / 9年 / 技术研发类 / 绩效 A→C→B（高开低走波动，持证）",
+    "labels": [
+      {"label": "Java开发", "category": "skill", "tier": "T1", "evidence": "绩效: 创新引入Java微服务方案；项目: ERP系统定制开发用Java"},
+      {"label": "数据分析", "category": "skill", "tier": "T1", "evidence": "项目: 工业大数据分析平台（Airflow）"},
+      {"label": "嵌入式开发", "category": "skill", "tier": "T1", "evidence": "项目: 边缘计算网关开发（核心开发，tools含嵌入式/C++/Linux/MQTT）"},
+      {"label": "项目管理", "category": "skill", "tier": "T1", "evidence": "证书: 信息系统项目管理师；培训: 项目管理PMP认证（进行中）"},
+      {"label": "学习敏捷性", "category": "behavior", "tier": "T2", "evidence": "360: 主动学习前沿、新技术"},
+      {"label": "资源整合", "category": "behavior", "tier": "T2", "evidence": "360: 布置任务清晰、有主见能推动决策"},
+      {"label": "领导力潜质", "category": "potential", "tier": "T3", "evidence": "360: 管理渐入佳境、具备基层管理能力、能激发团队士气"}
+    ]
+  },
+  "JZ0033": {
+    "name": "崔超",
+    "profile": "P8 / 20年 / 管理职能类 / 绩效 D→C→B（大反弹，资深管理，持证）",
+    "labels": [
+      {"label": "财务管理", "category": "skill", "tier": "T1", "evidence": "证: 中级会计师；项目: 薪酬体系改革、全面预算管理系统"},
+      {"label": "人力资源管理", "category": "skill", "tier": "T1", "evidence": "项目: 人力资源数字化平台、人才盘点"},
+      {"label": "项目管理", "category": "skill", "tier": "T1", "evidence": "项目: 资源协调、方案设计、流程优化"},
+      {"label": "法务审计", "category": "skill", "tier": "T1", "evidence": "专业: 法学；项目: 薪酬体系改革（tools含合规审计）；证: 中级会计师；绩效2026: 完成合规管理提升"},
+      {"label": "变革推动", "category": "behavior", "tier": "T2", "evidence": "360: 有主见能推动决策；项目: 薪酬体系改革"},
+      {"label": "抗压韧性", "category": "potential", "tier": "T3", "evidence": "绩效 D→C→B 大反弹 + 360: 关键时刻能兜底、责任维度得分高"},
+      {"label": "PowerBI", "category": "tool", "tier": "T0", "evidence": "项目: 人力资源数字化平台用Power BI"}
+    ]
+  },
+  "JZ0050": {
+    "name": "程芳",
+    "profile": "P3 / 11年 / 管理职能类 / 绩效 A→B→B（稳定高绩效，持证）",
+    "labels": [
+      {"label": "财务管理", "category": "skill", "tier": "T1", "evidence": "证: 高级会计师；项目: 企业内控体系建设"},
+      {"label": "项目管理", "category": "skill", "tier": "T1", "evidence": "项目: 交付管理、流程梳理"},
+      {"label": "法务审计", "category": "skill", "tier": "T1", "evidence": "专业: 法学；项目: 企业内控体系建设（协调人，tools含审计软件/COSO/风险矩阵/流程梳理）"},
+      {"label": "人力资源管理", "category": "skill", "tier": "T1", "evidence": "岗位: 薪酬福利专员；绩效2024: 创新引入人力资源数字化方案；绩效2025/2026: 人才盘点项目配合到位"},
+      {"label": "执行推进", "category": "behavior", "tier": "T2", "evidence": "360: 关键时刻能兜底、分内工作尽责到位"},
+      {"label": "质量导向", "category": "behavior", "tier": "T2", "evidence": "360: 质量意识强"},
+      {"label": "领导力潜质", "category": "potential", "tier": "T3", "evidence": "360: 有带团队潜力、承担过负责人角色、为下属争取资源"}
+    ]
+  }
+}

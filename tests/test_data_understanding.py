@@ -32,9 +32,10 @@ def _make_minimal_data(tmp_dir, n=3):
     """在 tmp_dir 下生成最小测试数据集（n 名员工）。"""
     emp_rows = [
         {"employee_id": f"T{i:04d}", "name": f"员工{i}", "age": 30 + i,
-         "gender": "男", "education": "本科", "major": "计算机",
+         "gender": "男", "political_status": "群众", "education": "本科", "major": "计算机",
          "job_sequence": "技术研发类", "current_position": "工程师",
-         "current_level": f"P{i+3}", "hire_date": "2020-01-01", "years_of_service": 6}
+         "current_level": f"P{i+3}", "hire_date": "2020-01-01", "years_of_service": 6,
+         "certificates": ""}
         for i in range(1, n + 1)
     ]
     _write_csv(os.path.join(tmp_dir, "employees.csv"), emp_rows)
