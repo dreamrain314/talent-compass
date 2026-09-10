@@ -63,10 +63,12 @@ _FEWSHOT_BANK: list[dict] = [
     {"channel": "t3", "source_text": "绩效 B→C→A 翻盘 + 主动学习新技术",
      "concept": "逆境反弹", "standard_label": "成长型思维",
      "note": "逆境反弹+主动学习属成长型思维"},
-    # ── S2 扩充：证书类（plan：证书须评估质量/体系类标签证据价值）──
+    # ── S2 扩充：证书类（证书→能力标签映射示范，序5b 修正：此前
+    # standard_label=ISO9001 与证书证据价值文案矛盾，kNN 送达后教 LLM 照抄
+    # 证书名、rerank 映射到 ISO9001 条目而非 GT 质量工程——A/B 序5 判负主因链①）──
     {"channel": "t1t2", "source_text": "主导公司通过 ISO9001 质量管理体系认证",
-     "concept": "质量体系管理", "standard_label": "ISO9001",
-     "note": "ISO9001 认证经历是质量管理体系类标签的直接证据"},
+     "concept": "质量体系管理", "standard_label": "质量工程",
+     "note": "证书映射能力标签而非照抄证书名——ISO9001 认证是质量工程能力的证据"},
     {"channel": "t1t2", "source_text": "持有 PMP 认证，统筹跨部门交付排期",
      "concept": "项目管理", "standard_label": "项目管理知识体系",
      "note": "PMP 认证对应项目管理方法论标签"},
@@ -412,9 +414,9 @@ class ProfileGeneration(BaseAgent):
         # S2：数量下限 + 逐字段自查（攻 B1「整段字段没看」类漏抽——87% 损耗在抽取层）
         lines.append(
             f"  🔴 数量要求：T1 通道至少输出 {config.T1_EXTRACT_MIN_COUNT} 个标签。"
-            "输出前逐字段自查：岗位序列/项目摘要/绩效摘要/证书/培训课程各扫一遍，"
-            "字段中能映射到标签库的技术词汇不得遗漏；"
-            "证书须评估其对质量/体系类标签的证据价值（如 ISO9001 认证是质量管理体系证据）。"
+            "输出前逐字段自查，按证据强度排序：项目摘要/绩效摘要/岗位序列为一级证据优先扫；"
+            "证书/培训课程仅作佐证（孤证不抽，须与项目或绩效相互印证方可计入）；"
+            "证书须映射到能力标签而非照抄证书名（如 ISO9001 认证佐证质量工程能力）。"
         )
         lines.extend(t1_lines if t1_lines else ["  (T1 标签库加载失败)"])
 

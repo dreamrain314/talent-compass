@@ -781,7 +781,8 @@ class TestLlmExtract:
         # 整短语断言锁定下限值（裸 "5" 子串可被 definition/keywords 假命中）
         assert f"至少输出 {config.T1_EXTRACT_MIN_COUNT} 个标签" in sp
         assert "逐字段自查" in sp
-        assert "ISO9001 认证是质量管理体系证据" in sp  # 证书证据价值引导
+        assert "按证据强度排序" in sp
+        assert "证书须映射到能力标签而非照抄证书名" in sp  # 证书证据价值引导（序5b 修正文案）
 
     def test_s2_knn_selects_nearest_examples(self, agent):
         """S2 kNN：fake encode 下与员工语义最近的 bank 条目被选中，恰 K 条。"""

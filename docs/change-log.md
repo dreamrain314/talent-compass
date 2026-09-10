@@ -1,5 +1,21 @@
 # progress.md — Bug修复进度
 
+## 🔧 A/B 序5b：S2 修正重测（2026-09-10 晚）
+
+- 用户拍板「A」：①`_FEWSHOT_BANK[5]` standard_label "ISO9001"→"质量工程"（证书→能力映射示范，note 同步）②T1 自查文案改按证据强度排序（项目/绩效/岗位序列一级证据优先；证书/培训孤证不抽须与项目绩效互证；证书映射能力标签）；测试断言同步（整短语锁定新文案）
+- 验证：pytest 481 全绿；序5b ×3 run（C_rGT 70/60/65 均值 **65.0**，vs 序1 68.3 差 2 命中/60 项，n=3 噪声带内持平）
+- 修正假设证实：质量工程 0/3→2/3 救回追平序1（bank[5] 例题矛盾=主因链①）；t1 8.0→6.4 更克制；conf<0.5 3.40% 三臂最优
+- 残留清单：嵌入式开发 0/3（序1 2/3）——根因=抽取层语义归并（LLM 把 JZ0004 边缘计算网关证据归并进 Java/Linux 主干概念，三轮 concepts 零嵌入式词根，映射层无关）；归属 Phase 6 后评估
+- 实验数据：`data/intermediate/experiment_5emp_live_20260910_{2008,2009,2010}*.json`；对比脚本 `tmp/compare_arms.py`
+
+## 🧪 A/B 序5：S2 效果闭环（2026-09-10 晚）
+
+- **判定：S2 判负（灰区级，机制链完整，待用户拍板处置）**
+- 数据：C_rGT 61.7 (60/60/65) vs 序1 参照臂 68.3 (65/75/65) −6.6pp；t1 5.9→8.0 数量约束生效；new_labels=0/置信 0.82 持平（反事实锚「硬凑标签」未发生）；质量工程 2/3→0/3、嵌入式开发 2/3→0/3
+- 根因三链：①`_FEWSHOT_BANK[5]`「ISO9001→ISO9001」与证书文案矛盾+ kNN 精准送达 JZ0001 ②「质量管理体系」概念 rerank 最近邻=ISO9001 工具条目（conf 0.96）≠GT 质量工程 ③「逐字段自查」挖出培训字段标签（ITIL/Redis），GT 曾拒「仅培训无项目证据」——自查方向与 GT 证据标准相反
+- 参照臂复用依据：progress「A/B 序0 数据回退态」原文 + B_rGT 51.7≠36.7 两臂 corpus 不同 + 序1/序5 同模型 glm-5.3-flash/effort=low/S1 开
+- 实验数据：`data/intermediate/experiment_5emp_live_20260910_{191948,192147,192341}_*.json`
+
 ## 🎯 T1 Phase 5：S2 prompt 稳定化 + S8b 裁撤（2026-09-10）
 
 - `agents/profile_generation.py`：T1 通道数量下限约束（`T1_EXTRACT_MIN_COUNT=5` + 逐字段自查 + 证书证据价值引导「ISO9001 认证是质量管理体系证据」）；few-shot 从静态 5 条升级为 `_FEWSHOT_BANK` 10 条按员工语义 kNN 选取（`FEWSHOT_KNN_K=2`，bank 向量按 encode_fn 身份模块级缓存 + 员工文本 lru_cache，前 5 条=原静态种子保证 employee=None 向后兼容，encode 失败回退静态不重试 D6）；`t1_below_min` 只记 stats 不触发第二次 LLM
