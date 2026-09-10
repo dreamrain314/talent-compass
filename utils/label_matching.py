@@ -103,6 +103,12 @@ SOURCE_CROSS_RERANK = "cross_encoder_rerank"
 SOURCE_CROSS_NEW_LABEL = "cross_encoder_new_label"
 SOURCE_CROSS_PENDING = "cross_encoder_pending_review"
 SOURCE_CROSS_FAILED_FALLBACK_LLM = "rerank_failed_fallback_llm"
+# S1 LLM 终裁 + S8b 扩展（plan_t1_s1_s8_b3_implementation.md 第五节，D2 单一来源）
+# 语义定死（防跨 agent 术语漂移）：confirmed = LLM 复核确认候选中有匹配（救回）；
+# rejected = LLM 复核维持新标签判定（计入新标签 cap）。
+SOURCE_CROSS_NEW_LLM_CONFIRMED = "cross_new_llm_confirmed"  # S1：LLM 终裁否决新标签判定，从候选救回
+SOURCE_CROSS_NEW_LLM_REJECTED = "cross_new_llm_rejected"    # S1：LLM 终裁维持"无合适候选"（计入新标签 cap）
+SOURCE_EXPANDED = "expanded_neighbor"                        # S8b：间接映射扩展项（profile_generation 导入消费）
 
 _RERANK_BATCH_SIZE = 5  # items>10 时分批，防 prompt 过长
 
@@ -447,6 +453,9 @@ def rerank_cross_encoder(
     对每项的 (concept, candidate) pair 用 cross-encoder 打分，选 top1。
     新标签判定：top1 score < RERANKER_NEW_LABEL_THRESHOLD → is_new_label。
     降级：cross_encoder_fn None/加载失败 → 调 rerank_label_llm（D6 确定性降级不重试）。
+    S1 终裁：config.RERANKER_LLM_ADJUDICATION 开启时，SOURCE_CROSS_NEW_LABEL /
+        SOURCE_CROSS_PENDING 项单轮送 rerank_label_llm 复核（confirmed=救回候选 /
+        rejected=维持新标签并计入 cap；LLM 失败或返回长度不符 → 保留原判定，零重试）。
 
     Args:
         items: [{idx, concept, standard_label, category, candidates (list[str]),
@@ -466,7 +475,7 @@ def rerank_cross_encoder(
         - 空 items → []
         - 降级 LLM → rerank_label_llm 返回（已对齐 _RERANK_ITEM_KEYS）
         - cross-encoder 打分失败 → 整批降级 LLM
-        - 正常打分 → 每项 {_RERANK_ITEM_KEYS} 全 6 key
+        - 正常打分（含 S1 终裁救回/维持/保留三分支）→ 每项 {_RERANK_ITEM_KEYS} 全 7 key
     """
     # C3 守卫：空 items
     if not items:
@@ -601,16 +610,57 @@ def rerank_cross_encoder(
                 "mapping_source": SOURCE_CROSS_RERANK,
             }
 
+    # ── S1 LLM 终裁（plan T1 Phase 1）：低分项送 rerank_label_llm 单轮复核 ──
+    # 收集 cross-encoder 判新标签/待复核项的原始条目（含 idx/concept/standard_label/
+    # category/candidates/extract_confidence，入参契约与 rerank_label_llm 一致）。
+    # D6：每员工最多 1 轮终裁（单次批量调用）、零重试；复核失败保留原判定。
+    if config.RERANKER_LLM_ADJUDICATION:
+        adj_items = [
+            it for it in to_rerank_items
+            if rerank_results_by_idx.get(it.get("idx"), {}).get("mapping_source")
+            in (SOURCE_CROSS_NEW_LABEL, SOURCE_CROSS_PENDING)
+        ]
+        if adj_items:
+            adj_results = rerank_label_llm(
+                adj_items, employee_context, corpus,
+                call_llm_json_fn=call_llm_json_fn,
+                trust_exact_match=False,  # 与既有两处降级调用同语义（Step 1.10：不让 exact 锁死）
+            )
+            # C3 守卫：非 list / 长度不符 → 整体保留原 cross-encoder 判定（不重试）
+            if isinstance(adj_results, list) and len(adj_results) == len(adj_items):
+                for it, llm_r in zip(adj_items, adj_results):
+                    orig = rerank_results_by_idx.get(it.get("idx"))
+                    if not isinstance(llm_r, dict) or orig is None:
+                        continue
+                    src = llm_r.get("mapping_source")
+                    if src in (SOURCE_LLM_RERANK, SOURCE_PENDING):
+                        # ① LLM 复核选中候选 → 救回（置信度用 LLM 值）
+                        orig["matched_label"] = llm_r.get("matched_label", "")
+                        orig["is_new_label"] = False
+                        orig["mapping_source"] = SOURCE_CROSS_NEW_LLM_CONFIRMED
+                        orig["rationale"] = "LLM复核救回: " + str(orig.get("rationale", ""))
+                        orig["match_confidence"] = llm_r.get(
+                            "match_confidence", orig.get("match_confidence", 0.0)
+                        )
+                    elif src in (SOURCE_NEW_LABEL, SOURCE_NEW_CAPPED):
+                        # ②③ LLM 判 NEW / 内部 cap 改写（HIGH-1 第四分支）→ 维持新标签，
+                        #    计入下方外层 cap（不二次惩罚），不采纳内部 cap 的降级改写
+                        orig["matched_label"] = it.get("concept", "")
+                        orig["is_new_label"] = True
+                        orig["mapping_source"] = SOURCE_CROSS_NEW_LLM_REJECTED
+                    # ④ SOURCE_RERANK_FAILED 等 → 保留原 cross-encoder 判定（不改任何字段）
+
     # 新标签防滥：超额项降级选 candidates[0]（与 LLM 路径同逻辑）
+    # S1：cross_new_llm_rejected（LLM 终裁维持新标签）与原判定同计入 cap
     new_label_count = sum(
         1 for v in rerank_results_by_idx.values()
-        if v.get("mapping_source") == SOURCE_CROSS_NEW_LABEL
+        if v.get("mapping_source") in (SOURCE_CROSS_NEW_LABEL, SOURCE_CROSS_NEW_LLM_REJECTED)
     )
     new_cap = config.LABEL_NEW_LABEL_MAX_PER_EMP
     if new_label_count > new_cap:
         over = 0
         for v in rerank_results_by_idx.values():
-            if v.get("mapping_source") == SOURCE_CROSS_NEW_LABEL:
+            if v.get("mapping_source") in (SOURCE_CROSS_NEW_LABEL, SOURCE_CROSS_NEW_LLM_REJECTED):
                 over += 1
                 if over > new_cap:
                     cands = v.get("candidates_seen", [])

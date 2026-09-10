@@ -230,6 +230,65 @@ class TestExecute:
         assert stats["rerank_failures"] == 0
         assert stats["new_labels"] == 0
         assert stats["exact_matches"] == 0
+        # T1 优化新 3 key（R7 三处对称：offline 路径全 0）
+        assert stats["llm_adjudications"] == 0
+        assert stats["expanded_labels"] == 0
+        assert stats["t1_below_min"] == 0
+
+    def test_stats_keys_symmetric_success_vs_worker_degraded(self, agent, monkeypatch):
+        """R7 stats 三处对称：worker 异常降级路径与成功路径聚合 stats key 集一致（含 S1 新 3 key）。"""
+        monkeypatch.setenv("TC_OFFLINE", "1")
+        expected = {
+            "total", "llm_calls", "rerank_calls", "rerank_failures", "new_labels",
+            "exact_matches", "offline_skipped_llm", "timeouts", "exceptions",
+            "llm_adjudications", "expanded_labels", "t1_below_min",
+        }
+        ok = agent.execute({"employees": [_agent1_employee("E001")]}, {})
+        assert set(ok["data"]["stats"].keys()) == expected
+
+        def _boom(emp, context, corpus, vecs):
+            raise RuntimeError("simulated worker crash")
+        monkeypatch.setattr(agent, "_process_employee", _boom)
+        bad = agent.execute({"employees": [_agent1_employee("E002")]}, {})
+        assert bad["data"]["stats"]["exceptions"] == 1
+        assert bad["data"]["stats"]["llm_adjudications"] == 0
+        assert set(bad["data"]["stats"].keys()) == expected
+
+    def test_s1_timeout_linkage_and_timeout_stats_keys(self, agent, monkeypatch):
+        """MED-4 S1 超时联动 + 超时降级路径 stats key 对称。
+
+        行为化验证公式：AGENT_PROFILE_TIMEOUT=0 + 慢 worker(0.2s)：
+        - S1 关 → timeout=0 → fut.result 立即超时（worker 0.2s 必未完成，非竞态）
+        - S1 开 → timeout=0+LABEL_RERANK_TIMEOUT(30) → worker 在预算内完成
+        """
+        import time as _time
+        monkeypatch.setenv("TC_OFFLINE", "1")
+        expected = {
+            "total", "llm_calls", "rerank_calls", "rerank_failures", "new_labels",
+            "exact_matches", "offline_skipped_llm", "timeouts", "exceptions",
+            "llm_adjudications", "expanded_labels", "t1_below_min",
+        }
+
+        def _slow(emp, context, corpus, vecs):
+            _time.sleep(0.2)
+            return ({"employee_id": emp.get("employee_id", ""), "status": "success"}, {})
+
+        monkeypatch.setattr(agent, "_process_employee", _slow)
+        monkeypatch.setattr(config, "AGENT_PROFILE_TIMEOUT", 0)
+
+        # S1 关：timeout = 0 + 0 = 0 → 超时降级
+        monkeypatch.setattr(config, "RERANKER_LLM_ADJUDICATION", False)
+        r_off = agent.execute({"employees": [_agent1_employee("E001")]}, {})
+        assert r_off["data"]["stats"]["timeouts"] == 1
+        assert r_off["data"]["employees"][0]["status"] == "degraded"
+        assert set(r_off["data"]["stats"].keys()) == expected  # 超时降级 dict 含新 3 key
+
+        # S1 开：timeout = 0 + 30 = 30 → 不超时
+        monkeypatch.setattr(config, "RERANKER_LLM_ADJUDICATION", True)
+        monkeypatch.setattr(config, "LABEL_RERANK_TIMEOUT", 30)
+        r_on = agent.execute({"employees": [_agent1_employee("E002")]}, {})
+        assert r_on["data"]["stats"]["timeouts"] == 0
+        assert r_on["data"]["stats"]["total"] == 1
 
     def test_corpus_loaded(self, agent, monkeypatch):
         # Phase 0 加载 corpus 成功（execute 不崩溃 + status=success 即隐式验证）

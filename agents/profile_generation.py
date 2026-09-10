@@ -618,6 +618,13 @@ class ProfileGeneration(BaseAgent):
         max_workers = min(3, len(employees)) or 1
         profiles: list[dict] = []
         per_emp_stats: list[dict] = []
+        # MED-4（S1 超时联动）：LLM 终裁开启时员工级预算加 LABEL_RERANK_TIMEOUT
+        # （120→300s），防终裁（GLM 慢 API 60-150s/次）被员工级超时降级抢杀；
+        # 关闭时逐位不变（120）。类属性 timeout_seconds 是 PipelineRunner 外层预算
+        # （import 时冻结），与此处 fut.result 的运行时读取是两个不同来源。
+        per_emp_timeout = config.AGENT_PROFILE_TIMEOUT + (
+            config.LABEL_RERANK_TIMEOUT if config.RERANKER_LLM_ADJUDICATION else 0
+        )
 
         def _run_one(emp: dict) -> tuple[dict, dict]:
             return self._process_employee(
@@ -630,7 +637,7 @@ class ProfileGeneration(BaseAgent):
                 fut = futures[i]
                 try:
                     profile, emp_stats = fut.result(
-                        timeout=config.AGENT_PROFILE_TIMEOUT
+                        timeout=per_emp_timeout
                     )
                     profiles.append(profile)
                     per_emp_stats.append(emp_stats)
@@ -643,6 +650,8 @@ class ProfileGeneration(BaseAgent):
                         "llm_calls": 0, "rerank_calls": 0,
                         "rerank_failures": 0, "new_labels": 0,
                         "exact_matches": 0, "offline_skipped": False,
+                        "llm_adjudications": 0, "expanded_labels": 0,
+                        "t1_below_min": 0,
                         "timeout": True,
                     })
                 except Exception as e:
@@ -653,6 +662,8 @@ class ProfileGeneration(BaseAgent):
                         "llm_calls": 0, "rerank_calls": 0,
                         "rerank_failures": 0, "new_labels": 0,
                         "exact_matches": 0, "offline_skipped": False,
+                        "llm_adjudications": 0, "expanded_labels": 0,
+                        "t1_below_min": 0,
                         "exception": True,
                     })
 
@@ -669,6 +680,10 @@ class ProfileGeneration(BaseAgent):
             "offline_skipped_llm": _sum("offline_skipped"),
             "timeouts": _sum("timeout"),
             "exceptions": _sum("exception"),
+            # T1 优化新 3 key（R7 三处对称：本块 + 两个降级 dict + emp_stats 初始化）
+            "llm_adjudications": _sum("llm_adjudications"),
+            "expanded_labels": _sum("expanded_labels"),
+            "t1_below_min": _sum("t1_below_min"),
         }
         result = {"employees": profiles, "stats": stats}
 
@@ -695,6 +710,7 @@ class ProfileGeneration(BaseAgent):
         emp_stats = {
             "llm_calls": 0, "rerank_calls": 0, "rerank_failures": 0,
             "new_labels": 0, "exact_matches": 0, "offline_skipped": False,
+            "llm_adjudications": 0, "expanded_labels": 0, "t1_below_min": 0,
         }
 
         # F3：进 worker 先查 cancel
@@ -825,10 +841,15 @@ class ProfileGeneration(BaseAgent):
             # 聚合 emp_stats（cross-encoder source 与 LLM source 对齐同类统计）
             if source in ("exact_name_match", "exact_name_match_dup"):
                 emp_stats["exact_matches"] += 1
-            elif source in ("new_label", "cross_encoder_new_label"):
+            elif source in ("new_label", "cross_encoder_new_label",
+                            "cross_new_llm_rejected"):
+                # S1：LLM 终裁维持新标签 → 计入 new_labels（最终判定是新标签）
                 emp_stats["new_labels"] += 1
             elif source in ("rerank_failed_trust_llm", "rerank_failed_fallback_llm"):
                 emp_stats["rerank_failures"] += 1
+            elif source == "cross_new_llm_confirmed":
+                # S1：LLM 终裁救回（独立计数线，expanded_labels/t1_below_min 消费在后续 Phase）
+                emp_stats["llm_adjudications"] += 1
 
     @staticmethod
     def _mark_corpus_failed(content: dict, emp_stats: dict) -> None:

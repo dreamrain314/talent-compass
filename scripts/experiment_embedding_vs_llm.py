@@ -222,6 +222,12 @@ def run_experiment(
     # 误导指标修正：真实 LLM/cross-encoder 调用次数（非入口计数）
     llm_rerank_actual_calls = 0     # mapping_source 非 exact_name_match* 的项数（推断 LLM 触发）
     cross_encoder_actual_calls = 0  # cross-encoder 打分项数（Step 8c 预留，当前 0）
+    # B3 统计扩展（plan 第七节 A/B 序 1）：S1 LLM 终裁产物独立计数。
+    # llm_adjudication_calls = 终裁改判项数（confirmed + rejected），独立于
+    # cross_encoder_actual_calls / llm_rerank_actual_calls 的 A/B 归因口径。
+    llm_adjudication_calls = 0
+    path_c_cross_new_llm_confirmed = 0   # 终裁救回项（原判新标签 → LLM 选回候选）
+    path_c_cross_new_llm_rejected = 0    # 终裁维持新标签项（计入新标签 cap）
 
     for emp in employees:
         eid = emp.get("employee_id", "")
@@ -254,6 +260,9 @@ def run_experiment(
                 "t1_count": 0,
                 "t2_count": 0,
                 "t3_count": 0,
+                # B3 统计扩展：与成功路径 emp_result 对称（失败员工无映射数据 → 0）
+                "cross_new_llm_confirmed": 0,
+                "cross_new_llm_rejected": 0,
                 "ground_truth_count": len(gt_labels),
                 "path_a": [],
                 "path_b": [],
@@ -282,6 +291,10 @@ def run_experiment(
             "t2_count": len(content.get("t2_behavioral", []) or []) if isinstance(content, dict) else 0,
             "t3_count": len(content.get("t3_labels", []) or []) if isinstance(content, dict) else 0,
             "ground_truth_count": len(gt_labels),
+            # B3 统计扩展：per-employee 级 S1 终裁 source 计数（key 名与
+            # summary["path_c"] 同名，防跨 level 契约漂移；error 路径对称为 0）
+            "cross_new_llm_confirmed": 0,
+            "cross_new_llm_rejected": 0,
             "path_a": [],
             "path_b": [],
             "path_c": [],
@@ -388,8 +401,22 @@ def run_experiment(
                     path_c_new_labels += 1
                 if source in ("rerank_failed_trust_llm", "rerank_failed_fallback_llm"):
                     path_c_rerank_failures += 1
-                # 指标修正
-                if source == "exact_name_match_confirmed" or source.startswith("cross_encoder_"):
+                # B3 统计扩展：S1 终裁 source 计数（per-employee + summary 双级）。
+                # 注意：cross_new_llm_rejected 不并入上方 path_c_new_labels——既有 key
+                # 语义零变化（new_labels 仅 = new_label/cross_encoder_new_label），
+                # 总新标签可由消费方 new_labels + cross_new_llm_rejected 合成。
+                if source == "cross_new_llm_confirmed":
+                    path_c_cross_new_llm_confirmed += 1
+                    emp_result["cross_new_llm_confirmed"] += 1
+                elif source == "cross_new_llm_rejected":
+                    path_c_cross_new_llm_rejected += 1
+                    emp_result["cross_new_llm_rejected"] += 1
+                # 指标修正（A9 分流修复）：cross_new_llm_* 既不匹配 cross_encoder_ 前缀
+                # 也非 exact 前缀，原逻辑会误入 llm_rerank_actual_calls（纯 LLM 通道
+                # 口径被污染）→ 独立计数 llm_adjudication_calls，保持三口径互斥。
+                if source in ("cross_new_llm_confirmed", "cross_new_llm_rejected"):
+                    llm_adjudication_calls += 1
+                elif source == "exact_name_match_confirmed" or source.startswith("cross_encoder_"):
                     cross_encoder_actual_calls += 1
                 elif not source.startswith("exact_name_match"):
                     llm_rerank_actual_calls += 1
@@ -494,6 +521,10 @@ def run_experiment(
             "recall_at_gt_pct": round(path_c_recall_at_gt, 1),
             "llm_rerank_actual_calls": llm_rerank_actual_calls,
             "cross_encoder_actual_calls": cross_encoder_actual_calls,
+            # B3 统计扩展（向后兼容：纯新增 key，既有 key 与语义零变化）
+            "cross_new_llm_confirmed": path_c_cross_new_llm_confirmed,
+            "cross_new_llm_rejected": path_c_cross_new_llm_rejected,
+            "llm_adjudication_calls": llm_adjudication_calls,
         },
         "decision": decision,
         "plan_b_triggered": plan_b,
@@ -540,6 +571,8 @@ def print_summary(summary: dict) -> None:
         print(f"  新标签: {pc['new_labels']}  重排失败降级: {pc['rerank_failures']}")
         print(f"  重排入口调用: {pc['rerank_calls']}  真实 LLM 触发项: {pc.get('llm_rerank_actual_calls',0)}"
               f"  cross-encoder 打分项: {pc.get('cross_encoder_actual_calls',0)}")
+        print(f"  LLM 终裁: 救回 {pc.get('cross_new_llm_confirmed',0)}  维持新标签 {pc.get('cross_new_llm_rejected',0)}"
+              f"  终裁项合计: {pc.get('llm_adjudication_calls',0)}")
     print()
     print(f"决策: {summary['decision']}")
     if summary["plan_b_triggered"]:

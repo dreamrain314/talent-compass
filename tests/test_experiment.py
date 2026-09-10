@@ -287,6 +287,68 @@ class TestRunExperiment:
         assert pc["cross_encoder_actual_calls"] == 2
         assert pc["llm_rerank_actual_calls"] == 0
 
+    def test_path_c_llm_adjudication_routing(self):
+        """B3 统计扩展：S1 终裁 source 计数 + A9 分流修复。
+
+        mock rerank 返回 2 项 cross_new_llm_confirmed + 1 项 cross_new_llm_rejected：
+        a. summary.path_c 三新 key 正确计数（confirmed=2 / rejected=1 / calls=3）
+        b. 负向（A9）：llm_rerank_actual_calls==0（纯 LLM 通道不被终裁产物污染）、
+           cross_encoder_actual_calls==0（三口径互斥）
+        c. per-employee 双级对称：emp 与 summary["path_c"] 同名 key 数值一致
+        d. 既有 key 语义零变化：new_labels==0（rejected 不并入 new_labels）
+        """
+        content_adj = {
+            "t1_professional": [
+                {"concept": "数据分析", "standard_label": "数据分析",
+                 "category": "skill", "confidence": 0.9},
+                {"concept": "质量体系管理", "standard_label": "质量工程",
+                 "category": "skill", "confidence": 0.8},
+                {"concept": "跨部门沟通顺畅", "standard_label": "跨部门协调",
+                 "category": "behavior", "confidence": 0.7},
+            ],
+            "t2_behavioral": [], "big_five": {}, "t3_raw": {},
+        }
+        extract_adj = {"content": content_adj, "error": None,
+                       "model": "mock", "usage": {}, "offline_skipped": False}
+        gt = {"JZ0001": {"数据分析"}}
+        emps = [_make_emp("JZ0001")]
+        corpus = load_label_corpus()
+
+        def fake_adj_rerank(items, emp, corpus_, **kw):
+            sources = ["cross_new_llm_confirmed", "cross_new_llm_confirmed",
+                       "cross_new_llm_rejected"]
+            return [{
+                "idx": it.get("idx", i),
+                "matched_label": it.get("standard_label", ""),
+                "is_new_label": src == "cross_new_llm_rejected",
+                "match_confidence": 0.6,
+                "rationale": "LLM复核",
+                "candidates_seen": it.get("candidates", []),
+                "mapping_source": src,
+            } for i, (it, src) in enumerate(zip(items, sources))]
+
+        with patch.object(exp.ProfileGeneration, "_llm_extract",
+                          return_value=extract_adj), \
+             patch("scripts.experiment_embedding_vs_llm.rerank_cross_encoder",
+                   side_effect=fake_adj_rerank):
+            summary = exp.run_experiment(emps, gt, corpus)
+
+        pc = summary["path_c"]
+        emp = summary["per_employee"][0]
+        # a. 新计数 key
+        assert pc["total_mappings"] == 3
+        assert pc["cross_new_llm_confirmed"] == 2
+        assert pc["cross_new_llm_rejected"] == 1
+        assert pc["llm_adjudication_calls"] == 3  # = confirmed + rejected
+        # b. 负向：三口径互斥，终裁产物不污染纯 LLM 通道 / cross-encoder 计数
+        assert pc["llm_rerank_actual_calls"] == 0
+        assert pc["cross_encoder_actual_calls"] == 0
+        # c. per-employee 双级对称（同名 key）
+        assert emp["cross_new_llm_confirmed"] == 2
+        assert emp["cross_new_llm_rejected"] == 1
+        # d. 既有 key 语义零变化：new_labels 不含终裁产物
+        assert pc["new_labels"] == 0
+
     def test_recall_at_gt_fair_metric(self):
         """recall@GT 公平口径：分母=GT 总标签数（非总映射数）。
         场景：1 员工 GT={跨部门协调,团队管理,智能制造}（3标签），LLM 提议 2 项
@@ -407,6 +469,8 @@ class TestRunExperiment:
             "employee_id", "error", "model", "usage", "content_keys",
             "t1_count", "t2_count", "t3_count", "ground_truth_count",
             "path_a", "path_b", "path_c",
+            # B3 统计扩展：S1 终裁 per-employee 计数（error 路径对称为 0）
+            "cross_new_llm_confirmed", "cross_new_llm_rejected",
         }
         assert set(emp.keys()) == expected_keys, (
             f"error 路径 per_employee key 不对称: missing={expected_keys - set(emp.keys())}, "

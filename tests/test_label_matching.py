@@ -361,6 +361,8 @@ from utils.label_matching import (  # noqa: E402
     rerank_cross_encoder, _reset_cross_encoder_for_test,
     SOURCE_CROSS_RERANK, SOURCE_CROSS_NEW_LABEL, SOURCE_CROSS_PENDING,
     SOURCE_CROSS_FAILED_FALLBACK_LLM, SOURCE_EXACT_CONFIRMED,
+    SOURCE_CROSS_NEW_LLM_CONFIRMED, SOURCE_CROSS_NEW_LLM_REJECTED,
+    SOURCE_NEW_CAPPED, _RERANK_ITEM_KEYS,
 )
 
 
@@ -620,6 +622,158 @@ class TestRerankCrossEncoder:
         result = rerank_cross_encoder(items, {}, None, cross_encoder_fn=encoder)
         # 无 pairs → 该项无 top1 → 降级 _degrade_item
         assert result[0]["mapping_source"] == SOURCE_CROSS_FAILED_FALLBACK_LLM
+
+    # ════════════ S1 LLM 终裁接线（plan T1 Phase 1）════════════
+
+    def test_s1_adjudication_rescues_low_score_item(self, monkeypatch):
+        """S1 正例：cross-encoder 全低分判新标签 + LLM 复核选候选 → cross_new_llm_confirmed。
+
+        输出项 key 集 == _RERANK_ITEM_KEYS（7 key，C1 对称）。
+        """
+        monkeypatch.setattr(config, "RERANKER_LLM_ADJUDICATION", True)
+        items = [_make_item(0, "量子计算", "量子计算", ["数据分析", "机器学习"])]
+        content = [{"idx": 0, "matched_label": "数据分析",
+                    "match_confidence": 0.85, "rationale": "证据指向数据分析"}]
+        fake = _FakeLLM({"content": content, "error": None})
+        result = rerank_cross_encoder(
+            items, {}, None,
+            cross_encoder_fn=lambda p: [0.01] * len(p),  # 全低分 < 0.15 → 判新标签
+            call_llm_json_fn=fake,
+        )
+        assert fake.call_count == 1  # 单轮终裁
+        assert result[0]["mapping_source"] == SOURCE_CROSS_NEW_LLM_CONFIRMED
+        assert result[0]["matched_label"] == "数据分析"
+        assert result[0]["is_new_label"] is False
+        assert result[0]["match_confidence"] == 0.85  # 保留 LLM 值
+        assert result[0]["rationale"].startswith("LLM复核救回: ")
+        assert set(result[0].keys()) == set(_RERANK_ITEM_KEYS)  # 7 key
+
+    def test_s1_adjudication_rescues_pending_item(self, monkeypatch):
+        """S1：pending 项（0.15≤score<0.5）也进终裁 → LLM 复核选候选 → confirmed。"""
+        monkeypatch.setattr(config, "RERANKER_LLM_ADJUDICATION", True)
+        items = [_make_item(0, "Java开发", "Java开发", ["Java开发", "Python开发"])]
+        content = [{"idx": 0, "matched_label": "Python开发",
+                    "match_confidence": 0.9, "rationale": "实为 Python 栈"}]
+        fake = _FakeLLM({"content": content, "error": None})
+        result = rerank_cross_encoder(
+            items, {}, None,
+            cross_encoder_fn=lambda p: [0.3] * len(p),  # 落 pending 带
+            call_llm_json_fn=fake,
+        )
+        assert fake.call_count == 1
+        assert result[0]["mapping_source"] == SOURCE_CROSS_NEW_LLM_CONFIRMED
+        assert result[0]["matched_label"] == "Python开发"
+
+    def test_s1_disabled_no_llm_call_baseline_preserved(self, monkeypatch):
+        """S1 负向①：开关关 → fake LLM 调用计数 == 0，SOURCE_CROSS_NEW_LABEL 现状保持。"""
+        monkeypatch.setattr(config, "RERANKER_LLM_ADJUDICATION", False)
+        items = [_make_item(0, "量子计算", "量子计算", ["数据分析", "机器学习"])]
+        fake = _FakeLLM({"content": [], "error": None})
+        result = rerank_cross_encoder(
+            items, {}, None,
+            cross_encoder_fn=lambda p: [0.01] * len(p),
+            call_llm_json_fn=fake,
+        )
+        assert fake.call_count == 0  # 零 LLM 终裁调用
+        assert result[0]["mapping_source"] == SOURCE_CROSS_NEW_LABEL
+        assert result[0]["is_new_label"] is True
+        assert result[0]["matched_label"] == "量子计算"
+
+    def test_s1_llm_error_preserves_cross_verdict(self, monkeypatch):
+        """S1 负向②：LLM 返回 error 降级 → 保留原 cross-encoder 判定（不 trust standard_label）。
+
+        rerank_label_llm 降级会 trust standard_label；S1 合并规则④不得采纳该降级值，
+        原判定 matched_label=concept 保持。
+        """
+        monkeypatch.setattr(config, "RERANKER_LLM_ADJUDICATION", True)
+        items = [_make_item(0, "量子计算", "标准量子", ["数据分析", "机器学习"])]
+        fail_llm = _FakeLLM({"content": None, "error": "api down"})
+        result = rerank_cross_encoder(
+            items, {}, None,
+            cross_encoder_fn=lambda p: [0.01] * len(p),
+            call_llm_json_fn=fail_llm,
+        )
+        assert fail_llm.call_count == 1
+        assert result[0]["mapping_source"] == SOURCE_CROSS_NEW_LABEL  # 原判定保留
+        assert result[0]["matched_label"] == "量子计算"  # concept，非 standard_label"标准量子"
+        assert result[0]["is_new_label"] is True
+
+    def test_s1_all_llm_new_cap_applies_across_sources(self, monkeypatch):
+        """S1 负向③：3 项 LLM 全判 NEW → 全 REJECTED 后外层 cap 把第 3 项改 NEW_CAPPED。
+
+        cap 跨 source 生效（REJECTED 与 CROSS_NEW 同计入 cap 计数）。
+        """
+        monkeypatch.setattr(config, "RERANKER_LLM_ADJUDICATION", True)
+        monkeypatch.setattr(config, "LABEL_NEW_LABEL_MAX_PER_EMP", 2)
+        items = [_make_item(i, f"c{i}", f"s{i}", [f"s{i}", "x"]) for i in range(3)]
+        content = [{"idx": i, "matched_label": "NEW",
+                    "match_confidence": 0.9, "rationale": "无合适候选"}
+                   for i in range(3)]
+        fake = _FakeLLM({"content": content, "error": None})
+        result = rerank_cross_encoder(
+            items, {}, None,
+            cross_encoder_fn=lambda p: [0.01] * len(p),
+            call_llm_json_fn=fake,
+        )
+        sources = [r["mapping_source"] for r in result]
+        assert sources.count(SOURCE_CROSS_NEW_LLM_REJECTED) == 2
+        assert sources.count(SOURCE_NEW_CAPPED) == 1
+        # REJECTED 项 matched_label = concept
+        rejected = [r for r in result if r["mapping_source"] == SOURCE_CROSS_NEW_LLM_REJECTED]
+        assert [r["matched_label"] for r in rejected] == ["c0", "c1"]
+
+    def test_s1_llm_persistent_error_bounded_calls_v8(self, monkeypatch):
+        """S1 负向④（V8）：fake LLM 持续 error → 每员工仅 1 轮终裁（1 次调用），无重试放大。"""
+        monkeypatch.setattr(config, "RERANKER_LLM_ADJUDICATION", True)
+        items = [_make_item(i, f"c{i}", f"s{i}", [f"s{i}", "x"]) for i in range(3)]
+        fail_llm = _FakeLLM({"content": None, "error": "persistent failure"})
+        result = rerank_cross_encoder(
+            items, {}, None,
+            cross_encoder_fn=lambda p: [0.01] * len(p),
+            call_llm_json_fn=fail_llm,
+        )
+        assert fail_llm.call_count == 1  # 3 项单批 1 次调用，零重试（D6）
+        # 原判定保留：2 项维持 cross 新标签；第 3 项被既有 cap 改写（S1 前同行为）
+        sources = [r["mapping_source"] for r in result]
+        assert sources.count(SOURCE_CROSS_NEW_LABEL) == 2
+        assert sources.count(SOURCE_NEW_CAPPED) == 1
+
+    def test_s1_llm_new_capped_maps_to_rejected_high1(self, monkeypatch):
+        """S1 HIGH-1：LLM 返回含 SOURCE_NEW_CAPPED 项 → 该项落 REJECTED（不双重惩罚）。
+
+        在 rerank_label_llm 函数 seam 伪造成品（call_llm_json 层经真实内部 cap 后，
+        终态与无第四分支时逐位重合，无法区分——故必须直接注入 NEW_CAPPED 项）。
+        cap=2 且总数 2 → 不触发外层改写，REJECTED 终态可直接观测：
+        若漏第四分支（回归），该项会保留 new_label_capped_trust_top1 + matched=候选，
+        与此断言不符。
+        """
+        monkeypatch.setattr(config, "RERANKER_LLM_ADJUDICATION", True)
+        monkeypatch.setattr(config, "LABEL_NEW_LABEL_MAX_PER_EMP", 2)
+        import utils.label_matching as lm
+        items = [
+            _make_item(0, "c0", "s0", ["s0", "x"]),
+            _make_item(1, "c1", "s1", ["s1", "x"]),
+        ]
+        fake_llm_rerank = lambda *a, **k: [  # noqa: E731
+            {"idx": 0, "matched_label": "c0", "is_new_label": True,
+             "match_confidence": 0.9, "rationale": "new",
+             "candidates_seen": ["s0", "x"], "mapping_source": "new_label"},
+            {"idx": 1, "matched_label": "s1", "is_new_label": False,
+             "match_confidence": 0.9, "rationale": "新标签超额(2)，降级选 top1 候选",
+             "candidates_seen": ["s1", "x"], "mapping_source": "new_label_capped_trust_top1"},
+        ]
+        monkeypatch.setattr(lm, "rerank_label_llm", fake_llm_rerank)
+        result = rerank_cross_encoder(
+            items, {}, None,
+            cross_encoder_fn=lambda p: [0.01] * len(p),
+        )
+        sources = [r["mapping_source"] for r in result]
+        # NEW + NEW_CAPPED 统一计为 REJECTED；总数 2 == cap → 无外层改写（不双重惩罚）
+        assert sources == [SOURCE_CROSS_NEW_LLM_REJECTED, SOURCE_CROSS_NEW_LLM_REJECTED]
+        assert SOURCE_NEW_CAPPED not in sources
+        # 第三分支覆盖：matched_label=concept（非内部 cap 的候选 s1），is_new_label=True
+        assert result[1]["matched_label"] == "c1"
+        assert result[1]["is_new_label"] is True
 
 
 class TestLoadCrossEncoderRetry:

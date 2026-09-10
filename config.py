@@ -105,6 +105,9 @@ DISCRIMINATION_POSITIVE_THRESHOLD = 4
 CONFIDENCE_EVALUATOR_BASELINE = 5
 CONFIDENCE_YEAR_COVERAGE = {3: 1.0, 2: 0.85, 1: 0.7}
 
+# ── 环境变量真值集合（LOW-2 消重 2026-09-10：is_offline_mode 与 _env_flag 共用单一来源）──
+_TRUTHY = ("1", "true", "yes", "on")
+
 # ── 离线模式（不调用真实 LLM，用确定性占位符）──────────────────
 # TC_OFFLINE=1 时，summarize_employee_texts 跳过 API，从原文截前 N 字
 # 派生摘要与锚点。用于：① 无 API Key 时跑通 pipeline 验证编排逻辑
@@ -112,7 +115,7 @@ CONFIDENCE_YEAR_COVERAGE = {3: 1.0, 2: 0.85, 1: 0.7}
 # 支持 CLI flag 注入。消费者：utils/llm_summarizer.py
 def is_offline_mode() -> bool:
     """运行时读取 TC_OFFLINE 环境变量判断是否启用离线模式。"""
-    return os.getenv("TC_OFFLINE", "").strip().lower() in ("1", "true", "yes", "on")
+    return os.getenv("TC_OFFLINE", "").strip().lower() in _TRUTHY
 
 
 # ── 占位符摘要派生常量（offline + degraded 共用，单一来源 D1）──
@@ -239,3 +242,30 @@ RERANKER_LOCAL_PATH = "D:/workplace/bge-reranker-v2-m3"
 RERANKER_FALLBACK_TO_LLM = True                        # 加载/推理失败 → zero-shot LLM
 RERANKER_NEW_LABEL_THRESHOLD = 0.15                    # top1 score < 此 → is_new_label（Step 1.10：0.3→0.15，BGE 对中文抽象词打分偏低，0.15-0.3 区间应收为 pending_review 而非判新标签）
 RERANKER_CONFIDENCE_THRESHOLD = 0.5                    # score < 此且 ≥ new 阈值 → pending_review
+
+# ── T1 recall 优化（plan: S1/S8b/B3/S2/S3，2026-09）──
+def _env_flag(name, default="0"):  # [MED-3 修复 2026-09-10] 默认关（opt-in）：默认开会破坏 A/B baseline 纪律与测试隔离
+    return os.getenv(name, default).strip().lower() in _TRUTHY  # _TRUTHY 提炼为模块级共享常量，与 is_offline_mode 复用（LOW-2，实施时顺手消重）
+
+# S1：cross-encoder 低分项（SOURCE_CROSS_NEW_LABEL / SOURCE_CROSS_PENDING）送 LLM 终裁
+# 消费者：utils/label_matching.rerank_cross_encoder（A/B 开关：TC_LLM_ADJUDICATION）
+RERANKER_LLM_ADJUDICATION = _env_flag("TC_LLM_ADJUDICATION")
+# B3：soft 类（behavior/potential）新标签阈值分轨；hard 轨沿用 RERANKER_NEW_LABEL_THRESHOLD=0.15
+# 消费者：utils/label_matching.rerank_cross_encoder（A/B 开关：TC_SOFT_TRACK）
+RERANKER_SOFT_CATEGORIES = frozenset({"behavior", "potential"})
+RERANKER_NEW_LABEL_THRESHOLD_SOFT = 0.05
+RERANKER_SOFT_TRACK = _env_flag("TC_SOFT_TRACK")
+# S8b：抽取后间接映射扩展（近邻阈值 / 每源近邻数 / 每员工上限）
+# 消费者：agents/profile_generation._expand_indirect_labels（A/B 开关：TC_EXPAND）
+EXPAND_NEIGHBOR_SIM = 0.75
+EXPAND_TOP_N = 2
+EXPAND_MAX_PER_EMP = 2
+EXPAND_ENABLED = _env_flag("TC_EXPAND")
+# S2：T1 抽取数量下限（prompt 文案 + 低于下限记 stats，不触发二次 LLM）与 few-shot kNN 选取数
+# 消费者：agents/profile_generation._build_system_prompt / _process_employee / _select_few_shot_examples
+T1_EXTRACT_MIN_COUNT = 5
+FEWSHOT_KNN_K = 2
+# S3：多遍抽取并集（预算门控：>1 需用户确认；A/B 开关：TC_EXTRACT_PASSES）
+# 消费者：agents/profile_generation._multi_pass_extract / execute 超时预算联动
+EXTRACT_PASSES = int(os.getenv("TC_EXTRACT_PASSES", "1"))
+EXTRACT_UNION_TEMPERATURE = 0.7  # ADU 温度实验：适中温度换多样性，高温单次质量崩
