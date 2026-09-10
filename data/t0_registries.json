@@ -270,19 +270,19 @@
   "KNOWLEDGE_REGISTRY": [
     {
       "name": "ISO9001",
-      "aliases": ["质量管理体系", "ISO 9001", "9001认证"],
+      "aliases": ["质量管理体系", "ISO 9001", "9001认证", "质量工程", "质量体系"],
       "category": "质量管理",
       "typical_use": "质量管理体系建立与认证"
     },
     {
       "name": "IATF16949",
-      "aliases": ["汽车质量体系", "IATF 16949", "TS16949"],
+      "aliases": ["汽车质量体系", "IATF 16949", "TS16949", "ISO9001", "质量工程"],
       "category": "质量管理",
       "typical_use": "汽车行业质量管理体系认证"
     },
     {
       "name": "GJB9001C",
-      "aliases": ["军工质量体系", "国军标", "GJB 9001C"],
+      "aliases": ["军工质量体系", "国军标", "GJB 9001C", "ISO9001", "质量工程"],
       "category": "质量管理",
       "typical_use": "军工产品质量管理体系认证"
     },
@@ -318,7 +318,7 @@
     },
     {
       "name": "六西格玛",
-      "aliases": ["Six Sigma", "6σ", "精益六西格玛"],
+      "aliases": ["Six Sigma", "6σ", "精益六西格玛", "质量工程"],
       "category": "质量管理",
       "typical_use": "统计驱动的过程改进与质量控制"
     },
