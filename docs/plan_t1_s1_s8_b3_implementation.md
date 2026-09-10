@@ -80,7 +80,7 @@ EXTRACT_UNION_TEMPERATURE = 0.7  # ADU 温度实验：适中温度换多样性�
 | `_multi_pass_extract`（新，S3） | 与 `_llm_extract` 同 key 集 `{content, error, model, usage, offline_skipped}`。三条路径（offline 直通 / 全遍 error / 并集成功）key 集相同，函数末尾注释列明 |
 | `_union_extract_contents`（新，S3） | 返回 content dict，key 集 = `_empty_extract()` 的 5 key `{t1_professional, t2_behavioral, big_five, t3_raw, t3_labels}` |
 | `_expand_indirect_labels`（新，S8b） | 返回 `int`（新增扩展项数）；`content` / `emp_stats` 原地变更 |
-| `_select_few_shot_examples`（新，S2） | 返回 `list[dict]`（示例库子集，元素 key `{source_text, concept, standard_label, note}`） |
+| `_select_few_shot_examples`（新，S2） | 返回 `list[dict]`（示例库子集，元素 key `{channel, source_text, concept, standard_label, note}`（channel 为实现期新增第 5 键：t1t2/t3，供 prompt 分通道渲染——计划笔误补正 2026-09-10，独立检查 LOW-3 回写）） |
 | `emp_stats` / `execute` stats | 新增 3 key：`llm_adjudications` / `expanded_labels` / `t1_below_min`。三处对称：`_process_employee` 初始化（L695-698）、`execute` 两个降级 stats dict（L642-647、L652-657）、聚合块（L659-672 `_sum`）——三处必须同 turn 同步改，防 key 漂移 |
 
 **新增 mapping_source 枚举**（`utils/label_matching.py` L91-105 枚举区追加，D2 单一来源）：

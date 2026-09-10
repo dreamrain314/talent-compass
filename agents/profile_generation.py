@@ -21,6 +21,7 @@ Day 3 将实现：
 
 from __future__ import annotations
 
+import functools
 import logging
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import TimeoutError as FuturesTimeoutError
@@ -40,6 +41,70 @@ from utils.llm_client import call_llm_json
 from utils.t3_scorer import compute_t3_scores
 
 logger = logging.getLogger(__name__)
+
+# ── S2 few-shot 示例库（plan_t1_s1_s8_b3_implementation.md Phase 5）──
+# kNN 按员工输入语义就近选取 FEWSHOT_KNN_K 条；前 5 条为原静态 few-shot 种子
+# （employee=None 静态路径向后兼容），扩充覆盖四类：硬技能/软技能/潜质/证书。
+# standard_label 全部经 standard_label_library_v1.json / t0_registries.json
+# 存在性核验（防幽灵标签——标签名须与标签库严格一致）。
+_FEWSHOT_BANK: list[dict] = [
+    {"channel": "t1t2", "source_text": "参与工业IoT管理平台，负责核心模块开发，涉及gRPC",
+     "concept": "物联网开发", "standard_label": "智能制造",
+     "note": "IoT 平台服务于智能制造生产流程"},
+    {"channel": "t1t2", "source_text": "创新引入Java微服务方案，效率提升30%",
+     "concept": "Java后端开发", "standard_label": "Java开发",
+     "note": "微服务是架构风格，开发技能归属 Java开发"},
+    {"channel": "t1t2", "source_text": "自然承担 leader 角色，具备基层管理能力",
+     "concept": "团队领导", "standard_label": "团队管理",
+     "note": "leader 角色体现团队管理行为"},
+    {"channel": "t3", "source_text": "为下属争取资源、关键时刻能兜底",
+     "concept": "非职权影响力", "standard_label": "领导力潜质",
+     "note": "非职权影响力属领导力潜质，非团队管理行为"},
+    {"channel": "t3", "source_text": "绩效 B→C→A 翻盘 + 主动学习新技术",
+     "concept": "逆境反弹", "standard_label": "成长型思维",
+     "note": "逆境反弹+主动学习属成长型思维"},
+    # ── S2 扩充：证书类（plan：证书须评估质量/体系类标签证据价值）──
+    {"channel": "t1t2", "source_text": "主导公司通过 ISO9001 质量管理体系认证",
+     "concept": "质量体系管理", "standard_label": "ISO9001",
+     "note": "ISO9001 认证经历是质量管理体系类标签的直接证据"},
+    {"channel": "t1t2", "source_text": "持有 PMP 认证，统筹跨部门交付排期",
+     "concept": "项目管理", "standard_label": "项目管理知识体系",
+     "note": "PMP 认证对应项目管理方法论标签"},
+    # ── S2 扩充：硬技能 ──
+    {"channel": "t1t2", "source_text": "搭建 Spark 离线数仓清洗埋点日志",
+     "concept": "大数据处理", "standard_label": "Spark",
+     "note": "Spark 数仓建设归属工具类标签"},
+    # ── S2 扩充：软技能 ──
+    {"channel": "t1t2", "source_text": "协调研发与供应链排期冲突，推动按期交付",
+     "concept": "跨部门协作", "standard_label": "团队管理",
+     "note": "跨部门协调推动交付属团队管理行为"},
+    # ── S2 扩充：潜质 ──
+    {"channel": "t3", "source_text": "绩效 D→C→B 稳步回升，关键项目零延期",
+     "concept": "逆境产出稳定", "standard_label": "抗压韧性",
+     "note": "逆境中产出稳定属抗压韧性"},
+]
+
+# bank 向量缓存：按 encode_fn 身份缓存（bank 静态，进程内只算一次；
+# 按函数身份隔离，防测试 fake 编码器与真实编码器交叉污染——测试隔离纪律）
+_BANK_VECS_CACHE: tuple | None = None
+
+
+def _get_fewshot_bank_vecs(encode_fn):
+    """bank 各条 source_text 的单位向量矩阵（模块级缓存）。"""
+    global _BANK_VECS_CACHE
+    if _BANK_VECS_CACHE is None or _BANK_VECS_CACHE[0] is not encode_fn:
+        import numpy as np
+        vecs = np.asarray(
+            encode_fn([b["source_text"] for b in _FEWSHOT_BANK]), dtype="float64")
+        norms = np.clip(np.linalg.norm(vecs, axis=1, keepdims=True), 1e-12, None)
+        _BANK_VECS_CACHE = (encode_fn, vecs / norms)
+    return _BANK_VECS_CACHE[1]
+
+
+@functools.lru_cache(maxsize=128)
+def _encode_employee_text_cached(emp_text: str, encode_fn) -> tuple:
+    """员工拼接文本 encode（每员工 1 次，LRU 缓存）。返回 tuple 供缓存可哈希。"""
+    return tuple(encode_fn([emp_text])[0])
 
 __all__ = ["ProfileGeneration"]
 
@@ -198,7 +263,7 @@ class ProfileGeneration(BaseAgent):
             }
 
         # ── 3. 构造 prompts ──
-        system_prompt = self._build_system_prompt()
+        system_prompt = self._build_system_prompt(employee)
         user_prompt = self._build_user_prompt(employee)
 
         # ── 4. 调用 LLM ──
@@ -286,8 +351,12 @@ class ProfileGeneration(BaseAgent):
             "t3_labels": [],
         }
 
-    def _build_system_prompt(self) -> str:
+    def _build_system_prompt(self, employee: dict | None = None) -> str:
         """构造 system prompt，三通道分块引导（T1/T2/T3 独立抽取互不干涉）。
+
+        S2（plan Phase 5）：employee 非 None 时 few-shot 按该员工
+        performance_summary+project_summary 语义 kNN 就近选取；None → 静态种子
+        （bank 前 5 条，向后兼容/测试隔离）。T1 通道含数量下限与逐字段自查约束。
 
         双层三通道方案 §2.4：单次 LLM 调用，prompt 内三通道分块引导（成本不增）。
         - T1 通道：只看专业能力证据（项目/绩效/证书里的技术技能）
@@ -340,6 +409,13 @@ class ProfileGeneration(BaseAgent):
             t1_lines.append(f"  {cat_label_t1[cat]}:")
             t1_lines.extend(_fmt_items(items))
         lines.append("【T1 通道·专业能力】只看专业能力证据（项目/绩效/证书里的技术技能）：")
+        # S2：数量下限 + 逐字段自查（攻 B1「整段字段没看」类漏抽——87% 损耗在抽取层）
+        lines.append(
+            f"  🔴 数量要求：T1 通道至少输出 {config.T1_EXTRACT_MIN_COUNT} 个标签。"
+            "输出前逐字段自查：岗位序列/项目摘要/绩效摘要/证书/培训课程各扫一遍，"
+            "字段中能映射到标签库的技术词汇不得遗漏；"
+            "证书须评估其对质量/体系类标签的证据价值（如 ISO9001 认证是质量管理体系证据）。"
+        )
         lines.extend(t1_lines if t1_lines else ["  (T1 标签库加载失败)"])
 
         # T2 通道（behavior）
@@ -368,33 +444,31 @@ class ProfileGeneration(BaseAgent):
 
         label_block = "\n".join(lines)
 
-        # few-shot 示例：T1/T2 通道（concept 必须是抽象能力名，展示「原文→抽象 concept→标准标签」三步）
-        # 🔴 Step 1.10 修复：旧 few-shot 的 concept 是原文短语（"参与工业IoT管理平台"），
-        # LLM 照搬导致 cross-encoder 对（长原文, 标签）打分天然低 → recall@GT 虚低。
-        # 新 few-shot 明确 concept 是抽象名（≤8 字能力词），并展示从原文提炼的步骤。
+        # few-shot 示例：S2 起按员工语义 kNN 选取（_select_few_shot_examples），
+        # employee=None → bank 前 5 条种子（= 原静态 few-shot，向后兼容/测试隔离）。
+        # 🔴 Step 1.10 原则保留：concept 必须是抽象能力名（≤8 字），禁止照抄原文片段——
+        # ❌/✅ 对照是规则说明，静态始终渲染。
+        selected = self._select_few_shot_examples(employee)
+        # 通道兜底：kNN 只选 K 条，某通道无选中项时补该通道首条种子（保持两示例块结构稳定）
+        t1t2_ex = [b for b in selected if b["channel"] == "t1t2"] or \
+            [b for b in _FEWSHOT_BANK if b["channel"] == "t1t2"][:1]
+        t3_ex = [b for b in selected if b["channel"] == "t3"] or \
+            [b for b in _FEWSHOT_BANK if b["channel"] == "t3"][:1]
+
+        def _fmt_ex(b: dict) -> str:
+            return (f"  原文「{b['source_text']}」"
+                    f' → concept="{b["concept"]}" → standard_label="{b["standard_label"]}" '
+                    f"({b['note']})")
+
         few_shot_t1t2 = (
             "\n示例（concept 必须是抽象能力名，从原文提炼后映射；禁止照抄原文片段）：\n"
-            '  原文「参与工业IoT管理平台，负责核心模块开发，涉及gRPC」'
-            ' → concept="物联网开发" → standard_label="智能制造" '
-            '(IoT 平台服务于智能制造生产流程)\n'
-            '  原文「创新引入Java微服务方案，效率提升30%」'
-            ' → concept="Java后端开发" → standard_label="Java开发" '
-            '(微服务是架构风格，开发技能归属 Java开发)\n'
-            '  原文「自然承担 leader 角色，具备基层管理能力」'
-            ' → concept="团队领导" → standard_label="团队管理" '
-            '(leader 角色体现团队管理行为)\n'
-            '  ❌ 错误：concept="工业大数据分析平台中Airflow等技术应用"（照抄原文，太长太具体）\n'
-            '  ✅ 正确：concept="数据分析"（抽象能力名）\n'
+            + "\n".join(_fmt_ex(b) for b in t1t2_ex) + "\n"
+            + '  ❌ 错误：concept="工业大数据分析平台中Airflow等技术应用"（照抄原文，太长太具体）\n'
+            + '  ✅ 正确：concept="数据分析"（抽象能力名）\n'
         )
-        # T3 few-shot（concept 同样抽象化；用 GT 员工真实信号；实验结论需标注"含 few-shot 提示"）
         few_shot_t3 = (
             "示例（T3 通道 concept 抽象化后映射 standard_label）：\n"
-            '  原文「为下属争取资源、关键时刻能兜底」'
-            ' → concept="非职权影响力" → standard_label="领导力潜质" '
-            '(非职权影响力属领导力潜质，非团队管理行为)\n'
-            '  原文「绩效 B→C→A 翻盘 + 主动学习新技术」'
-            ' → concept="逆境反弹" → standard_label="成长型思维" '
-            '(逆境反弹+主动学习属成长型思维)\n'
+            + "\n".join(_fmt_ex(b) for b in t3_ex) + "\n"
         )
 
         return (
@@ -417,6 +491,48 @@ class ProfileGeneration(BaseAgent):
             "sfia_level 整数 0-7（IT 类）/通用能力等级整数 1-5（非 IT 类）；"
             "ability_score 整数 0-100；confidence 浮点 0-1。"
         )
+
+    def _select_few_shot_examples(
+        self, employee: dict | None, encode_fn=None
+    ) -> list[dict]:
+        """S2：按员工输入语义就近选取 few-shot 示例（plan Phase 5，竞品迁移建议 4）。
+
+        返回 _FEWSHOT_BANK 恰 FEWSHOT_KNN_K 条子集（元素 key：
+        channel/source_text/concept/standard_label/note；channel 供 prompt
+        分通道渲染）。失败路径全部回退 bank 前 5 条种子（D6：不重试）：
+        - employee=None / 非 dict / summary 拼接为空 → 静态种子（测试隔离+向后兼容）
+        - encode 异常 → 静态种子（日志含异常类型名，C3）
+        类型守卫（C4）：summary 非 dict、字段非 str → 按 "" 处理。
+        """
+        static = _FEWSHOT_BANK[:5]
+        if not isinstance(employee, dict):
+            return static
+        summary = employee.get("summary")
+        if not isinstance(summary, dict):
+            summary = {}
+        perf = summary.get("performance_summary")
+        proj = summary.get("project_summary")
+        perf = perf if isinstance(perf, str) else ""
+        proj = proj if isinstance(proj, str) else ""
+        emp_text = f"{perf}\n{proj}".strip()
+        if not emp_text:
+            return static
+        if encode_fn is None:
+            encode_fn = encode_labels  # 模块级已 import（BGE 真实编码器）
+        try:
+            import numpy as np
+            bank_vecs = _get_fewshot_bank_vecs(encode_fn)
+            emp_vec = np.asarray(
+                _encode_employee_text_cached(emp_text, encode_fn), dtype="float64")
+            emp_unit = emp_vec / max(float(np.linalg.norm(emp_vec)), 1e-12)
+            sims = bank_vecs @ emp_unit
+            k = min(config.FEWSHOT_KNN_K, len(_FEWSHOT_BANK))
+            top_idx = np.argsort(-sims)[:k].tolist()
+            return [_FEWSHOT_BANK[i] for i in top_idx]
+        except Exception as e:
+            logger.warning("few-shot kNN 选取失败（%s: %s），回退静态种子示例",
+                           type(e).__name__, e)
+            return static
 
     def _build_user_prompt(self, employee: dict) -> str:
         """构造 user prompt，嵌入员工数据。"""
@@ -737,6 +853,12 @@ class ProfileGeneration(BaseAgent):
             ), emp_stats
 
         content = extract.get("content") or {}
+
+        # S2：T1 数量下限监控（只记 stats，不触发第二次 LLM——D6）。
+        # 离线短路不计；解析失败确定性降级的空 extract 计入（本就是抽取质量信号）。
+        t1_items = content.get("t1_professional")
+        if not isinstance(t1_items, list) or len(t1_items) < config.T1_EXTRACT_MIN_COUNT:
+            emp_stats["t1_below_min"] = 1
 
         # ── Stage 2+3: 召回 + 重排（corpus 加载失败时降级 trust LLM）──
         if corpus:

@@ -1,5 +1,13 @@
 # progress.md — Bug修复进度
 
+## 🎯 T1 Phase 5：S2 prompt 稳定化 + S8b 裁撤（2026-09-10）
+
+- `agents/profile_generation.py`：T1 通道数量下限约束（`T1_EXTRACT_MIN_COUNT=5` + 逐字段自查 + 证书证据价值引导「ISO9001 认证是质量管理体系证据」）；few-shot 从静态 5 条升级为 `_FEWSHOT_BANK` 10 条按员工语义 kNN 选取（`FEWSHOT_KNN_K=2`，bank 向量按 encode_fn 身份模块级缓存 + 员工文本 lru_cache，前 5 条=原静态种子保证 employee=None 向后兼容，encode 失败回退静态不重试 D6）；`t1_below_min` 只记 stats 不触发第二次 LLM
+- `tests/test_profile_generation.py`：+6 测（kNN 正例/None 静态回退零 encode/encode 失败回退不重试/renders 恰 K 条负向/下限计数无二次 LLM/prompt 整短语断言）
+- `docs/plan_t1_s1_s8_b3_implementation.md`：§五 元素 key 补 channel（独立检查 LOW-3 回写）
+- S8b 裁撤：用户拍板「S8b 裁撤，S2 开工」，无已实施代码，仅此记录 + task-plan 改档
+- 验证：pytest 481 全绿（475+6）；独立检查 agent PASS（0 HIGH/MED，4 LOW：LOW-1 弱子串断言/LOW-3 计划文档漂移已修，LOW-2 共享 mock 原位变异/LOW-4 静默降级类型名日志挂遗留）
+
 ## 🧹 S8a 下线（A/B 判负）（2026-09-10）
 
 - 决策依据：A/B 序1→序2 C_rGT 68.3→46.7（三对完美分离向下）、B_rGT 51.7→36.7（S8a 直接改 corpus 向量的干净归因通道）；校准探针预言的近亲证书吸附（IATF16949/GJB9001C 拉升 > 目标词）被 9-run 实证。用户拍板：「S1复查留下，S8a去掉」

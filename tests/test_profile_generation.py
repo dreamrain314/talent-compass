@@ -10,7 +10,7 @@
 import pytest
 
 import config
-from agents.profile_generation import ProfileGeneration
+from agents.profile_generation import _FEWSHOT_BANK, ProfileGeneration
 from utils.label_embedding import load_label_corpus
 
 
@@ -771,6 +771,97 @@ class TestLlmExtract:
         assert "智能制造" in sp, "few-shot 智能制造示例缺失"
         assert "Java开发" in sp, "few-shot Java开发示例缺失"
         assert "团队管理" in sp, "few-shot 团队管理示例缺失"
+
+    # ── S2（plan Phase 5）：数量下限约束 + few-shot kNN ──
+
+    def test_s2_min_count_constraint_in_prompt(self, agent):
+        """S2 正例：prompt 含数量下限约束文案 + T1_EXTRACT_MIN_COUNT 具体值。"""
+        sp = agent._build_system_prompt()
+        assert "至少" in sp
+        # 整短语断言锁定下限值（裸 "5" 子串可被 definition/keywords 假命中）
+        assert f"至少输出 {config.T1_EXTRACT_MIN_COUNT} 个标签" in sp
+        assert "逐字段自查" in sp
+        assert "ISO9001 认证是质量管理体系证据" in sp  # 证书证据价值引导
+
+    def test_s2_knn_selects_nearest_examples(self, agent):
+        """S2 kNN：fake encode 下与员工语义最近的 bank 条目被选中，恰 K 条。"""
+        single_calls = {"n": 0}
+
+        def fake_encode(texts):
+            # 一维语义空间：含 IoT 语义的文本 → [1]，其余 → [0]。
+            # 只数单条批调用：bank 批(10 条)与员工批(单条)各调 1 次，
+            # 总计数恒为 2，会掩盖"员工文本恰 encode 1 次"契约
+            if len(texts) == 1:
+                single_calls["n"] += 1
+            return [[1.0] if ("IoT" in t or "物联网" in t) else [0.0] for t in texts]
+
+        emp = {"employee_id": "E1",
+               "summary": {"performance_summary": "负责工业IoT管理平台",
+                           "project_summary": ""}}
+        sel = agent._select_few_shot_examples(emp, encode_fn=fake_encode)
+        assert len(sel) == config.FEWSHOT_KNN_K
+        assert sel[0]["standard_label"] == "智能制造"  # bank[0] IoT 语义最近
+        assert single_calls["n"] == 1  # 员工文本 encode 恰 1 次（每员工 1 次 encode 契约）
+
+    def test_s2_none_employee_no_encode_static_fallback(self, agent):
+        """S2 负向①：employee=None 不触发 encode，回退 bank 前 5 条种子。"""
+        calls = {"n": 0}
+
+        def fake_encode(texts):
+            calls["n"] += 1
+            return [[1.0] for _ in texts]
+
+        sel = agent._select_few_shot_examples(None, encode_fn=fake_encode)
+        assert calls["n"] == 0
+        assert sel == _FEWSHOT_BANK[:5]
+        assert [b["standard_label"] for b in sel] == [
+            "智能制造", "Java开发", "团队管理", "领导力潜质", "成长型思维"]
+
+    def test_s2_encode_failure_falls_back_static(self, agent):
+        """S2 负向（D6）：encode 抛异常 → 回退静态种子，不重试。"""
+        calls = {"n": 0}
+
+        def boom(texts):
+            calls["n"] += 1
+            raise RuntimeError("encode down")
+
+        sel = agent._select_few_shot_examples(
+            {"summary": {"performance_summary": "x", "project_summary": "y"}},
+            encode_fn=boom)
+        assert calls["n"] == 1  # 不重试
+        assert sel == _FEWSHOT_BANK[:5]
+
+    def test_s2_knn_prompt_renders_selected_not_full_bank(self, agent, monkeypatch):
+        """S2 负向③：kNN 只渲染 K 条，bank 不全量进 prompt（增量 < 2000 字符）。"""
+        monkeypatch.setattr(
+            agent, "_select_few_shot_examples",
+            lambda emp, encode_fn=None: [_FEWSHOT_BANK[5], _FEWSHOT_BANK[9]])
+        emp = {"employee_id": "E1",
+               "summary": {"performance_summary": "s", "project_summary": "p"}}
+        sp_knn = agent._build_system_prompt(emp)
+        # 静态对照用未被 monkeypatch 的新实例（agent 实例的 _select 已被劫持，
+        # 对 None 也返回同 2 条 → len 差恒 0 假绿）；新实例走真实静态路径 5 条种子
+        sp_static = ProfileGeneration()._build_system_prompt()
+        # 选中的 2 条（ISO9001 证书类 + 抗压韧性潜质类）进 prompt
+        assert _FEWSHOT_BANK[5]["source_text"] in sp_knn
+        assert _FEWSHOT_BANK[9]["source_text"] in sp_knn
+        # 未选中的 bank 条目不进（bank 第 8 条 Spark 不在）
+        assert _FEWSHOT_BANK[7]["source_text"] not in sp_knn
+        # 增量 < 2000 字符（K=2 条 vs 静态 5 条）
+        assert abs(len(sp_knn) - len(sp_static)) < 2000
+
+    def test_s2_t1_below_min_stats_no_second_llm(self, agent, monkeypatch):
+        """S2 负向②：t1 数 2 < T1_EXTRACT_MIN_COUNT=5 → t1_below_min=1
+        且 llm_calls=1（只记 stats，不触发第二次 LLM——D6）。"""
+        monkeypatch.delenv("TC_OFFLINE", raising=False)
+        with patch("agents.profile_generation.call_llm_json",
+                   return_value=_MOCK_SUCCESS_PROFILE) as mock_call:
+            profile, emp_stats = agent._process_employee(
+                _adapted_employee(), {}, None, None)
+        assert mock_call.call_count == 1
+        assert emp_stats["llm_calls"] == 1
+        # _MOCK_SUCCESS_PROFILE 的 t1_professional 仅 2 项 < 5
+        assert emp_stats["t1_below_min"] == 1
 
     def test_build_user_prompt_includes_employee_data(self, agent):
         emp = _adapted_employee()
