@@ -12,7 +12,7 @@ import json
 import logging
 import os
 import threading
-from config import DEEPSEEK_API_KEY, DEEPSEEK_BASE_URL, DEEPSEEK_MODEL, LLM_API_TIMEOUT
+from config import DEEPSEEK_API_KEY, DEEPSEEK_BASE_URL, DEEPSEEK_MODEL, LLM_API_TIMEOUT, LLM_REASONING_EFFORT
 
 logger = logging.getLogger(__name__)
 
@@ -122,6 +122,13 @@ def call_llm(
     if timeout is not None:
         # OpenAI SDK 支持 .create(timeout=...) per-call 覆盖客户端默认 timeout
         kwargs["timeout"] = timeout
+    if LLM_REASONING_EFFORT:
+        # GLM-5.3 思考档位（config.LLM_REASONING_EFFORT，空=不发送保持兼容）。
+        # 档位是独立顶层字段 reasoning_effort；thinking.type 仅支持 "enabled"。
+        kwargs["extra_body"] = {
+            "thinking": {"type": "enabled"},
+            "reasoning_effort": LLM_REASONING_EFFORT,
+        }
 
     try:
         resp = client.chat.completions.create(**kwargs)

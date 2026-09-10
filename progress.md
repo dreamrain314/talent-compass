@@ -1,5 +1,7 @@
 # Progress — Talent Compass
 
+[VERIFIED] GLM-5.3 思考档位接线 (2026-09-10): files=config.py,utils/llm_client.py,tests/test_llm_client.py,.env — 新常量 LLM_REASONING_EFFORT(env TC_LLM_REASONING_EFFORT,空=不发送保持 DeepSeek/Paratera 兼容);call_llm kwargs 条件注入 extra_body={"thinking":{"type":"enabled"},"reasoning_effort":<档>};.env 设 low。验证:pytest 475 passed+1 deselect(唯一失败 test_s8a_quality_family_aliases_merged 系 A/B 序0 数据回退态已知态:工作树 grep 质量工程=0,S8a 版在 af0c503,序2 恢复数据后自愈)+对抗审查 5 项(负向/400 确定性不雪崩/重试同参/单一咽喉点 grep/strip.lower 归一)+F8 生产路径实测(effort='low' 真调用 error=None completion=3)+探针实证(low:reasoning 8129→3,content 0→3757,length→stop,t1 6 项语义 sane;high 同过,档位选 low)
+
 [VERIFIED] S8a 别名富化 (2026-09-10): files=data/t0_registries.json,tests/test_label_embedding.py — 质量管理 4 条目家族词双向边(ISO9001+=质量工程/质量体系;IATF16949/GJB9001C+=ISO9001/质量工程;六西格玛+=质量工程),aliases 经 _load_registry_corpus 只进 corpus text/keywords,name 池不动;+2 测（main-loop）
 
 ## [VERIFIED] — 2026-09-10（T1 Phase 2：S8a 别名富化）

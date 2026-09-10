@@ -8,6 +8,7 @@ from __future__ import annotations
 import pytest
 
 from utils.llm_client import _try_parse_json, _repair_truncated_json
+from utils import llm_client as lc
 
 
 # ── _try_parse_json ───────────────────────────────────────────────────────
@@ -101,3 +102,50 @@ class TestRepairTruncatedJson:
         assert result is not None
         # 转义引号后内容被部分恢复
         assert "你好" in result["note"]
+
+
+# ── TC_LLM_REASONING_EFFORT 门控（GLM-5.3 思考强度 extra_body 注入）──────
+
+
+class TestReasoningEffortKwargs:
+    """call_llm 按模块常量门控：设置 → extra_body 含 thinking enabled +
+    reasoning_effort 档位；空串 → extra_body 完全不出现在请求中（其他网关兼容）。"""
+
+    def _capture_create_kwargs(self, monkeypatch, effort):
+        """跑一次 call_llm，返回 create() 实收的完整 kwargs。"""
+        monkeypatch.setattr(lc, "LLM_REASONING_EFFORT", effort)
+        captured = {}
+
+        class _Resp:
+            choices = [type("Choice", (), {
+                "message": type("Msg", (), {"content": "ok"}),
+                "finish_reason": "stop",
+            })()]
+            model = "fake-model"
+            usage = None
+
+        class _Completions:
+            def create(self, **kw):
+                captured.update(kw)
+                return _Resp()
+
+        class _Client:
+            chat = type("Chat", (), {"completions": _Completions()})()
+
+        monkeypatch.setattr(lc, "_get_client", lambda: _Client())
+        result = lc.call_llm(prompt="p")
+        assert result["error"] is None
+        return captured
+
+    @pytest.mark.parametrize("effort", ["low", "high"])
+    def test_effort_sent_as_extra_body(self, monkeypatch, effort):
+        kw = self._capture_create_kwargs(monkeypatch, effort)
+        assert kw["extra_body"] == {
+            "thinking": {"type": "enabled"},
+            "reasoning_effort": effort,
+        }
+
+    def test_empty_effort_not_sent(self, monkeypatch):
+        # 负向断言：档位为空串时请求中不得出现 extra_body（DeepSeek 官方兼容）
+        kw = self._capture_create_kwargs(monkeypatch, "")
+        assert "extra_body" not in kw

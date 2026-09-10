@@ -31,6 +31,15 @@ DEEPSEEK_BASE_URL = os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com")
 # 模型槽位分配参见 CLAUDE.md 配置表。
 DEEPSEEK_MODEL = os.getenv("DEEPSEEK_MODEL", "deepseek-chat")
 
+# GLM-5.3 系（智谱网关）思考强度档位。GLM-5.3 始终思考、thinking.type 仅支持
+# enabled（关不掉），档位走独立顶层字段 reasoning_effort（low/high/max，网关默认
+# max）。默认 max 会把 max_tokens 预算 ~99% 耗在 reasoning_tokens 上（2026-09-10
+# 实测 8129/8192、content=0、finish_reason=length），长 JSON 抽取全部截断。
+# 空串=不发送该参数（DeepSeek 官方/Paratera 网关行为不变）。
+# 消费者：utils/llm_client.call_llm（extra_body 注入）。文档：
+# docs.bigmodel.cn/cn/guide/models/text/glm-5.3
+LLM_REASONING_EFFORT = os.getenv("TC_LLM_REASONING_EFFORT", "").strip().lower()
+
 # ── 运行时一致性警告 ─────────────────────────────────────────
 # 🔴 修复：自定义 BASE_URL 但未在 .env 设置模型名 → 模型名与代理不匹配
 _warned_model = False

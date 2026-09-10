@@ -1,5 +1,12 @@
 # progress.md — Bug修复进度
 
+## 🔧 GLM-5.3 思考档位接线（2026-09-10）
+
+- `config.py`：新常量 `LLM_REASONING_EFFORT`（env `TC_LLM_REASONING_EFFORT`，空=不发送保持 DeepSeek 官方/Paratera 兼容）；`.env` 设 low
+- `utils/llm_client.py`：`call_llm` kwargs 条件注入 `extra_body={"thinking":{"type":"enabled"},"reasoning_effort":<档>}`（官方形状：档位是独立顶层字段，非 thinking.type；GLM-5.3 始终思考关不掉，网关默认 max 会把 max_tokens ~99% 耗在 reasoning_tokens 上致长 JSON 全截断）
+- `tests/test_llm_client.py`：+3 测（parametrize low/high 形状断言 + 空串负向断言 extra_body 不在 kwargs）
+- 验证：pytest 475 passed + 1 deselect（唯一失败 `test_s8a_quality_family_aliases_merged` 系 A/B 序0 数据回退态已知态，序2 恢复数据自愈）；F8 生产路径真调用实证（effort=low、error=None、completion=3）；探针 JZ0001 生产 prompt 实证（low: reasoning 8129→3、content 0→3757、finish_reason length→stop、t1 6 项语义 sane；high 同过，选 low）；序0 baseline run1b 有效（t1_count 246/263→5/5/4、3 调用 0 失败）
+
 ## 🧬 T1 Phase 2：S8a 别名富化（2026-09-10）
 
 - `data/t0_registries.json`：质量管理 4 条目 aliases 家族词双向边（ISO9001+=质量工程/质量体系；IATF16949/GJB9001C+=ISO9001/质量工程；六西格玛+=质量工程）——纯数据零代码，aliases 经 `_load_registry_corpus` 进 corpus text/keywords，打通 ISO9001→质量工程 间接映射词面基础
