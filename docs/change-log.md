@@ -1,5 +1,11 @@
 # progress.md — Bug修复进度
 
+## 🧹 S8a 下线（A/B 判负）（2026-09-10）
+
+- 决策依据：A/B 序1→序2 C_rGT 68.3→46.7（三对完美分离向下）、B_rGT 51.7→36.7（S8a 直接改 corpus 向量的干净归因通道）；校准探针预言的近亲证书吸附（IATF16949/GJB9001C 拉升 > 目标词）被 9-run 实证。用户拍板：「S1复查留下，S8a去掉」
+- 下线清单（防退役真空）：`data/t0_registries.json` 回退至 08416ec（grep 质量工程=0）；`test_s8a_quality_family_aliases_merged` 删除（断言已回退数据）；`test_s8a_aliases_do_not_spawn_new_items` → 重命名 `test_registry_aliases_do_not_spawn_new_items`（通用 aliases 守卫，断言体零改动）；S8a 数据保留于 git 历史 `af0c503` 备查
+- 保留决策：S1 终裁（A/B 正向，env `TC_LLM_ADJUDICATION` 门控）
+
 ## 🔧 GLM-5.3 思考档位接线（2026-09-10）
 
 - `config.py`：新常量 `LLM_REASONING_EFFORT`（env `TC_LLM_REASONING_EFFORT`，空=不发送保持 DeepSeek 官方/Paratera 兼容）；`.env` 设 low

@@ -227,24 +227,13 @@ class TestLoadLabelCorpus:
         cats = {c["category"] for c in reg}
         assert {"tool", "domain", "knowledge"}.issubset(cats)
 
-    def test_s8a_quality_family_aliases_merged(self):
-        # S8a（plan_t1_s1_s8_b3_implementation.md Phase 2）：质量管理类条目家族词
-        # 双向边——aliases 进 corpus text（召回相似度）与 keywords（prompt 展示），
-        # 打通 ISO9001→质量工程 间接映射的词面基础
-        corpus = load_label_corpus()
-        by_name = {c["name"]: c for c in corpus}
-        assert "质量工程" in by_name["ISO9001"]["keywords"]
-        assert "质量工程" in by_name["ISO9001"]["text"]
-        for nm in ("IATF16949", "GJB9001C", "六西格玛"):
-            assert "质量工程" in by_name[nm]["keywords"], nm
-        assert "ISO9001" in by_name["IATF16949"]["keywords"]
-        assert "ISO9001" in by_name["GJB9001C"]["keywords"]
-
-    def test_s8a_aliases_do_not_spawn_new_items(self):
+    def test_registry_aliases_do_not_spawn_new_items(self):
         # 负向断言：aliases 只进 text/keywords，name 池（GT 命中池）不变——
         # registry 派生项 name 集合与 t0_registries.json 三注册表 name 全集精确相等；
         # 若 _load_registry_corpus 意外为 alias 生成衍生项（如「质量工程」「ISO9001」），
         # 精确相等断言变红。禁止回退 set 交集过滤写法——对只增不删的污染单调=假绿。
+        # （此守卫源自 S8a 评审（2026-09-10）；S8a 别名数据经 A/B 判负已回退下线，
+        #  守卫本身约束的是所有 registry aliases 的通用性质，保留）
         corpus = load_label_corpus()
         with open(config.T0_REGISTRIES_PATH, encoding="utf-8-sig") as f:
             reg = json.load(f)
