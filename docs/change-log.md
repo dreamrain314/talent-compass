@@ -1,5 +1,26 @@
 # progress.md — Bug修复进度
 
+## 🧬 T1 Phase 2：S8a 别名富化（2026-09-10）
+
+- `data/t0_registries.json`：质量管理 4 条目 aliases 家族词双向边（ISO9001+=质量工程/质量体系；IATF16949/GJB9001C+=ISO9001/质量工程；六西格玛+=质量工程）——纯数据零代码，aliases 经 `_load_registry_corpus` 进 corpus text/keywords，打通 ISO9001→质量工程 间接映射词面基础
+- `tests/test_label_embedding.py`：+2 测（家族词入 text+keywords 正例 / registry name 集合精确相等+list 计数防衍生负向——首版 set 交集写法被独立检查 agent 抓出假绿后修复）
+- 验证：corpus 121 项（62+59）零衍生；pytest 473 全绿；独立检查验收 FAIL(1 MED)→修复→复验 PASS
+
+## 🎯 T1 Phase 1：S1 LLM 兜底接线（2026-09-10）
+
+- `utils/label_matching.py`：`rerank_cross_encoder` 新增 S1 终裁块（cross-encoder 低分项单轮 `rerank_label_llm` 复核，四分支合并含 HIGH-1 `NEW_CAPPED→REJECTED`）；cap 计数/改写两处条件扩含 REJECTED；新增 3 source 枚举（cross_new_llm_confirmed/rejected/expanded_neighbor）
+- `agents/profile_generation.py`：`execute` 员工级超时联动（S1 开 → 120+180=300s）；stats 三处对称新增 llm_adjudications/expanded_labels/t1_below_min；`_inject_mapping_fields` 终裁计数分支
+- `config.py`：`_TRUTHY` 模块级消重 + EOF T1 recall 优化常量块（12 常量，TC_* 开关默认关，A/B baseline 纪律）
+- `scripts/experiment_embedding_vs_llm.py` + `tests/test_experiment.py`：Path C 终裁 source 双级计数 + A9 分流修复（三口径互斥）
+- 验证：+10 用例（S1 正例/pending 救回/负向 4/HIGH-1/stats 对称/超时联动/分流回归）；pytest 471 全绿（闸门链 461→470→471）；Workflow B1/B2/B3 独立 check 全 PASS（0 修复轮）+ integrate APPROVE
+
+## 🧪 API 切换 GLM 官方 + S4 probe 假 0% 根因修复（2026-09-05）
+
+- `.env` → GLM 官方 GLM-5.3-Flash（`/api/paas/v4`，key 运行时取 cc-switch.db；备份 .env.bak-20260905）。GLM thinking 默认开：全量 prompt 单调用 60-150s，90s 超时误杀（150s 安全）
+- S4 probe v1 假 0% 根因：生产 `_build_user_prompt` 尾部内嵌生产输出 schema，与 SYSTEM 的 selected 指令冲突（GLM 跟随 user 模板）；v3 锚点切割数据段保真、仅换输出段。隔离证据：全量 SYSTEM+短 user 格式完全服从
+- v3 实测：单次 38.9%≈基线 35.4%（模型混淆只可粗比），并集 50%<87.5%（直选确定性无 union 增益）；**S4 不采纳为 T1 主方案，维持 S7→S1+S2**
+- 教训沉淀：复用生产 prompt 做实验必须切割输出段（memory: root-cause-prompt-reuse-embeds-old-schema）
+
 ## 🏗️ Week 2 Day 3: 双层三通道重构 Step 1.7-1.9 GT 扩展 + Path C 覆盖 T3 + C1 对称修复 (2026-07-27)
 
 **状态**: [VERIFIED] Step 1.7-1.9（461 tests 绿）。Workflow 4 agent + 主循环清闸门修 HIGH finding。

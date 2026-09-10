@@ -1,5 +1,116 @@
 # Progress — Talent Compass
 
+[VERIFIED] S8a 别名富化 (2026-09-10): files=data/t0_registries.json,tests/test_label_embedding.py — 质量管理 4 条目家族词双向边(ISO9001+=质量工程/质量体系;IATF16949/GJB9001C+=ISO9001/质量工程;六西格玛+=质量工程),aliases 经 _load_registry_corpus 只进 corpus text/keywords,name 池不动;+2 测（main-loop）
+
+## [VERIFIED] — 2026-09-10（T1 Phase 2：S8a 别名富化）
+
+**执行方式:** main-loop 实现 + 独立检查 agent（ecc:code-reviewer，只读 + 反谄媚提示词）验收。首轮 **FAIL**（1 MED：负向断言假绿——set 交集过滤对 spawn 污染单调，检测不到别名衍生项）→ 修复（registry name 集合精确相等 + list 计数双断言）→ 复验 **PASS**（1 修复轮，未触发两次失败换方向）。
+
+**验证:** 数据 diff 与计划 Phase 2 逐字一致（恰 4 行 aliases 零超出）；消费链实测 ISO9001 text/keywords 含「质量工程」、IATF16949/GJB9001C/六西格玛 keywords 含「质量工程」；corpus 121 = 62 标签库 + 59 registry 零衍生项；pytest **473 passed**（主循环 2 次 + 检查 agent 1 次）。
+
+**遗留（非阻塞）:** 检查 agent 建议——未来 registry 新增 alias 与质量族外条目 name 同名时现有双断言可被绕过，可选加固「corpus 总数 = 两 JSON 现算条目和」第三断言（当前数据实测无碰撞，挂遗留清单）。
+
+**校准探针（Phase 3 硬 gate, MED-2）:** 运行中（本地 embedding 零 API 成本），结论随 A/B 方案呈报。
+
+---
+
+[VERIFIED] B3 实验脚本统计扩展 (2026-09-10): files=scripts/experiment_embedding_vs_llm.py,tests/test_experiment.py — Path C 统计块加 S1 终裁 source 双级计数(cross_new_llm_confirmed/rejected,per-employee 与 summary["path_c"] 同名 key,error 路径对称为 0)+A9 分流修复(新 source 独立计 llm_adjudication_calls,llm_rerank_actual_calls 纯 LLM 通道口径不被污染,三口径互斥)+print_summary 展示行(.get 容错)+分流回归测 1 例(含负向断言 new_labels==0/两既有口径==0),既有 key 语义零变化,pytest 471 全绿（workflow impl-agent）
+
+[VERIFIED] B2 S1终裁垂直切片 (2026-09-10): files=utils/label_matching.py,agents/profile_generation.py,tests/test_label_matching.py,tests/test_profile_generation.py — rerank_cross_encoder 插入 S1 终裁块(单轮 rerank_label_llm 复核,四分支合并含 HIGH-1 NEW_CAPPED→REJECTED,C3 长度守卫)+cap 两处条件扩含 REJECTED+docstring 补终裁路径并修正 7 key;profile_generation execute 超时联动(S1 开=AGENT_PROFILE_TIMEOUT+LABEL_RERANK_TIMEOUT→300s)+stats 三处对称新增 llm_adjudications/expanded_labels/t1_below_min+_inject_mapping_fields confirmed 计数与 rejected 入 new_labels;新增 9 测(正例+pending 救回+负向4+HIGH-1+stats 对称+超时联动),pytest 470 全绿（workflow impl-agent）
+
+[VERIFIED] B1 config+枚举 (2026-09-10): files=config.py,utils/label_matching.py — _TRUTHY 模块级常量+is_offline_mode 等价复用(LOW-2,行为不变);EOF 追加 T1 recall 优化常量块(_env_flag 默认关+RERANKER_LLM_ADJUDICATION/SOFT_TRACK/EXPAND 等开关与 S2/S3 常量);枚举区追加 SOURCE_CROSS_NEW_LLM_CONFIRMED/cross_new_llm_rejected/expanded_neighbor 三枚举;纯前置数据层零行为变化,pytest 461 全绿（workflow impl-agent）
+
+## [VERIFIED] — 2026-09-10（T1 Phase 1：S1 LLM 兜底接线落地）
+
+**执行方式:** Workflow 两阶段——B0 开工前勘察（4 只读 agent 38+ 锚点核对 + 独立仲裁 GO_WITH_ADJUSTMENTS，发现 A9 分流陷阱/cap 第二处定位漂移等）→ B1/B2/B3 分块实现（每块 impl + 独立只读 check，修复轮均 0）→ 末尾独立 integrate 审查 **APPROVE**（0 HIGH/MED，3 LOW 非阻塞）。中途 GLM 429 quota 中断一次（check:B2 阵亡），cache-resume 续跑（3 cached + 4 live，7 agents 0 error）。
+
+**改动清单（10 文件）:** `config.py`（_TRUTHY 消重 + EOF 12 常量块，开关默认关）、`utils/label_matching.py`（3 枚举 + S1 终裁块四分支 + cap 两处扩展 + docstring 7 key 修正，+54/-3）、`agents/profile_generation.py`（超时联动 120→300s + stats 三处对称 + _inject 终裁分支，+24/-1）、`tests/test_label_matching.py`（+154 纯新增）、`tests/test_profile_generation.py`（+59 纯新增）、`scripts/experiment_embedding_vs_llm.py` + `tests/test_experiment.py`（A9 分流修复 + 终裁双级计数 + 1 回归用例）。
+
+**验证:** 闸门链 461→470→471（各 check agent 亲跑）+ 主循环终态亲跑 **471 passed**；S1 负向断言全落地（开关关零调用 / LLM 失败保原判 / cap 跨 source / V8 有界）；A9 分流有正例+负向断言（三口径互斥）。
+
+**遗留（LOW，不阻塞）:** ① `_inject_mapping_fields` S1 分支无正向测试（仅 ==0 断言，建议 Phase 2 顺手补 1 例）② V8 跨 batch（>10 项分批）用例可选 ③ commit 时须拆分 S1 代码与 09-04 后规划期文档改动（integrate LOW-2）④ `llm_adjudications`（agent stats，仅 confirmed）vs `llm_adjudication_calls`（实验 summary，confirmed+rejected）命名语义分叉，注释已有但建议补交叉指涉。
+
+---
+
+## [VERIFIED] — 2026-09-10（T1 优化工作流三角色：A 计划 + B 源码摘录 + C 对抗检视）
+
+**产出 3 文档:** `docs/plan_t1_s1_s8_b3_implementation.md`（A：S1→S8a→S8b→B3→S2→S3 六 Phase 落地计划，含 config 常量块/数据契约/副作用矩阵/A-B 实验表/风险 R1-R7）、`docs/source_extracts_skill_extraction.md`（B：SkillNer/Skill-LLM 6 摘录 + 许可表 + 根因对照）、`docs/review_t1_workflow_c.md`（C：对抗检视报告）。
+
+**执行方式（诚实披露）:** Workflow 工具本环境不存在 → Agent fan-out 真并发三角色（A=ecc:planner、B=general-purpose、C=ecc:code-reviewer）；A 中途 API 断连一次，经 SendMessage 续跑恢复交付。
+
+**C 检视结论:** A = **APPROVE_WITH_FIXES**（1 HIGH + 4 MED + 4 LOW）；B = **APPROVE**。锚点核对 39 处、幽灵引用 0、B3 非假绿（category 取值代码核实）。
+- **HIGH-1:** S1 合并规则漏 `SOURCE_NEW_CAPPED` 路径（`rerank_label_llm` 内部 cap L335-351 会改写第 3+ 个 NEW 项，三分支规则未覆盖）→ 需显式第四分支（REJECTED + matched_label=concept）
+- **MED-1:** S8b「零新增编码」断言不成立——encode LRU 以整 tuple 为 key，单条 query 未命中；改用 `corpus_text_vecs` 行直查
+- **MED-2:** S8a 双向别名致近亲竞争——IATF16949/GJB9001C/六西格玛会占掉 top-2 扩展槽，验收锚点可能因排序而非阈值失败 → S8b 前置校准探针（打印 top-5 邻居+sim）
+- **MED-3:** `_env_flag` 默认 "1"（全开）违 baseline 纪律 → 默认 "0"（opt-in）
+- **MED-4:** S1 终裁 180s 未纳入 `AGENT_PROFILE_TIMEOUT=120` 预算（GLM 慢 API 下必然触发）→ 需联动公式
+- **反事实（C）:** 最大风险假设 = embedding 词面 sim 承载证书→能力语义跳跃；若校准 sim 远低于 0.75，不降阈值，转向 B 摘录 1 的 low_surface_forms 设计（证书词作低置信候选直送裁决器）
+
+**用户决策（2026-09-10）:** ①✅ HIGH-1 + MED-1..4 修复已回写计划文档（标注 `[XXX修复 2026-09-10]`）②✅ S8a 双向边设计确认 ③④（GT 复核排期 / S2 口径 + S3 预算）延后到 Phase 0/5/6 时再定。
+
+**🔄 新窗口交接指引（2026-09-10，开工 Phase 1 用）:**
+- **开工点**: Phase 1（S1 LLM 兜底接线）→ `utils/label_matching.py:rerank_cross_encoder`（L438-630），按计划 Phase 1 步骤 a-e 照做（含 HIGH-1 第四分支 + MED-4 超时联动）
+- **必读三件**: `docs/plan_t1_s1_s8_b3_implementation.md`（已批，含修复）+ `docs/review_t1_workflow_c.md`（C 检视）+ `docs/source_extracts_skill_extraction.md`（B 参考）
+- **硬性前置**: Phase 3 前跑校准探针（MED-2，打印 top-5 邻居+sim）；每步 [AWAITING_VERIFY] 闸门 + pytest 全绿 + 独立 A/B（`scripts/experiment_embedding_vs_llm.py`；开关 env 默认全关，逐个开）
+- **验收锚点**: ISO9001→质量工程 翻正（≥2/3 run）+ T1 recall@GT 3-run 均值 ≥60%
+- **工具教训**: 本 session 曾误判「Workflow 工具不存在」——实为 ToolSearch 多词查询假阴性，单词条 `Workflow` 复验即命中；新窗口用工作流前先单词搜索浮现 schema
+
+---
+
+## [VERIFIED] — 2026-09-09（T1 竞品调研：专业技能抽取业界方案 → 新增 S8 候选）
+
+**产出:** `docs/competitive_research_skill_extraction.md`（竞品对比表 + 5 源深读 + 四瓶颈映射 + 迁移排序 + Sources）。
+
+**执行方式（诚实披露）:** 用户指令 fan-out subagent；本 session 无 Workflow/Agent 工具 → 用「4 轴搜索（并行触发 429 后改串行）+ 5 源深读」模拟分工；WebFetch 域名验证全挂 → 改 web_reader MCP（5/5 成功：Skill-LLM 论文 / ADU 博客 / LinkedIn Skills Graph / Eightfold / SkillNer）。
+
+**核心发现（SkillSpan 基准交叉验证）:**
+- **纯 prompting 天花板 ~25-28%**: GPT-4 few-shot 仅 27.8% F1、GPT-3.5 25.0%——我们单遍 25-37.5% 与文献吻合，是范式极限而非 prompt 质量问题
+- 微调才破 60%（Skill-LLM 64.8% SOTA / NNOSE 64.2% / ESCOXLM-R 62.6%）——中文无标注数据，demo 期不做（GREEN 合成标注 + ADU $7 微调记录为未来选项）
+- **Ma et al. 2023「LLM 不是好抽取器但是好 reranker」** + 我们 S4 直选无 union 增益 → 三方一致验证「embedding 召回 + LLM 精排」架构方向正确，B4（LLM 兜底未接线）= 纯接线问题
+- **LinkedIn skill expansion（→ 新增候选 S8）**: 间接映射（ISO9001→质量工程）的业界解法是抽取后沿技能图（同组/父子/兄弟）扩展，不是让抽取器更聪明；t0_registries aliases + embedding 近邻可低成本落地，直接对准 B2（S4 已证明直选丢硬映射、抽取管线能抽出）
+- **ADU 温度实验**: temp=0 确定性且单次 recall 最高、高温单次质量崩但多样性升 → S3 多遍并集 = 用单次 precision 换 union recall，文献语义下合法（建议 temp 0.7 适中）
+- **B3 软技能误杀**: LinkedIn 分关系打分（required/core/mention）+ SkillSpan 硬/软分轨 → 分类别阈值或软技能直送 LLM rerank
+
+**迁移排序:** S1 接线 → S8 技能扩展（新）→ B3 分轨阈值 → S2 prompt 稳定化（吸收 Nguyen kNN few-shot 选取）→ S3 多遍并集（预算门控）→ 微调不做。
+
+**下一步:** S7 GT 复核 → S1+S2+S8 实施与独立 A/B（ISO9001→质量工程 必须翻正 + expanded 项上限负向断言）。
+
+---
+
+## [VERIFIED] — 2026-09-05（API 切换 GLM 官方 + S4 probe 0% 根因闭环 + v3 重跑与判定）
+
+**API 通道:** `.env` Paratera(403) → **GLM 官方 GLM-5.3-Flash**（OpenAI 兼容 `/api/paas/v4`；key 运行时取自 cc-switch.db 不落码，`tmp/patch_env_glm.py` 一次性切换，备份 .env.bak-20260905）。上方 API 阻塞备注解除。GLM 行为特征：thinking 默认开（全量 prompt 单调用 completion 1.7-7.6k tokens、耗时 60-150s），**90s 超时会误杀**（v1 probe 1/9、独立复跑 4/9 超时；150s 后 0/9）。
+
+**S4 probe 0% → 根因 = probe 设计缺陷（指令冲突），非 GLM 能力:**
+- 现象: v1 两次独立运行均 err=None 且 selected=[]（假 0%）
+- 根因: 生产 `_build_user_prompt`（agents/profile_generation.py:483）尾部内嵌「请基于以上信息，严格输出以下 JSON」+ 生产抽取 schema（t1_professional/...）；probe「零漂移」复用后与 SYSTEM 的 `{"selected": [...]}` 输出指令冲突，GLM 跟随 user 模板（更具体更靠后）→ 返回生产形态 dict → 解析取 selected 落空
+- 证据链: ① 小 prompt 格式服从 ② 全量 SYSTEM+极短 user 服从（139 completion tokens，`{'selected': []}`，对无证据假员工正确选空=宁缺毋滥生效）③ 全量 user 才漂移（4.7-7.6k thinking tokens）④ 源码输出段定位
+- probe v3 修复: `_s4_user_prompt` 锚点切割（`count==1` 断言），员工数据段逐字节保生产一致仅换输出段；另加 `__main__` 守卫（v1 模块级执行致诊断脚本 import 意外重跑 9 调用，事故 PID 29180）+ 每调用留存 content_type/keys/repr（C8 补课）+ 超时 150s
+
+**v3 结果（3 run × 3 员工，9/9 有效）:**
+- 单次均值 hit_rate **38.9%**（基线 Path C 单 run 35.4%——注意模型×架构混淆：基线是 DeepSeek-V4-Pro，只可粗比）
+- 跨 run 并集 **4/8 = 50%**（基线 6-run 并集 87.5%）
+- 机制发现: **直选近乎确定性**（JZ0004 三 run 选择 run2==run3、run1⊂run2）→ 并集不随 run 数显著增长；抽取管线 87.5% 并集正来自抽取非确定性，S4 用确定性换掉了 union 增益
+- 硬映射丢失: JZ0001 GT（智能制造/质量工程）3 run 全 miss——ISO9001→质量工程类间接映射在直选模式不出现，抽取管线反而能抽出
+- **判定: S4 无优势，不作为 T1 主方案**，维持 S7→S1+S2 主线（docs/plan_t1_optimization.md）
+
+**文件:** tmp/s4_direct_select_probe.py(v3) / s4_probe_results_v3.json / s4_probe_summary_v3.md / s4_diag_sysprompt.json（隔离实验）/ s4_probe_results.json（现为 29180 复跑数据集，同 0% 签名）/ s4_diag_one.json（诊断调用自身 90s 超时，未提供增量证据）
+
+---
+
+## [备注 · 🔴 API 阻塞] — 2026-09-04（S4 probe 首跑被拦，三通道全死）
+
+**现象:** S4 直选 probe（`tmp/s4_direct_select_probe.py`，已就绪待跑）首跑 9/9 调用失败，逐通道排查：
+1. Paratera `DeepSeek-V4-Pro` → **403 team_model_access_denied**（团队权限被收回，非过期）
+2. Paratera `DeepSeek-V4-Flash` → **403 同上**（团队整体被收回，非单模型）
+3. 官方 `api.deepseek.com`（.env 注释中的 key）→ **402 Insufficient Balance**（07-26 起未充值）
+
+**判定:** D6 确定性故障，重试无意义。**所有 live 实验阻塞**（S4 probe / Step 1.10 / T1 任何真实实验），恢复需用户三选一：充值官方 / 恢复 Paratera 团队权限 / 提供其他 OpenAI 兼容 key（llm_client 为 OpenAI SDK，改 BASE_URL+MODEL 即可）。
+
+**已就绪未跑:** S4 probe 脚本含公平性守卫（GT 8/8 ⊆ 40 列表已 assert 通过；复用生产 `_adapt_input`+`_build_user_prompt` 零漂移；唯一变量=选择方式）。API 恢复后一条命令：`python -X utf8 tmp/s4_direct_select_probe.py`（3 员工 × 3 run = 9 调用）。
+
+---
+
 ## [VERIFIED] — 2026-09-04（重新基线 + checkpoint 提交 + tracking 补记 07-28/29 未收录工作）
 
 **背景:** 竞赛提交期限已过（今日 2026-09-04），用户决策（本轮确认）：
