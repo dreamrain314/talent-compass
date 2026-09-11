@@ -1,5 +1,12 @@
 # progress.md — Bug修复进度
 
+## 📌 GT v1.1：JZ0003 补标「成长型思维」（2026-09-12，用户拍板）
+
+- **变更**：`data/experiment/ground_truth_5.json` JZ0003 labels 6→7，新增 `{成长型思维, potential, T3, 证据: 绩效 C→C→A 翻盘 + 360: 主动学习（残词「主动学」经用户人工裁定采纳，佐证与绩效一级证据互证成立）}`；_meta status → `[USER_REVIEWED_V1.1]` + review_2026-09-12 字段（首批人工审计 + 补标裁定记录）
+- **依据**：与 JZ0001 `成长型思维` 证据模式同构（翻盘 + 主动学习）；codebook 待裁定项 4 已关闭
+- **分母裁定（用户）**：不回溯历史 run（in_gt 已固化），GT 分母变化留待扩样本后统一按**比例**对比，不追求跨期绝对值可比
+- **验证**：pytest 489/489 全绿；GT 无测试锁死（grep 确认）；消费方（eval/gen_evidence_audit/experiment 脚本）仅按 employee key 读取，_meta 仅 gen_evidence_audit 跳过引用，零破坏
+
 ## 🔍 首批人工审计核验：39/40 支持，1 条假 TP 实锤（2026-09-12 凌晨）
 
 - **用户核验** `data/audit/evidence_audit_20260910.csv` 40 条：其余 38 行（39 条核验项）全部「支持」；否决 JZ0003 孟华 `自驱力`←concept「主动学习」（审计表中 2 行，同组合不同来源 run）
