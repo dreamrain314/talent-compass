@@ -1,5 +1,7 @@
 # Progress — Talent Compass
 
+[AWAITING_USER_REVIEW] GT 扩容 batch2 草案 (2026-09-12): files=data/experiment/ground_truth_batch2_draft.json,data/audit/gt_batch2_review.csv,tmp/gen_gt_batch2_draft.py — 10 人 62 条分层抽样（技研×5+管职×5，seed=42），起草零接触 run 输出，幽灵校验 PASS；待用户复核 4 个裁定点（JZ0006 结构设计边界/JZ0043 绩效D与T2冲突/毛文双学习标签/JZ0037 教育教学映射），通过后合并 GT v2 并重跑基线。详见 change-log 2026-09-12 条目。
+
 [VERIFIED] T1 评测工具正式化 (2026-09-11): files=scripts/eval_label_extraction.py,tests/test_eval_label_extraction.py — tmp/compare_arms.py 三臂原型正式化：臂文件列表仅经 CLI `--arm NAME=...` 传入（代码零硬编码时间戳、零 tmp/ 依赖）；stdout 每臂 P/R/F1 + mean±std 噪声带（样本 std，n<2 WARNING）+ 每概念 n/N 命中矩阵；不写任何文件。指标口径（P=TP/len(items)、R=recall_at_gt/total_gt、F1=2PR/(P+R)）由 6 测试精确值锁死防跨期漂移。验证:pytest 489/489（481+6+2 算术吻合）+三臂实跑 seq1 R=0.6833 与已知 C_rGT 吻合+JZ0001 质量工程/JZ0004 嵌入式开发锚点行齐备+负向断言（grep tmp/=0、时间戳常量=0）过。（lead-agent Wave1 B1/B2 契约断言逐条复核——原 checker 因宿主 429 中断，ZCode 接手收尾）
 
 [VERIFIED] S2 总开关默认关 TC_S2_PROMPT (2026-09-11): files=config.py,agents/profile_generation.py,tests/test_profile_generation.py — 新增 `S2_PROMPT_ENABLED = _env_flag("TC_S2_PROMPT")` 默认关（MED-3 纪律）；两处门控：①_select_few_shot_examples 关时无条件 return _FEWSHOT_BANK[:5]（不 encode 不 kNN）②_build_system_prompt 的 S2 T1 约束文案（数量下限/逐字段自查/证书映射）仅开时渲染，关=序1 prompt 形态；t1_below_min stats 常开不受门控。测试：既有 6 个 S2 测试加 setattr(config,"S2_PROMPT_ENABLED",True) 显式开启前置 + 新增 2 个默认关负向用例（encode 零调用/bank[5:] 不渲染/静态种子三短语仍在防过度回退）。验证:pytest 489/489+负向断言（无 setenv 冻结、关时 prompt 无「至少输出/逐字段自查/证书须映射」）过。效果:「默认关=序1」成回归保护，重开 S2 必显式感知在改抽取 prompt。（Wave1 B3/B4）

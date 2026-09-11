@@ -1,5 +1,14 @@
 # progress.md — Bug修复进度
 
+## 📦 GT 扩容第一批草案：5→15 员工（batch2，10 人 62 条，2026-09-12）
+
+- **产出**：`data/experiment/ground_truth_batch2_draft.json`（[DRAFT_AWAITING_USER_REVIEW]）+ `data/audit/gt_batch2_review.csv`（人工复核表，含起草备注）；起草脚本 `tmp/gen_gt_batch2_draft.py`
+- **选样**：剩余 45 员工分层抽样 10 人（seed=42）：技术研发类×5 + 管理职能类×5，绩效趋势 up/flat/down 全覆盖，职位 10 种；JZ0025/JZ0009/JZ0006/JZ0019/JZ0013/JZ0036/JZ0029/JZ0037/JZ0043/JZ0046
+- **起草纪律**：只读 phase1 原文（performance/projects/certificates/training/360 摘要），**零接触 run JSON 抽取输出**（防起草-评测同源自我证实）；起草者=GLM（与 pipeline 同源，缓解=原文隔离+用户复核关）；标签 ⊆ 标签库∪registry（幽灵校验 PASS）；每员工 5-7 条
+- **样本设计价值**：职位陷阱对照组（JZ0025 嵌入式职位/全软件项目→不标 vs JZ0009 测试职位/网关C++→标 §2.1 正例 vs JZ0019 FPGA职位→不标）；§2.6 判别规则应用组（成长型思维完整词根 JZ0013/JZ0046 vs 速度词根→学习敏捷性 JZ0009/JZ0006 vs 翻盘+残词 JZ0037=JZ0003 同构）；新增标签域×4（全栈开发/教育教学/结构设计/软件测试）
+- **待用户复核裁定**：①JZ0006 结构设计（职位+360 互证、无项目证据）②JZ0043 的 2026 D 绩效与 T2 行为标签冲突（360 长期评价 vs 年度结果孰优先）③毛文学习敏捷性+成长型思维并存是否重复 ④JZ0037 教育教学（培训≈教学职能映射）——复核表「是否支持」列
+- **复核通过后**：合并入 ground_truth → 重跑序1 形态 ×3 → 新基线 C_rGT（15 员工）→ 噪声带收窄后再做 S2 重测 / codebook 判据接入（攻嵌入式 0/3）的 A/B
+
 ## 📌 GT v1.1：JZ0003 补标「成长型思维」（2026-09-12，用户拍板）
 
 - **变更**：`data/experiment/ground_truth_5.json` JZ0003 labels 6→7，新增 `{成长型思维, potential, T3, 证据: 绩效 C→C→A 翻盘 + 360: 主动学习（残词「主动学」经用户人工裁定采纳，佐证与绩效一级证据互证成立）}`；_meta status → `[USER_REVIEWED_V1.1]` + review_2026-09-12 字段（首批人工审计 + 补标裁定记录）
