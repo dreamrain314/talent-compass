@@ -161,11 +161,17 @@ def build_evidence(
     if gt_evidence:
         parts.append(f"【GT证据】{gt_evidence.strip()}")
     keywords = {k for k in (hit["concept"], hit["matched_label"]) if k}
-    matched = [u for u in raw_units if any(k in u for k in keywords)]
+    # 截断容错：概念是长词时其 ≥3 字前缀也参与匹配——上游摘要可能存残词
+    # （实例：360 评价摘要被截断在「主动学」，全词「主动学习」匹配失败曾误导核验）
+    prefix_kw = {k[:n] for k in keywords if len(k) >= 4 for n in range(len(k) - 1, 2, -1)}
+    matched = [u for u in raw_units if any(k in u for k in keywords | prefix_kw)]
     for u in matched[:MAX_UNITS]:
         parts.append(f"【原文】{u[:UNIT_MAX_CHARS]}")
-    if not matched:  # 兜底：无字面命中时给绩效摘要，保证证据原文非空
-        fallback = next((u for u in raw_units if u.startswith("[绩效摘要]")), raw_units[0] if raw_units else "")
+    if not matched:  # 兜底：优先含 GT 证据关键词的单元（360 类行为证据常在评价摘要），再退绩效摘要
+        gt_kw = [w for w in (gt_evidence or "").replace("360:", " ").replace("；", " ").replace("、", " ").split() if len(w) >= 3]
+        fallback = next((u for u in raw_units if any(w in u for w in gt_kw)), None)
+        if fallback is None:
+            fallback = next((u for u in raw_units if u.startswith("[绩效摘要]")), raw_units[0] if raw_units else "")
         if fallback:
             parts.append(f"【原文(兜底)】 {fallback[:UNIT_MAX_CHARS]}")
     evidence = " ｜ ".join(parts)

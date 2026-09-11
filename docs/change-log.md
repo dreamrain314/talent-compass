@@ -1,5 +1,14 @@
 # progress.md — Bug修复进度
 
+## 🔍 首批人工审计核验：39/40 支持，1 条假 TP 实锤（2026-09-12 凌晨）
+
+- **用户核验** `data/audit/evidence_audit_20260910.csv` 40 条：其余 38 行（39 条核验项）全部「支持」；否决 JZ0003 孟华 `自驱力`←concept「主动学习」（审计表中 2 行，同组合不同来源 run）
+- **否决定性（查证后）**：非抽取幻觉——360 评价原文末尾实为**截断残词「主动学」**，LLM 补全升格为 concept「主动学习」→ rerank conf 0.575 映射 `自驱力`，8/16 run 全部 in_gt=True 算 TP。证据（主动承担责任/发挥关键作用）支撑 `自驱力` 但不含学习语义；按 JZ0001 先例「主动学习」应归 `成长型思维`（JZ0003 GT 疑漏标该标签，已入 codebook 待裁定项 4）——**次近邻侥幸命中，「召回率≠效果好」首个实证**
+- **审计工具 bug（连带发现并修复）**：`gen_evidence_audit.py` 全词匹配失败（「主动学习」≠残词「主动学」）后兜底死给绩效摘要，证据列错字段误导核验人。修复：①concept ≥4 字时其 ≥3 字前缀参与截断容错匹配 ②兜底优先含 GT 证据关键词的原文单元（360 类行为证据在评价摘要）再退绩效摘要。修复后该行证据列正确显示 360 评价摘要；行集/确定性/40 行/data 只读断言复验全过
+- **落库**：`data/audit/evidence_audit_20260910_reviewed.csv`（原表+是否支持列+人工备注，保留用户核验时原貌）；codebook_gt_v0 新增 §2.6 判别规则（主动学习 vs 自驱力 vs 成长型思维 + 残词禁令）与待裁定项 4；GT 本身未动（`自驱力` 标签成立，错在概念升格与映射）
+- **backlog 新增**：phase1 `text_summaries.evaluation_summary` 生成期截断（Agent① 360 汇总 max_tokens 待排查）
+- **下一步仍待用户**：①是否给 JZ0003 补 `成长型思维` GT（动 R 分母，跨期可比性权衡）②继续核验其余样本（扩表后）或按 codebook v0 启动 GT 扩充
+
 ## 🔧 T1 评测工具正式化 eval_label_extraction（2026-09-11）
 
 - **文件**: `scripts/eval_label_extraction.py`（新建）、`tests/test_eval_label_extraction.py`（新建，6 用例）
