@@ -1,5 +1,30 @@
 # progress.md — Bug修复进度
 
+## 🔧 T1 评测工具正式化 eval_label_extraction（2026-09-11）
+
+- **文件**: `scripts/eval_label_extraction.py`（新建）、`tests/test_eval_label_extraction.py`（新建，6 用例）
+- **变更**: 将 `tmp/compare_arms.py` 三臂对比原型正式化为评测工具——臂文件列表仅经 CLI `--arm NAME=FILE1,FILE2,...` 传入（代码零硬编码时间戳、零 tmp/ 依赖）；stdout 输出每臂 P/R/F1（round means）+ mean±std 噪声带（statistics.st 样本口径，n<2 打 WARNING）+ 按 (employee_id, matched_label) 聚合的每概念 n/N 命中矩阵；不写任何文件
+- **指标口径锁死**: P=TP/len(path_c items)、R=path_c.recall_at_gt/total_gt_labels（文件级已有 key）、F1=2PR/(P+R)——由测试精确值用例锁定，防跨期实验口径漂移
+- **验证**: `pytest tests/test_eval_label_extraction.py` 6/6 全绿；三臂实跑复核（序1/5a/5b 各 3 文件）exit 0，seq1 R=0.6833 与已知 C_rGT 68.3% 吻合；JZ0001 质量工程、JZ0004 嵌入式开发两锚点行齐备；负向断言过（`grep -c "tmp/"` =0、时间戳常量 =0）
+- **背景**: lead-agent workflow Wave1 块 B1/B2（契约 `.patrol/contracts/B1.json`/`B2.json`），coder-B1 实施、主 agent 契约断言逐条复核通过（原 checker 会话因宿主 429 限额中断）
+
+## 🔧 S2 总开关默认关（TC_S2_PROMPT）（2026-09-11）
+
+- **文件**: `config.py`、`agents/profile_generation.py`、`tests/test_profile_generation.py`
+- **变更**: 新增 `S2_PROMPT_ENABLED = _env_flag("TC_S2_PROMPT")`（默认关，沿 MED-3 纪律）；两处门控——①`_select_few_shot_examples` 开关关时无条件返回 `_FEWSHOT_BANK[:5]`（不 encode、不 kNN）②`_build_system_prompt` 的 S2 T1 约束文案（数量下限/逐字段自查/证书映射）仅开关开时渲染，关时回到序1 prompt 形态；t1_below_min stats 常开不受门控（B3 决策）
+- **测试同步**: 既有 6 个 S2 测试加 `monkeypatch.setattr(config, "S2_PROMPT_ENABLED", True)` 显式开启前置；新增 2 个默认关负向用例（encode 零调用 + prompt 无 S2 文案 + bank[5:] 扩充条不渲染；静态种子三短语仍在防过度回退）；统一属性注入、无 setenv 冻结风险
+- **验证**: 全量 `pytest tests/ -q` **489/489**（481 基线 + 6 eval 工具 + 2 默认关）；负向断言过（无 `setenv('TC_S2_PROMPT')`）
+- **效果**: 「默认关=序1 prompt」成为回归保护；后续重开 S2（`TC_S2_PROMPT=1`）必显式感知自己在改抽取 prompt
+- **背景**: lead-agent workflow Wave1 块 B3/B4（契约 `.patrol/contracts/B3.json`/`B4.json`）
+
+## 🔧 T1 证据审计材料 + GT codebook v0（2026-09-11）
+
+- **文件**: `scripts/gen_evidence_audit.py`（新建）、`data/audit/evidence_audit_20260910.csv`（新建，40 行）、`docs/codebook_gt_v0.md`（新建）
+- **审计生成器**: run JSON path_c 命中项（无证据原文字段）join phase1_output.json（50 员工 summary/performance/projects 原文）+ ground_truth_5.json（GT evidence），固定 seed=42 确定性抽样 40 条 in_ground_truth==true 项；产出人工核验表（员工ID/姓名/标签/概念/证据原文/是否支持[待人工]/来源run文件/match_confidence）
+- **验证**: 重跑 SHA256 逐字节一致；data/intermediate 与 data/experiment 零改动（`git status --porcelain` 空）；(员工ID,标签) 去重组合 ≥10 且覆盖 JZ0001/0003/0004
+- **codebook_gt_v0**: GT 标注规则手册 v0 草案——标注总则（证据分级：项目/绩效一级，证书/培训孤证不抽须互证）+ 易混对判别（嵌入式开发/网络技术/边缘网关开发/质量工程/证书→能力映射，关键词级可操作判据）+ 抽取 prompt 边界判据（双用途锚点，与现行文案逐条人工核对零矛盾）+ 幽灵标签负向断言（自动检查节）；「网络技术/边缘网关开发」定义为证据短语而非标签
+- **背景**: lead-agent workflow Wave1 块 B5/B6（契约 `.patrol/contracts/B5.json`/`B6.json`）；B6 攻「嵌入式开发 0/3 语义归并残留」+ 终结 GT 标注规则散记状态；B5 为「召回率≠效果好」的人工准确率核验提供材料（对齐用户 2026-09-10「目的是抽出正确的能力」）
+
 ## 🔧 A/B 序5b：S2 修正重测（2026-09-10 晚）
 
 - 用户拍板「A」：①`_FEWSHOT_BANK[5]` standard_label "ISO9001"→"质量工程"（证书→能力映射示范，note 同步）②T1 自查文案改按证据强度排序（项目/绩效/岗位序列一级证据优先；证书/培训孤证不抽须与项目绩效互证；证书映射能力标签）；测试断言同步（整短语锁定新文案）

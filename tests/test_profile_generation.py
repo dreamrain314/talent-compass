@@ -774,8 +774,9 @@ class TestLlmExtract:
 
     # ── S2（plan Phase 5）：数量下限约束 + few-shot kNN ──
 
-    def test_s2_min_count_constraint_in_prompt(self, agent):
+    def test_s2_min_count_constraint_in_prompt(self, agent, monkeypatch):
         """S2 正例：prompt 含数量下限约束文案 + T1_EXTRACT_MIN_COUNT 具体值。"""
+        monkeypatch.setattr(config, "S2_PROMPT_ENABLED", True)  # B3：S2 默认关，显式开启
         sp = agent._build_system_prompt()
         assert "至少" in sp
         # 整短语断言锁定下限值（裸 "5" 子串可被 definition/keywords 假命中）
@@ -784,8 +785,9 @@ class TestLlmExtract:
         assert "按证据强度排序" in sp
         assert "证书须映射到能力标签而非照抄证书名" in sp  # 证书证据价值引导（序5b 修正文案）
 
-    def test_s2_knn_selects_nearest_examples(self, agent):
+    def test_s2_knn_selects_nearest_examples(self, agent, monkeypatch):
         """S2 kNN：fake encode 下与员工语义最近的 bank 条目被选中，恰 K 条。"""
+        monkeypatch.setattr(config, "S2_PROMPT_ENABLED", True)  # B3：S2 默认关，显式开启
         single_calls = {"n": 0}
 
         def fake_encode(texts):
@@ -804,8 +806,9 @@ class TestLlmExtract:
         assert sel[0]["standard_label"] == "智能制造"  # bank[0] IoT 语义最近
         assert single_calls["n"] == 1  # 员工文本 encode 恰 1 次（每员工 1 次 encode 契约）
 
-    def test_s2_none_employee_no_encode_static_fallback(self, agent):
+    def test_s2_none_employee_no_encode_static_fallback(self, agent, monkeypatch):
         """S2 负向①：employee=None 不触发 encode，回退 bank 前 5 条种子。"""
+        monkeypatch.setattr(config, "S2_PROMPT_ENABLED", True)  # B3：S2 默认关，显式开启
         calls = {"n": 0}
 
         def fake_encode(texts):
@@ -818,8 +821,9 @@ class TestLlmExtract:
         assert [b["standard_label"] for b in sel] == [
             "智能制造", "Java开发", "团队管理", "领导力潜质", "成长型思维"]
 
-    def test_s2_encode_failure_falls_back_static(self, agent):
+    def test_s2_encode_failure_falls_back_static(self, agent, monkeypatch):
         """S2 负向（D6）：encode 抛异常 → 回退静态种子，不重试。"""
+        monkeypatch.setattr(config, "S2_PROMPT_ENABLED", True)  # B3：S2 默认关，显式开启
         calls = {"n": 0}
 
         def boom(texts):
@@ -834,6 +838,7 @@ class TestLlmExtract:
 
     def test_s2_knn_prompt_renders_selected_not_full_bank(self, agent, monkeypatch):
         """S2 负向③：kNN 只渲染 K 条，bank 不全量进 prompt（增量 < 2000 字符）。"""
+        monkeypatch.setattr(config, "S2_PROMPT_ENABLED", True)  # B3：S2 默认关，显式开启
         monkeypatch.setattr(
             agent, "_select_few_shot_examples",
             lambda emp, encode_fn=None: [_FEWSHOT_BANK[5], _FEWSHOT_BANK[9]])
@@ -853,7 +858,9 @@ class TestLlmExtract:
 
     def test_s2_t1_below_min_stats_no_second_llm(self, agent, monkeypatch):
         """S2 负向②：t1 数 2 < T1_EXTRACT_MIN_COUNT=5 → t1_below_min=1
-        且 llm_calls=1（只记 stats，不触发第二次 LLM——D6）。"""
+        且 llm_calls=1（只记 stats，不触发第二次 LLM——D6）。
+        注：t1_below_min stats 常开不受 S2_PROMPT_ENABLED 门控（B3 决策）。"""
+        monkeypatch.setattr(config, "S2_PROMPT_ENABLED", True)  # B3：S2 默认关，显式开启
         monkeypatch.delenv("TC_OFFLINE", raising=False)
         with patch("agents.profile_generation.call_llm_json",
                    return_value=_MOCK_SUCCESS_PROFILE) as mock_call:
@@ -863,6 +870,46 @@ class TestLlmExtract:
         assert emp_stats["llm_calls"] == 1
         # _MOCK_SUCCESS_PROFILE 的 t1_professional 仅 2 项 < 5
         assert emp_stats["t1_below_min"] == 1
+
+    # ── B3/B4（2026-09-11）：S2 总开关默认关——抽取行为回到序1（pre-S2）形态 ──
+
+    def test_s2_off_static_fewshot_no_encode_no_s2_phrases(self, agent, monkeypatch):
+        """B3 负向：开关关（默认）时，员工含非空 summary 也无条件走静态种子，
+        encode 零调用；prompt 不含 S2 四件套文案；bank[5:] 扩充条不进 prompt。"""
+        monkeypatch.setattr(config, "S2_PROMPT_ENABLED", False)
+        calls = {"n": 0}
+
+        def fake_encode(texts):
+            calls["n"] += 1
+            return [[1.0] for _ in texts]
+
+        emp = {"employee_id": "E1",
+               "summary": {"performance_summary": "负责工业IoT管理平台核心模块",
+                           "project_summary": "Java微服务开发"}}
+        sel = agent._select_few_shot_examples(emp, encode_fn=fake_encode)
+        assert calls["n"] == 0  # 不 encode、不 kNN
+        assert sel == _FEWSHOT_BANK[:5]
+        sp = agent._build_system_prompt(emp)
+        for phrase in ("至少输出", "逐字段自查", "证书须映射到能力标签"):
+            assert phrase not in sp, f"开关关时 prompt 不应含 S2 文案: {phrase}"
+        # ISO9001/PMP/Spark/跨部门/抗压韧性 扩充条（bank[5:]）不得进 prompt
+        for b in _FEWSHOT_BANK[5:]:
+            assert b["source_text"] not in sp,                 f"开关关时扩充条不应渲染: {b['source_text']}"
+
+    def test_s2_off_prompt_keeps_static_seed_examples(self, agent, monkeypatch):
+        """B4 防过度回退：开关关时 prompt 仍含静态种子示例（序1 few-shot：
+        智能制造/Java开发/团队管理 三短语 + 种子 source_text 原文）。"""
+        monkeypatch.setattr(config, "S2_PROMPT_ENABLED", False)
+        emp = {"employee_id": "E1",
+               "summary": {"performance_summary": "s", "project_summary": "p"}}
+        sp = agent._build_system_prompt(emp)
+        # 序1 静态种子三短语（契约 B4 第1条）
+        assert "智能制造" in sp
+        assert "Java开发" in sp
+        assert "团队管理" in sp
+        # 种子原文进 prompt（强断言：few-shot 渲染的是 bank[:5] 而非空/扩充）
+        for b in _FEWSHOT_BANK[:3]:
+            assert b["source_text"] in sp
 
     def test_build_user_prompt_includes_employee_data(self, agent):
         emp = _adapted_employee()

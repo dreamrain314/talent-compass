@@ -274,6 +274,12 @@ EXPAND_ENABLED = _env_flag("TC_EXPAND")
 # 消费者：agents/profile_generation._build_system_prompt / _process_employee / _select_few_shot_examples
 T1_EXTRACT_MIN_COUNT = 5
 FEWSHOT_KNN_K = 2
+# S2 总开关（TC_S2_PROMPT，默认关——S2 判负处置 2026-09-11，B3）：四件套整体门控
+# （kNN few-shot + T1 数量下限文案 + 逐字段自查 + 证书证据价值文案）。
+# 关 = 抽取行为回到序1（pre-S2）形态：静态 5 条种子 few-shot、无 kNN、无 S2 约束文案；
+# t1_below_min stats 记录不受此开关影响（常开，stats-only 不影响抽取行为）。
+# 消费者：agents/profile_generation._select_few_shot_examples / _build_system_prompt
+S2_PROMPT_ENABLED = _env_flag("TC_S2_PROMPT")
 # S3：多遍抽取并集（预算门控：>1 需用户确认；A/B 开关：TC_EXTRACT_PASSES）
 # 消费者：agents/profile_generation._multi_pass_extract / execute 超时预算联动
 EXTRACT_PASSES = int(os.getenv("TC_EXTRACT_PASSES", "1"))

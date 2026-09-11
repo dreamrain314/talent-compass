@@ -411,13 +411,15 @@ class ProfileGeneration(BaseAgent):
             t1_lines.append(f"  {cat_label_t1[cat]}:")
             t1_lines.extend(_fmt_items(items))
         lines.append("【T1 通道·专业能力】只看专业能力证据（项目/绩效/证书里的技术技能）：")
-        # S2：数量下限 + 逐字段自查（攻 B1「整段字段没看」类漏抽——87% 损耗在抽取层）
-        lines.append(
-            f"  🔴 数量要求：T1 通道至少输出 {config.T1_EXTRACT_MIN_COUNT} 个标签。"
-            "输出前逐字段自查，按证据强度排序：项目摘要/绩效摘要/岗位序列为一级证据优先扫；"
-            "证书/培训课程仅作佐证（孤证不抽，须与项目或绩效相互印证方可计入）；"
-            "证书须映射到能力标签而非照抄证书名（如 ISO9001 认证佐证质量工程能力）。"
-        )
+        # S2（TC_S2_PROMPT 开时才渲染）：数量下限 + 逐字段自查 + 证书证据价值文案
+        # （攻 B1「整段字段没看」类漏抽）。开关关 → 标题行直接接标签列表（pre-S2 结构）。
+        if config.S2_PROMPT_ENABLED:
+            lines.append(
+                f"  🔴 数量要求：T1 通道至少输出 {config.T1_EXTRACT_MIN_COUNT} 个标签。"
+                "输出前逐字段自查，按证据强度排序：项目摘要/绩效摘要/岗位序列为一级证据优先扫；"
+                "证书/培训课程仅作佐证（孤证不抽，须与项目或绩效相互印证方可计入）；"
+                "证书须映射到能力标签而非照抄证书名（如 ISO9001 认证佐证质量工程能力）。"
+            )
         lines.extend(t1_lines if t1_lines else ["  (T1 标签库加载失败)"])
 
         # T2 通道（behavior）
@@ -505,7 +507,14 @@ class ProfileGeneration(BaseAgent):
         - employee=None / 非 dict / summary 拼接为空 → 静态种子（测试隔离+向后兼容）
         - encode 异常 → 静态种子（日志含异常类型名，C3）
         类型守卫（C4）：summary 非 dict、字段非 str → 按 "" 处理。
+
+        B3 总开关（config.S2_PROMPT_ENABLED，默认关）：关 → 首行无条件返回
+        bank 前 5 条静态种子（不 encode、不 kNN，员工含 summary 也一样），
+        抽取行为回到序1（pre-S2）形态。
         """
+        # 首行门控：开关关 → 静态种子（四件套整体门控之一，lead_ruling 2026-09-11）
+        if not config.S2_PROMPT_ENABLED:
+            return _FEWSHOT_BANK[:5]
         static = _FEWSHOT_BANK[:5]
         if not isinstance(employee, dict):
             return static
@@ -858,6 +867,8 @@ class ProfileGeneration(BaseAgent):
 
         # S2：T1 数量下限监控（只记 stats，不触发第二次 LLM——D6）。
         # 离线短路不计；解析失败确定性降级的空 extract 计入（本就是抽取质量信号）。
+        # B3 决策（2026-09-11）：本 stats 记录保持常开，不受 S2_PROMPT_ENABLED 门控——
+        # stats-only 不影响抽取行为与 LLM 成本，且关掉会丢失重开 S2 时的 A/B 观测基线。
         t1_items = content.get("t1_professional")
         if not isinstance(t1_items, list) or len(t1_items) < config.T1_EXTRACT_MIN_COUNT:
             emp_stats["t1_below_min"] = 1
