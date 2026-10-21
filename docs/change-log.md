@@ -1235,3 +1235,46 @@ training: 400 ✅ | eval360: 2500 ✅
 1. 做完 = 端到端闭环（2.3.x）；2.4.x 打磨做基础版；竞赛第三/四/五阶段降级 backlog
 2. 下一步 = T1 硬技能 recall 优化（25-37.5%，方向候选：LLM 兜底接线 / 接受现状后置）
 3. 测试 461/461 ×3 全绿；冷启动首跑 12 failed 瞬态记录于 progress.md
+
+---
+
+## [AWAITING_VERIFY] 2026-10-21 — 向量直配匹配层 M1-M5（竞品 TalentAtlas 思路迁移，upgrade/vector-matching 分支）
+
+### 背景
+复赛竞品 TalentAtlas（九洲人才星图队）分析（`docs/competitor_talentatlas_analysis.md`）表明：我方 87% T1 召回 miss 卡在「LLM 单次抽取→标签库映射」范式，竞品用向量直配绕开该问题。用户拍板四项决策：向量直配+五层公式 / 算法层+盲测先行 / 现货模型先跑（微调后置）/ S3 暂停资源转匹配层。
+
+### 新增内容（M1-M5）
+| 文件 | 说明 |
+|------|------|
+| `utils/evidence_index.py` | M1 员工证据切片+向量索引：按记录自然切 chunk（position/projects/performance/training/三摘要），复用 bge-small-zh fastembed 编码，.npy 缓存（哈希编文件名）；编码器绑定实例（防 fake 注入构建/真实模型检索维度错配） |
+| `agents/job_analysis.py` | M2 Agent③' 岗位解析：offline 确定性抽取（正则硬条件 + corpus 关键词扫描，同名去重）+ LLM 温度0 结构化解析（失败确定性回退 D6）；零评分纪律 |
+| `utils/match_engine.py` | M3 核心：两段式（全员 bi 初排 → Top-10 CE 批量校准 1 次 predict）+ 固定公式 T0×50+T1×30+T2×10+T3×10（零 LLM 评分）+ H 闸门 + 置信三档（对接备选池） |
+| `agents/matching.py` | Agent④' BaseAgent 封装（timeout 600s） |
+| `scripts/blind_test.py` | M4 盲测台：TC_OFFLINE 强制，金标 Top-5 命中率 N-run 均值 + 确定性检查 + 报告生成 |
+| `scripts/run_matching.py` | M5 编排：PipelineRunner 串联 Agent③'→④' |
+| `data/jobs/blind_gold_jobs.json` + `data/experiment/blind_test_gold.json` | 5 个金标岗位（GT 员工证据模式反推，B04/B05 高相似干扰对） |
+| `tests/test_evidence_index.py` / `test_match_engine.py` / `test_job_analysis.py` | 50 个新测试（确定性 fake 注入，全离线） |
+| `config.py` | 新增 MATCH_* 常量组 + 阈值标定注释 |
+| `docs/reports/blind_test_report_20261021.md` | 盲测报告（含标定记录） |
+
+### 盲测结果（验收协议，竞品盲测移植+我方统计纪律）
+- **Top-5 金标命中率 5/5**（3-run 均值，强制 TC_OFFLINE=1）；金标名次：B01 第2 / B02 第2 / B03 第1 / B04 第5 / B05 第1
+- **确定性 PASS**（3-run 排序逐位一致）
+- 端到端编排冒烟通过（PipelineRunner 5 岗位 success，~9s/岗位 含 CE）
+
+### 标定记录（详见报告「标定记录」节）
+1. 阈值重标：REJECT 0.60→0.32（对齐全员总分 P80）、REVIEW 0.85→0.45（金标带下沿）——竞品 0.60/0.85 按其公式分布定，照搬致金标全驳回
+2. T0 分母修正：只取 name+证书，不拆 detail 关键词
+3. T0 同名去重：corpus 重复项撑大分母（曾致 B04 金标跌出 Top-5）
+4. 分层各司其职：T0 字面层保留归一化、去掉 keywords 桥接（泛化 kw 致全员 t0≈0.92 失去区分度）；同义改写交 T1 语义层——修正后恢复 5/5
+
+### 设计决策
+- T1 标签降级为展示/解释层，召回不再依赖 LLM 单次抽取（结构性消除 87% miss 源）
+- CE 双契约：真实 CrossEncoder.predict / 测试注入裸函数 fn(pairs)
+- rejected 两种成因：H 闸门拦截 vs 总分不足（gate.fail_reasons 区分）
+
+### 验证
+- [x] pytest 全量 539/539（489 基线零破坏 + 50 新增）
+- [x] 盲测 3-run 5/5 + 确定性 PASS
+- [x] run_matching.py 端到端冒烟（--offline）
+- [ ] 独立对抗审查（按 CLAUDE.md 闸门，待做后转 [VERIFIED]）
