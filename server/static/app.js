@@ -205,7 +205,7 @@ function renderCard(c, idx) {
   // 动画挂载后触发
   requestAnimationFrame(() => {
     const num = $(".score-num", el);
-    countUp(num, s.total, 1);
+    countUp(num, parseFloat(num.dataset.target), 1);  // 动画终点 = data-target（展示分），勿用原始分覆盖
     $$(".bar-fill", el).forEach((b) => { b.style.width = b.dataset.w + "%"; });
   });
   // 证据折叠 + 溯源
