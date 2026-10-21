@@ -80,7 +80,61 @@ body {
 @keyframes viewIn { from { opacity: 0; transform: translateY(22px); filter: blur(6px); } to { opacity: 1; transform: none; filter: none; } }
 
 .match-grid { display: grid; grid-template-columns: 400px 1fr; gap: 2.2rem; align-items: start; }
-@media (max-width: 960px) { .match-grid { grid-template-columns: 1fr; } }
+@media (max-width: 960px) {
+  .match-grid { grid-template-columns: 1fr; }
+  /* 关键修复：单列布局下取消面板 sticky——sticky 会让请求面板粘在视口顶部，
+     后续空态/结果从其下方穿过造成页面重叠（2026-10-21 手机端实测） */
+  .panel { position: static; }
+}
+
+/* ── 手机端（<700px）：导航紧凑化 + 全局呼吸收缩 ── */
+@media (max-width: 700px) {
+  .topnav { top: .6rem; padding: 0 .55rem; }
+  .nav-pill {
+    width: 100%; gap: .55rem;
+    padding: .4rem .45rem .4rem .75rem;
+    flex-wrap: nowrap; overflow: hidden;
+  }
+  .brand { flex-shrink: 0; gap: .45rem; }
+  .brand-mark { font-size: 1.05rem; }
+  .brand-text { flex-shrink: 0; }
+  .brand-text strong { font-size: .78rem; white-space: nowrap; }
+  .brand-text span { font-size: .58rem; white-space: nowrap; }
+  .nav-tabs { flex-shrink: 1; }
+  .nav-tab { font-size: .76rem; padding: .38rem .7rem; white-space: nowrap; }
+  .nav-meta { display: none; }  /* 窄屏藏统计文案，防挤压换行 */
+  .shell { padding: 1.7rem .8rem 4rem; }
+  .panel-head { padding: 1.15rem 1rem .85rem; }
+  .panel-head h2 { font-size: 1.28rem; }
+  form { padding: .2rem 1rem 1.1rem; }
+  .field-row { flex-wrap: wrap; }
+  .field-row .field.inline { flex: 1 1 100%; }
+  .field-row .cta { flex: 1 1 100%; justify-content: space-between; padding: .6rem .8rem .6rem 1.4rem; }
+  .gold-strip { padding: 0 1rem 1.15rem; }
+  .empty-inner, .loading-inner { padding: 3rem 1.4rem; }
+  .results-head { flex-direction: column; align-items: flex-start; gap: .7rem; }
+  .results-title h2 { font-size: 1.3rem; }
+  .parsed-strip { padding: .75rem .85rem; }
+  .cand-inner { padding: 1.1rem 1rem; }
+  .cand-top { flex-wrap: wrap; gap: .75rem; }
+  .rank { width: 2.2rem; height: 2.2rem; font-size: .9rem; }
+  .cand-id { flex: 1 1 auto; min-width: 0; }
+  .cand-name { font-size: 1.02rem; }
+  .cand-meta { font-size: .68rem; }
+  .emp-sub { font-size: .66rem; }
+  .score-box.top-score { flex: 0 0 auto; display: flex; align-items: center; gap: .55rem; text-align: left; padding: .45rem .7rem; }
+  .score-box.top-score .score-num { font-size: 1.35rem; }
+  .score-box.top-score .score-sub { margin-top: 0; font-size: .56rem; letter-spacing: .1em; max-width: 5.2em; line-height: 1.5; }
+  .cand-body { grid-template-columns: 1fr; gap: 1rem; }
+  .bar-row { grid-template-columns: 78px 1fr 56px; }
+  .bar-label { font-size: .68rem; }
+  .foot { flex-direction: column; gap: .35rem; padding: 1rem 1rem 1.8rem; }
+  .library-head { flex-direction: column; align-items: flex-start; gap: .8rem; }
+  .search-box { max-width: 100%; width: 100%; margin-left: 0; }
+  .emp-grid { grid-template-columns: 1fr 1fr; gap: .7rem; }
+  .drawer { width: 100vw; }
+  .modal { width: 94vw; max-height: 86vh; }
+}
 
 /* ── 双层包边（Double-Bezel）────────────────────────── */
 .bezel {
@@ -94,6 +148,11 @@ body {
 .bezel.soft { background: rgba(255, 255, 255, 0.028); }
 
 .panel { position: sticky; top: 5.4rem; }
+/* 单列布局（≤960px）取消 sticky——否则面板粘在视口顶部，后续内容从其下
+   方穿过造成重叠。必须放在上面 sticky 规则之后才能正确覆盖（2026-10-21） */
+@media (max-width: 960px) {
+  .panel { position: static; top: auto; }
+}
 .panel-head { padding: 1.4rem 1.2rem 1rem; }
 .panel-head h2 { font-size: 1.5rem; font-weight: 650; letter-spacing: .01em; margin-top: .5rem; }
 .hint { color: var(--ink-dim); font-size: .82rem; line-height: 1.7; margin-top: .55rem; }
