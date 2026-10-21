@@ -133,7 +133,8 @@
 | 2.5.3 | 10.21 | M3 匹配引擎 `utils/match_engine.py` + `agents/matching.py`（两段式 bi→CE 校准 + 固定公式 T0×50+T1×30+T2×10+T3×10 零 LLM 评分 + H 闸门 + 置信三档对接备选池） | ✅ |
 | 2.5.4 | 10.21 | M4 盲测台 `scripts/blind_test.py` + 金标 5 岗位（3-run 均值 + 确定性检查） | ✅ 5/5，确定性 PASS |
 | 2.5.5 | 10.21 | M5 编排 `scripts/run_matching.py`（PipelineRunner 串联）+ 50 新测试 + 标定（阈值 0.32/0.45、T0 去重/归一化） | ✅ pytest 539 全绿 |
-| 2.5.6 | — | 后置：UI ⑥⑦⑧、反馈闭环（feedback.json）、TalentCLEF 微调 e5（torch 环境）、独立对抗审查转 [VERIFIED] | ⏳ |
+| 2.5.6 | 10.21 | 匹配工作台网站（server/ Flask 8082）：员工库+岗位匹配+推荐理由+溯源弹层，浏览器逐点验收通过，9 API 测试（全量 548 绿） | ✅ |
+| 2.5.7 | — | 后置：反馈闭环（feedback.json）、TalentCLEF 微调 e5（torch 环境）、独立对抗审查转 [VERIFIED]、服务器生产化部署 | ⏳ |
 
 ---
 
