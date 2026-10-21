@@ -252,6 +252,32 @@ RERANKER_FALLBACK_TO_LLM = True                        # 加载/推理失败 →
 RERANKER_NEW_LABEL_THRESHOLD = 0.15                    # top1 score < 此 → is_new_label（Step 1.10：0.3→0.15，BGE 对中文抽象词打分偏低，0.15-0.3 区间应收为 pending_review 而非判新标签）
 RERANKER_CONFIDENCE_THRESHOLD = 0.5                    # score < 此且 ≥ new 阈值 → pending_review
 
+# ── 向量直配匹配层（upgrade/vector-matching M1-M3，竞品思路迁移）──
+# 固定公式评分（零 LLM 评分）：总分 = T0 直接技能 50 + T1 语义匹配 30
+#   + T2 行为 10 + T3 潜力 10（百分制）。权重和不必校验为 100：缺失层
+#   发中性分（该层权重×0.5），公式确定性优先。
+# 消费者：utils/match_engine.py / agents/matching.py / scripts/blind_test.py
+MATCH_FORMULA_WEIGHTS = {
+    "t0_direct": 50.0,     # T0 直接技能：证书/培训/工具/岗位的字面+别名命中
+    "t1_semantic": 30.0,   # T1 语义：bi-encoder 召回 + cross-encoder 校准
+    "t2_behavior": 10.0,   # T2 行为：360 五维映射
+    "t3_potential": 10.0,  # T3 潜力：绩效轨迹 + 培训 + 360 学习能力（确定性代理）
+}
+# 置信三档（总分/100）：低于 REJECT → 驳回；REJECT-REVIEW → 待审（=备选池）；≥REVIEW → 自动推荐
+# 标定依据（2026-10-21，盲测 50 人池）：竞品 0.60/0.85 是按其公式（50/20/20/10）
+# 的分布定的，直接照搬致金标全被驳回。按本公式实测分布重标：
+#   全员总分 P50=0.26 / P80=0.32；金标带 0.33-0.49。
+#   REJECT 对齐 P80（相关性低于全员前 20% → 驳回）；REVIEW 对齐金标带下沿。
+MATCH_REJECT_THRESHOLD = 0.32
+MATCH_REVIEW_THRESHOLD = 0.45
+MATCH_TOP_K = 5                    # Top-N 推荐
+MATCH_RERANK_TOPN = 10             # bi 初排总分前 N 进 cross-encoder 校准（成本分层）
+MATCH_SEMANTIC_FLOOR = 0.30        # T1 语义原始 sim 低于此视为噪声归 0（防低分填充）
+MATCH_RERANK_BLEND = 0.5           # T1 语义最终 = bi-encoder×(1-b) + cross-encoder 校准×b
+EVIDENCE_CHUNK_MAX_CHARS = 600     # 单证据切片上限（超长截断，防摘要超长稀释向量）
+# 备选池：H 闸门未过但 T1 语义归一分 ≥ 此值的候选进备选池而非直接驳回（原设计四象限）
+MATCH_POOL_SEMANTIC_MIN = 0.60
+
 # ── T1 recall 优化（plan: S1/S8b/B3/S2/S3，2026-09）──
 def _env_flag(name, default="0"):  # [MED-3 修复 2026-09-10] 默认关（opt-in）：默认开会破坏 A/B baseline 纪律与测试隔离
     return os.getenv(name, default).strip().lower() in _TRUTHY  # _TRUTHY 提炼为模块级共享常量，与 is_offline_mode 复用（LOW-2，实施时顺手消重）
