@@ -49,3 +49,6 @@ pipeline_config/
 # Pipeline intermediate artifacts (auto-generated per test run)
 data/intermediate/
 tmp/
+
+# 例外：匹配工作台的演示数据（50 人 mock，phase1 产物）——网站运行必需
+!data/intermediate/phase1_output.json

@@ -9,3 +9,7 @@ jsonschema>=4.20.0
 numpy>=1.24.0
 cachetools>=5.0.0  # encode_labels 线程安全 LRU 缓存（Agent② W=5 并发）
 pytest>=8.0.0
+flask>=3.0.0        # 匹配工作台 server/app.py（端口 8082）
+sentence-transformers>=3.0.0  # bge-reranker-v2-m3 交叉重排（cross-encoder）
+# torch 未列出：按平台自行安装 CPU 版（pip install torch --index-url https://download.pytorch.org/whl/cpu）；
+# 仅 fastembed+Flask 亦可跑（CE 加载失败自动降级纯 bi-encoder 分数）

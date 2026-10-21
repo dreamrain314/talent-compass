@@ -132,3 +132,26 @@ python scripts/run_pipeline_phase1.py
 ---
 
 *详情请参阅 `docs/task-plan.md`（任务规划）和 `docs/change-log.md`（变更记录）。*
+---
+
+## 🧭 匹配工作台网站（server/，端口 8082）
+
+向量直配匹配层的可视化网站：员工库（50 人档案）+ 岗位匹配（Top-N 候选 + 固定公式评分 + 推荐理由）+ 证据溯源（点回原文）。
+
+```bash
+pip install -r requirements.txt          # 另需 torch CPU 版（见 requirements 尾注）
+python server/app.py                     # → http://127.0.0.1:8082
+```
+
+- 员工数据：`data/intermediate/phase1_output.json`（50 人 mock 演示数据，已入库）
+- 首次运行自动从 HuggingFace 下载 bge-small-zh（~100MB）；`D:/workplace/bge-reranker-v2-m3` 存在则用本地重排器，否则自动从 HF 下载 bge-reranker-v2-m3（~2.3GB）
+- 演示岗位：左侧「示例岗位」5 个金标（金标映射 `data/experiment/blind_test_gold.json`）
+- 验收基准：`python scripts/blind_test.py --runs 3`（盲测 Top-5 命中率 + 确定性检查）
+
+### 其他设备在线体验（三选一）
+
+1. **局域网**：`python server/app.py` 改 `host="0.0.0.0"` 后，同一 Wi-Fi 下访问 `http://<本机IP>:8082`
+2. **公网隧道**（本机跑服务，任意设备走 HTTPS）：`cloudflared tunnel --url http://127.0.0.1:8082`，把输出的 trycloudflare.com 地址发给其他设备；隧道关闭即失效
+3. **GitHub Codespaces**（完全云端）：仓库页 → Code → Codespaces → 新建 → `pip install -r requirements.txt && pip install torch --index-url https://download.pytorch.org/whl/cpu && python server/app.py` → Ports 面板把 8082 设为 Public → 用转发的 URL 访问（首次下载模型 ~2.4GB，耐心等待；闲置自动休眠）
+
+> 安全提示：工作台无登录鉴权，公网隧道地址等同于公开；演示数据均为 mock（`scripts/generate_mock_data.py` 可再生），不含真实员工信息。

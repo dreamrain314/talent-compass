@@ -246,8 +246,12 @@ LABEL_NEW_LABEL_MAX_PER_EMP = 2             # 新标签防滥上限（超限降�
 # 降级：加载失败 → rerank_label_llm（zero-shot LLM fallback，D6 确定性降级不重试）。
 RERANKER_MODEL_NAME = "BAAI/bge-reranker-v2-m3"        # cross-encoder 多语言
 # 本地模型路径（git clone 下载，优先于 HF hub 下载，省网络）。
-# None → 走 HF hub cache（需 HF_ENDPOINT=hf-mirror）；非 None → 直接加载本地目录。
-RERANKER_LOCAL_PATH = "D:/workplace/bge-reranker-v2-m3"
+# 存在才启用（可移植性：云端/他人机器无此目录 → None → 走 HF hub 下载同名模型，
+# 需 HF_ENDPOINT=hf-mirror 或可访问 hf.co）；非 None 但不存在会静默降级纯 bi 分。
+RERANKER_LOCAL_PATH = (
+    "D:/workplace/bge-reranker-v2-m3"
+    if Path("D:/workplace/bge-reranker-v2-m3").exists() else None
+)
 RERANKER_FALLBACK_TO_LLM = True                        # 加载/推理失败 → zero-shot LLM
 RERANKER_NEW_LABEL_THRESHOLD = 0.15                    # top1 score < 此 → is_new_label（Step 1.10：0.3→0.15，BGE 对中文抽象词打分偏低，0.15-0.3 区间应收为 pending_review 而非判新标签）
 RERANKER_CONFIDENCE_THRESHOLD = 0.5                    # score < 此且 ≥ new 阈值 → pending_review
