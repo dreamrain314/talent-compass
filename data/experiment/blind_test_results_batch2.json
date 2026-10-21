@@ -1,0 +1,348 @@
+{
+ "generated_at": "2026-10-22T02:05:10",
+ "overall": 0.4,
+ "deterministic": true,
+ "acceptance": {
+  "hit_5of5": false,
+  "gold_rank_le_3": false,
+  "gold_above_review_with_margin": false,
+  "no_seq_mismatch_recommend": false
+ },
+ "jobs": [
+  {
+   "job_id": "JOB_B06",
+   "title": "嵌入式软件研发工程师（测试与质量方向）",
+   "gold_emp_id": "JZ0009",
+   "hit_rate": 0.0,
+   "gold_rank": null,
+   "gold_total": 25.92,
+   "gold_decision": "rejected",
+   "margin": -8.659999999999997,
+   "hard_negs": [
+    {
+     "emp_id": "JZ0025",
+     "total": 34.58,
+     "decision": "rejected",
+     "seq_mismatch": true
+    },
+    {
+     "emp_id": "JZ0050",
+     "total": 33.27,
+     "decision": "rejected",
+     "seq_mismatch": true
+    },
+    {
+     "emp_id": "JZ0026",
+     "total": 33.05,
+     "decision": "rejected",
+     "seq_mismatch": true
+    }
+   ],
+   "top": [
+    {
+     "emp_id": "JZ0025",
+     "name": "尹飞",
+     "total": 34.58,
+     "decision": "rejected",
+     "ce_calibrated": true
+    },
+    {
+     "emp_id": "JZ0050",
+     "name": "程芳",
+     "total": 33.27,
+     "decision": "rejected",
+     "ce_calibrated": true
+    },
+    {
+     "emp_id": "JZ0026",
+     "name": "付涛",
+     "total": 33.05,
+     "decision": "rejected",
+     "ce_calibrated": true
+    },
+    {
+     "emp_id": "JZ0027",
+     "name": "严志强",
+     "total": 32.99,
+     "decision": "rejected",
+     "ce_calibrated": true
+    },
+    {
+     "emp_id": "JZ0022",
+     "name": "姜宇",
+     "total": 32.59,
+     "decision": "rejected",
+     "ce_calibrated": true
+    }
+   ]
+  },
+  {
+   "job_id": "JOB_B07",
+   "title": "研发项目负责人（结构设计与数据应用方向）",
+   "gold_emp_id": "JZ0006",
+   "hit_rate": 1.0,
+   "gold_rank": 2,
+   "gold_total": 35.59,
+   "gold_decision": "review",
+   "margin": -2.569999999999993,
+   "hard_negs": [
+    {
+     "emp_id": "JZ0004",
+     "total": 38.16,
+     "decision": "review",
+     "seq_mismatch": true
+    },
+    {
+     "emp_id": "JZ0013",
+     "total": 35.45,
+     "decision": "review",
+     "seq_mismatch": true
+    },
+    {
+     "emp_id": "JZ0050",
+     "total": 34.89,
+     "decision": "rejected",
+     "seq_mismatch": true
+    }
+   ],
+   "top": [
+    {
+     "emp_id": "JZ0004",
+     "name": "贺峰",
+     "total": 38.16,
+     "decision": "review",
+     "ce_calibrated": true
+    },
+    {
+     "emp_id": "JZ0006",
+     "name": "宋睿",
+     "total": 35.59,
+     "decision": "review",
+     "ce_calibrated": true
+    },
+    {
+     "emp_id": "JZ0013",
+     "name": "何天宇",
+     "total": 35.45,
+     "decision": "review",
+     "ce_calibrated": true
+    },
+    {
+     "emp_id": "JZ0050",
+     "name": "程芳",
+     "total": 34.89,
+     "decision": "rejected",
+     "ce_calibrated": true
+    },
+    {
+     "emp_id": "JZ0008",
+     "name": "梁欣然",
+     "total": 34.05,
+     "decision": "rejected",
+     "ce_calibrated": true
+    }
+   ]
+  },
+  {
+   "job_id": "JOB_B08",
+   "title": "人力资源项目负责人（HR体系方向）",
+   "gold_emp_id": "JZ0029",
+   "hit_rate": 0.0,
+   "gold_rank": null,
+   "gold_total": 36.06,
+   "gold_decision": "review",
+   "margin": -8.119999999999997,
+   "hard_negs": [
+    {
+     "emp_id": "JZ0035",
+     "total": 44.18,
+     "decision": "recommend",
+     "seq_mismatch": true
+    },
+    {
+     "emp_id": "JZ0004",
+     "total": 40.42,
+     "decision": "recommend",
+     "seq_mismatch": true
+    },
+    {
+     "emp_id": "JZ0050",
+     "total": 39.18,
+     "decision": "review",
+     "seq_mismatch": true
+    }
+   ],
+   "top": [
+    {
+     "emp_id": "JZ0035",
+     "name": "高川",
+     "total": 44.18,
+     "decision": "recommend",
+     "ce_calibrated": true
+    },
+    {
+     "emp_id": "JZ0004",
+     "name": "贺峰",
+     "total": 40.42,
+     "decision": "recommend",
+     "ce_calibrated": true
+    },
+    {
+     "emp_id": "JZ0050",
+     "name": "程芳",
+     "total": 39.18,
+     "decision": "review",
+     "ce_calibrated": true
+    },
+    {
+     "emp_id": "JZ0025",
+     "name": "尹飞",
+     "total": 38.6,
+     "decision": "review",
+     "ce_calibrated": true
+    },
+    {
+     "emp_id": "JZ0013",
+     "name": "何天宇",
+     "total": 38.57,
+     "decision": "review",
+     "ce_calibrated": true
+    }
+   ]
+  },
+  {
+   "job_id": "JOB_B09",
+   "title": "培训与人才发展负责人（教学方向）",
+   "gold_emp_id": "JZ0037",
+   "hit_rate": 0.0,
+   "gold_rank": null,
+   "gold_total": 38.7,
+   "gold_decision": "review",
+   "margin": -11.029999999999994,
+   "hard_negs": [
+    {
+     "emp_id": "JZ0035",
+     "total": 49.73,
+     "decision": "recommend",
+     "seq_mismatch": true
+    },
+    {
+     "emp_id": "JZ0004",
+     "total": 44.15,
+     "decision": "recommend",
+     "seq_mismatch": true
+    },
+    {
+     "emp_id": "JZ0029",
+     "total": 43.77,
+     "decision": "recommend",
+     "seq_mismatch": true
+    }
+   ],
+   "top": [
+    {
+     "emp_id": "JZ0035",
+     "name": "高川",
+     "total": 49.73,
+     "decision": "recommend",
+     "ce_calibrated": true
+    },
+    {
+     "emp_id": "JZ0004",
+     "name": "贺峰",
+     "total": 44.15,
+     "decision": "recommend",
+     "ce_calibrated": true
+    },
+    {
+     "emp_id": "JZ0029",
+     "name": "毛文",
+     "total": 43.77,
+     "decision": "recommend",
+     "ce_calibrated": true
+    },
+    {
+     "emp_id": "JZ0044",
+     "name": "潘恒",
+     "total": 43.53,
+     "decision": "recommend",
+     "ce_calibrated": true
+    },
+    {
+     "emp_id": "JZ0045",
+     "name": "周静",
+     "total": 42.26,
+     "decision": "recommend",
+     "ce_calibrated": true
+    }
+   ]
+  },
+  {
+   "job_id": "JOB_B10",
+   "title": "Java全栈研发负责人（企业应用方向）",
+   "gold_emp_id": "JZ0025",
+   "hit_rate": 1.0,
+   "gold_rank": 2,
+   "gold_total": 39.5,
+   "gold_decision": "review",
+   "margin": -2.1000000000000014,
+   "hard_negs": [
+    {
+     "emp_id": "JZ0004",
+     "total": 41.6,
+     "decision": "recommend",
+     "seq_mismatch": true
+    },
+    {
+     "emp_id": "JZ0013",
+     "total": 39.15,
+     "decision": "review",
+     "seq_mismatch": true
+    },
+    {
+     "emp_id": "JZ0022",
+     "total": 37.93,
+     "decision": "review",
+     "seq_mismatch": true
+    }
+   ],
+   "top": [
+    {
+     "emp_id": "JZ0004",
+     "name": "贺峰",
+     "total": 41.6,
+     "decision": "recommend",
+     "ce_calibrated": true
+    },
+    {
+     "emp_id": "JZ0025",
+     "name": "尹飞",
+     "total": 39.5,
+     "decision": "review",
+     "ce_calibrated": true
+    },
+    {
+     "emp_id": "JZ0013",
+     "name": "何天宇",
+     "total": 39.15,
+     "decision": "review",
+     "ce_calibrated": true
+    },
+    {
+     "emp_id": "JZ0022",
+     "name": "姜宇",
+     "total": 37.93,
+     "decision": "review",
+     "ce_calibrated": true
+    },
+    {
+     "emp_id": "JZ0008",
+     "name": "梁欣然",
+     "total": 36.63,
+     "decision": "review",
+     "ce_calibrated": true
+    }
+   ]
+  }
+ ]
+}

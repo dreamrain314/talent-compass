@@ -1,0 +1,15 @@
+{
+  "_meta": {
+    "purpose": "batch2 新金标映射（pooled margin CI 第二批考卷）：job_id → 金标员工。系统盲搜不知道本文件存在。",
+    "protocol": "与 blind_test_gold.json 同协议；金标 = JD 起草所依据的裁定标签持有人（1 岗 1 人，互不兼任）",
+    "provenance": "映射方向 = 员工裁定标签集 → JD；金标员工身份由起草过程唯一确定，起草未读证据原文（见 blind_gold_jobs_batch2.json _meta.provenance）",
+    "created": "2026-10-22"
+  },
+  "gold": {
+    "JOB_B06": "JZ0009",
+    "JOB_B07": "JZ0006",
+    "JOB_B08": "JZ0029",
+    "JOB_B09": "JZ0037",
+    "JOB_B10": "JZ0025"
+  }
+}
