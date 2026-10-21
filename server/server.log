@@ -1,0 +1,12 @@
+Talent Compass 匹配工作台 → http://127.0.0.1:8082
+ * Serving Flask app 'app'
+ * Debug mode: off
+WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+ * Running on http://127.0.0.1:8082
+Press CTRL+C to quit
+127.0.0.1 - - [21/Oct/2026 18:39:28] "GET /api/state HTTP/1.1" 200 -
+127.0.0.1 - - [21/Oct/2026 18:39:29] "GET / HTTP/1.1" 200 -
+127.0.0.1 - - [21/Oct/2026 18:39:29] "GET /static/style.css HTTP/1.1" 200 -
+127.0.0.1 - - [21/Oct/2026 18:39:29] "GET /static/app.js HTTP/1.1" 200 -
+127.0.0.1 - - [21/Oct/2026 18:39:41] "POST /api/match HTTP/1.1" 400 -
+127.0.0.1 - - [21/Oct/2026 18:39:45] "POST /api/match HTTP/1.1" 400 -

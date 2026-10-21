@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Talent Compass · 人才匹配工作台</title>
+<link rel="stylesheet" href="/static/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧭</text></svg>">
+</head>
+<body>
+<div class="orb orb-a" aria-hidden="true"></div>
+<div class="orb orb-b" aria-hidden="true"></div>
+<div class="orb orb-c" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<nav class="topnav">
+  <div class="nav-pill">
+    <div class="brand">
+      <span class="brand-mark">🧭</span>
+      <div class="brand-text">
+        <strong>Talent Compass</strong>
+        <span>人才匹配工作台</span>
+      </div>
+    </div>
+    <div class="nav-tabs" role="tablist">
+      <button class="nav-tab active" data-view="match" role="tab">岗位匹配</button>
+      <button class="nav-tab" data-view="library" role="tab">员工库</button>
+    </div>
+    <div class="nav-meta" id="navMeta">— 人 · —</div>
+  </div>
+</nav>
+
+<main class="shell">
+  <!-- ═══════════ 岗位匹配视图 ═══════════ -->
+  <section id="view-match" class="view active">
+    <div class="match-grid">
+      <aside class="panel req-panel reveal">
+        <div class="bezel">
+          <div class="panel-head">
+            <span class="eyebrow">MATCH REQUEST</span>
+            <h2>匹配请求</h2>
+            <p class="hint">粘贴岗位职责与任职要求，引擎以向量直配在全员证据中找人。</p>
+          </div>
+          <form id="matchForm">
+            <label class="field">
+              <span>岗位名称</span>
+              <input type="text" id="jobTitle" placeholder="如：质量体系工程师" autocomplete="off">
+            </label>
+            <label class="field">
+              <span>工作职责 <em>每行一条</em></span>
+              <textarea id="jobResp" rows="5" placeholder="负责智能制造平台类项目的全过程质量管控与验收&#10;主导质量管理体系（ISO9001）建设与持续改进"></textarea>
+            </label>
+            <label class="field">
+              <span>任职要求 <em>每行一条</em></span>
+              <textarea id="jobReq" rows="5" placeholder="本科及以上学历，3年及以上相关经验&#10;熟悉质量管理体系与质量工具"></textarea>
+            </label>
+            <div class="field-row">
+              <label class="field inline">
+                <span>展示人数</span>
+                <select id="topK">
+                  <option value="5" selected>Top 5</option>
+                  <option value="10">Top 10</option>
+                  <option value="15">Top 15</option>
+                </select>
+              </label>
+              <button type="submit" class="cta" id="matchBtn">
+                <span class="cta-label">开始匹配</span>
+                <span class="cta-icon">→</span>
+              </button>
+            </div>
+          </form>
+          <div class="gold-strip">
+            <span class="gold-title">示例岗位</span>
+            <div class="gold-chips" id="goldChips"></div>
+          </div>
+        </div>
+      </aside>
+
+      <section class="results-col">
+        <div id="matchEmpty" class="empty-state reveal">
+          <div class="bezel soft">
+            <div class="empty-inner">
+              <div class="empty-glyph">🧭</div>
+              <h3>等待一次匹配请求</h3>
+              <p>左侧输入岗位，或点选示例岗位。结果按固定公式评分：<br>
+              T0 直接技能 50 · T1 语义匹配 30 · T2 行为 10 · T3 潜力 10</p>
+            </div>
+          </div>
+        </div>
+        <div id="matchLoading" class="loading-state hidden">
+          <div class="bezel soft"><div class="loading-inner">
+            <div class="spinner"></div>
+            <p id="loadingText">向量检索中…</p>
+          </div></div>
+        </div>
+        <div id="matchResults" class="hidden">
+          <div class="results-head reveal">
+            <div class="results-title">
+              <span class="eyebrow">MATCH RESULT</span>
+              <h2 id="resultJobTitle"></h2>
+            </div>
+            <div class="results-stats" id="resultStats"></div>
+          </div>
+          <div class="parsed-strip reveal" id="parsedStrip"></div>
+          <div class="card-list" id="cardList"></div>
+        </div>
+      </section>
+    </div>
+  </section>
+
+  <!-- ═══════════ 员工库视图 ═══════════ -->
+  <section id="view-library" class="view">
+    <div class="library-head reveal">
+      <span class="eyebrow">TALENT LIBRARY</span>
+      <h2>员工库</h2>
+      <input type="search" id="empSearch" class="search-box" placeholder="搜索姓名 / 岗位 / 序列…">
+    </div>
+    <div class="emp-grid" id="empGrid"></div>
+  </section>
+</main>
+
+<!-- 溯源弹层 -->
+<div class="modal-mask hidden" id="traceModal">
+  <div class="modal glass">
+    <div class="modal-head">
+      <div>
+        <span class="eyebrow">EVIDENCE TRACE</span>
+        <h3 id="traceTitle">证据溯源</h3>
+      </div>
+      <button class="icon-btn" id="traceClose">✕</button>
+    </div>
+    <div class="modal-body" id="traceBody"></div>
+  </div>
+</div>
+
+<!-- 员工档案抽屉 -->
+<div class="drawer-mask hidden" id="empDrawer">
+  <aside class="drawer glass">
+    <div class="drawer-head">
+      <div id="drawerTitle"></div>
+      <button class="icon-btn" id="drawerClose">✕</button>
+    </div>
+    <div class="drawer-body" id="drawerBody"></div>
+  </aside>
+</div>
+
+<footer class="foot">
+  <span>向量直配 · 固定公式评分 · 零 LLM 评分 · 证据可溯源</span>
+  <span id="footModels"></span>
+</footer>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
