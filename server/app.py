@@ -26,7 +26,7 @@ import config  # noqa: E402
 from agents.job_analysis import _offline_extract, build_queries  # noqa: E402
 from utils.evidence_index import EvidenceIndex, chunk_employee  # noqa: E402
 from utils.label_embedding import load_label_corpus  # noqa: E402
-from utils.match_engine import rank_candidates  # noqa: E402
+from utils.match_engine import display_score, rank_candidates  # noqa: E402
 
 from flask import Flask, jsonify, request, send_from_directory  # noqa: E402
 
@@ -209,6 +209,9 @@ def create_app(employees=None, encode_fn=None, cross_encoder_fn=None) -> Flask:
         for c in candidates:
             counts[c["decision"]] = counts.get(c["decision"], 0) + 1
         profile = ranking.pop("_profile", {})
+        # 展示层金标锚定映射（Phase D）：display_score 只进展示，原始分保留
+        for c in candidates:
+            c["display_score"] = round(display_score(c["scores"]["total"]), 1)
         return jsonify({
             "job": {
                 "job_id": ranking.get("job_id", job["job_id"]),

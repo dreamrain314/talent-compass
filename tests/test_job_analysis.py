@@ -57,6 +57,16 @@ class TestOfflineExtract:
     def test_deterministic(self, job_jd, corpus):
         assert _offline_extract(job_jd, corpus) == _offline_extract(job_jd, corpus)
 
+    def test_single_char_keyword_denoise(self, corpus):
+        """C语言 假阳性修复：关键词 'C' 单字符不再命中「SPC/FMEA」中的 C（2026-10-21 降噪）。"""
+        job = {
+            "job_id": "J", "title": "质量体系工程师",
+            "responsibilities": ["负责质量管控与体系审核"],
+            "requirements": ["熟悉质量工具（SPC/FMEA/8D）"],
+        }
+        profile = _offline_extract(job, corpus)
+        assert "C语言" not in [s["name"] for s in profile["skill_requirements"]]
+
 
 class TestValidateLLMProfile:
     def test_valid(self):

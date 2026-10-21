@@ -105,17 +105,19 @@ def _offline_extract(job: dict, corpus: list[dict]) -> dict:
             score += 3
             matched.append(name)
         for kw in item.get("keywords", []) or []:
-            if kw and kw in text:
+            # 单字符关键词排除（2026-10-21 降噪）：'C' 在「SPC/FMEA」中假阳性命中，
+            # 曾致质量岗 JD 解析出「C语言」撑大 T0 分母（反事实模拟 V1 判定依据）
+            if kw and len(str(kw)) >= 2 and kw in text:
                 score += 1
                 matched.append(kw)
-            if score > 0:
-                detail = "、".join(dict.fromkeys(matched)) if matched else item.get("definition", "")[:40]
-                scored.append({
-                    "name": name,
-                    "detail": detail,
-                    "tier": item.get("tier", ""),
-                    "_score": score,
-                })
+        if score > 0:
+            detail = "、".join(dict.fromkeys(matched)) if matched else item.get("definition", "")[:40]
+            scored.append({
+                "name": name,
+                "detail": detail,
+                "tier": item.get("tier", ""),
+                "_score": score,
+            })
     scored.sort(key=lambda x: -x["_score"])
     # 同名去重（保留最高分项）：标签库与 T0 注册表可能产出同名项，
     # 重复项会撑大 T0 分母并让字面层失去区分度（2026-10-21 修复）

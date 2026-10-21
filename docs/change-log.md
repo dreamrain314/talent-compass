@@ -1309,3 +1309,39 @@ training: 400 ✅ | eval360: 2500 ✅
 - 根因②：导航胶囊窄屏未禁换行（「岗位匹配」竖排、导航超高粘住遮内容）→ 700px 断点紧凑化（nowrap/隐藏 nav-meta/全宽按钮）
 - 根因③：候选卡顶部 score-box `flex:1 1 auto` 抢宽致名字/元信息竖排 → `flex:0 0 auto` 收缩
 - 验证：IAB 390×844 视口逐屏截图（首页/结果页/员工库）通过
+
+---
+
+## [AWAITING_VERIFY] 2026-10-21（深夜）— 评分体系证据驱动升级（V2a 新基线，Kimi 修订版采纳）
+
+### 背景
+用户问「金标最高分才 40 多是判分太严还是真不对口」→ 只读诊断拆出 T0 词表错配税 + 解析噪声 + 区分度薄（金标 vs 碰词人 margin 0.5 分）三层。Kimi/DS 修订版建议（证据先行/密度分/闸门升级/金标锚定展示）经探索验证后采纳，其中「250 对真值在生成元数据里」被证伪（生成器无 suitability 字段且职位陷阱是故意设计），降级为弱标签诊断。
+
+### Phase A 反事实模拟台（`scripts/counterfactual_sim.py`，只读先行）
+5 岗位 × 50 人分量矩阵 + 记录级命中明细，模拟 7 变体。**判定（预注册规则）**：采纳 V2a = 解析降噪 + T0 密度 D2；**否决权重再平衡**（B03 margin 6.05→2.38 恶化——证据否决先验）；别名补丁 margin 中性（硬负例同样命中），以语义正确性采纳。报告 `docs/reports/counterfactual_sim_20261021.md`。
+
+### Phase B 实施
+| 文件 | 变更 |
+|------|------|
+| `agents/job_analysis.py` | 单字符关键词排除（修 C语言假阳性：'C' 命中 SPC 中的 C） |
+| `utils/match_engine.py` | T0 重写为密度 D2（term 命中去重记录数 r：0.6+0.4·min(r-1,2)/2，单记录碰词降权、多源印证封顶）；JD 侧受控别名表 `data/jobs/alias_patches.json`（4 对，逐对归因）；`display_score()` 分段线性金标锚定 |
+| `config.py` | T0_DENSITY_* 常量 + TC_T0_BINARY 回退开关 + MATCH_DISPLAY_ANCHORS + 阈值重标 |
+| `scripts/blind_test.py` | 验收升级：金标 margin vs 最硬负例 + bootstrap CI + 金标排名 ≤3 + 金标 ≥ 推荐线+2 分 + 序列错配者禁入 recommend 档（初版「硬负例无 recommend」在 B04/B05 干扰对设计下不成立，修正语义）+ `--ab-compare`/`--out-json` |
+| `server/app.py` + `static/app.js` | display_score 注入与渲染（tooltip 保留原始分） |
+
+### V2a 盲测结果（3-run，`blind_test_results.json`）
+- **命中率 5/5、确定性 PASS、验收断言 4/4 PASS**
+- 金标排名 **[1,1,1,3,3]**（V0 期 [2,2,1,5,1]）；B01 margin **-4.81→+4.4 转正**；B02 +0.9；B03 +5.3；B04/B05 为高相似干扰对金标第 3（margin -3.0/-2.7，双双 recommend 属预期行为）
+- margin mean +0.99，bootstrap CI [-2.10, +4.08]（n=5，方向参考）
+
+### 阈值重标
+REJECT 0.32→0.35（V2a 全员 P80）、REVIEW 0.45→0.40（金标带下沿 0.426 减 2 分余量，实测 5 金标余量 2.2-10.2 分）。
+
+### 统计效力边界（诚实声明）
+n=5 岗位 CI 宽，方向一致性为主；密度参数（0.6/0.4/2）为预注册初值，真实数据需重验；硬负例由 V0 排名定义存在选择偏差。
+
+### 验证
+- [x] pytest 全量 553/553（+5：密度/别名/降噪/展示映射）
+- [x] 盲测 3-run 5/5 + 验收断言 PASS + A/B 基线落盘
+- [x] display_score 端到端（API + 前端 tooltip）
+- [ ] 独立对抗审查（转 [VERIFIED] 前置）

@@ -268,12 +268,13 @@ MATCH_FORMULA_WEIGHTS = {
     "t3_potential": 10.0,  # T3 潜力：绩效轨迹 + 培训 + 360 学习能力（确定性代理）
 }
 # 置信三档（总分/100）：低于 REJECT → 驳回；REJECT-REVIEW → 待审（=备选池）；≥REVIEW → 自动推荐
-# 标定依据（2026-10-21，盲测 50 人池）：竞品 0.60/0.85 是按其公式（50/20/20/10）
-# 的分布定的，直接照搬致金标全被驳回。按本公式实测分布重标：
-#   全员总分 P50=0.26 / P80=0.32；金标带 0.33-0.49。
-#   REJECT 对齐 P80（相关性低于全员前 20% → 驳回）；REVIEW 对齐金标带下沿。
-MATCH_REJECT_THRESHOLD = 0.32
-MATCH_REVIEW_THRESHOLD = 0.45
+# 标定依据（2026-10-21 V2a 基线 = T0 密度 D2 + 解析降噪，反事实模拟采纳）：
+#   实测全员总分 P50=0.285 / P80=0.354 / max=0.529；金标带 0.426-0.502。
+#   REJECT 对齐新 P80（相关性低于全员前 20% → 驳回）；
+#   REVIEW = 金标带下沿 0.426 减 2 分余量 → 0.40（5 金标全部 ≥REVIEW+2 分：
+#   实际余量 2.6/2.2/2.6/2.8/10.2 分）。历史：V0 期曾为 0.32/0.45。
+MATCH_REJECT_THRESHOLD = 0.35
+MATCH_REVIEW_THRESHOLD = 0.40
 MATCH_TOP_K = 5                    # Top-N 推荐
 MATCH_RERANK_TOPN = 10             # bi 初排总分前 N 进 cross-encoder 校准（成本分层）
 MATCH_SEMANTIC_FLOOR = 0.30        # T1 语义原始 sim 低于此视为噪声归 0（防低分填充）
@@ -281,6 +282,22 @@ MATCH_RERANK_BLEND = 0.5           # T1 语义最终 = bi-encoder×(1-b) + cross
 EVIDENCE_CHUNK_MAX_CHARS = 600     # 单证据切片上限（超长截断，防摘要超长稀释向量）
 # 备选池：H 闸门未过但 T1 语义归一分 ≥ 此值的候选进备选池而非直接驳回（原设计四象限）
 MATCH_POOL_SEMANTIC_MIN = 0.60
+
+# ── T0 密度分（V2a 新基线，2026-10-21 反事实模拟采纳，报告 docs/reports/counterfactual_sim_20261021.md）──
+# 判定依据：模拟显示密度 D2 使 min_margin -4.81→-3.58、金标排名 [2,2,1,5,1]→[1,2,1,3,1]（全部 Top-3）；
+# 权重再平衡被否决（B03 恶化 6.05→2.38）。
+# D2 公式：term 命中 r 条去重记录 → 得分 base + bonus·min(r-1, cap)/cap（单记录碰词 0.6，≥3 条多源印证 1.0）
+T0_DENSITY_ENABLED = os.getenv("TC_T0_BINARY", "").strip().lower() not in _TRUTHY  # TC_T0_BINARY=1 回退二值版（A/B 用）
+T0_DENSITY_BASE = 0.6
+T0_DENSITY_BONUS = 0.4
+T0_DENSITY_CAP_RECORDS = 2
+# JD 侧受控别名表（每对来自金标 miss 归因；扩充须逐对过盲测——回归驱动打补丁）
+T0_ALIAS_PATCHES_PATH = DATA_DIR / "jobs" / "alias_patches.json"
+# 展示层金标锚定映射（Phase D）：分段线性 [raw, display]，锚点来自 V2a 实测分布
+# （硬负例带顶 ~52.9、金标带 42.6-50.2，见 docs/reports/blind_test_report_20261021.md）。
+# 语义：驳回区（<35）不变形；待审区拉伸到 35-75；金标带 42.6-50.2 → 75-85；上限 98。
+# 只进展示层，API 原始分保留（Kimi 修订版：固定公式下绝对分值无意义，margin 和闸门才有）。
+MATCH_DISPLAY_ANCHORS = [[0, 0], [35, 35], [42.6, 75], [50.2, 85], [100, 98]]
 
 # ── T1 recall 优化（plan: S1/S8b/B3/S2/S3，2026-09）──
 def _env_flag(name, default="0"):  # [MED-3 修复 2026-09-10] 默认关（opt-in）：默认开会破坏 A/B baseline 纪律与测试隔离

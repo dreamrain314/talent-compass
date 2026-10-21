@@ -1,0 +1,905 @@
+{
+ "V0": {
+  "label": "现行基线（binary t0_v0, W0）",
+  "per_job": {
+   "JOB_B01": {
+    "gold_total": 39.68,
+    "gold_rank": 2,
+    "top_hard_neg": [
+     {
+      "emp": "JZ0022",
+      "total": 44.49,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0013",
+      "total": 39.38,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0038",
+      "total": 39.19,
+      "seq_mismatch": true
+     }
+    ],
+    "margin": -4.81,
+    "seq_mismatch_in_top10": "JZ0038"
+   },
+   "JOB_B02": {
+    "gold_total": 41.68,
+    "gold_rank": 2,
+    "top_hard_neg": [
+     {
+      "emp": "JZ0020",
+      "total": 42.04,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0001",
+      "total": 40.8,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0013",
+      "total": 40.73,
+      "seq_mismatch": false
+     }
+    ],
+    "margin": -0.36,
+    "seq_mismatch_in_top10": "JZ0042"
+   },
+   "JOB_B03": {
+    "gold_total": 49.02,
+    "gold_rank": 1,
+    "top_hard_neg": [
+     {
+      "emp": "JZ0013",
+      "total": 42.97,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0022",
+      "total": 41.72,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0025",
+      "total": 39.32,
+      "seq_mismatch": false
+     }
+    ],
+    "margin": 6.05,
+    "seq_mismatch_in_top10": "JZ0050"
+   },
+   "JOB_B04": {
+    "gold_total": 39.48,
+    "gold_rank": 5,
+    "top_hard_neg": [
+     {
+      "emp": "JZ0030",
+      "total": 43.61,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0044",
+      "total": 40.54,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0050",
+      "total": 40.04,
+      "seq_mismatch": false
+     }
+    ],
+    "margin": -4.13,
+    "seq_mismatch_in_top10": "JZ0013"
+   },
+   "JOB_B05": {
+    "gold_total": 46.06,
+    "gold_rank": 1,
+    "top_hard_neg": [
+     {
+      "emp": "JZ0044",
+      "total": 38.58,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0039",
+      "total": 38.35,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0035",
+      "total": 37.82,
+      "seq_mismatch": false
+     }
+    ],
+    "margin": 7.48,
+    "seq_mismatch_in_top10": "JZ0025"
+   }
+  },
+  "min_margin": -4.81,
+  "mean_margin": 0.85,
+  "gold_ranks": [
+   2,
+   2,
+   1,
+   5,
+   1
+  ]
+ },
+ "V1": {
+  "label": "+解析降噪（t0_v1, W0）",
+  "per_job": {
+   "JOB_B01": {
+    "gold_total": 47.32,
+    "gold_rank": 1,
+    "top_hard_neg": [
+     {
+      "emp": "JZ0022",
+      "total": 46.58,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0012",
+      "total": 42.11,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0003",
+      "total": 41.91,
+      "seq_mismatch": false
+     }
+    ],
+    "margin": 0.75,
+    "seq_mismatch_in_top10": "JZ0038"
+   },
+   "JOB_B02": {
+    "gold_total": 54.18,
+    "gold_rank": 1,
+    "top_hard_neg": [
+     {
+      "emp": "JZ0001",
+      "total": 53.3,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0020",
+      "total": 42.04,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0012",
+      "total": 41.0,
+      "seq_mismatch": false
+     }
+    ],
+    "margin": 0.88,
+    "seq_mismatch_in_top10": "JZ0042"
+   },
+   "JOB_B03": {
+    "gold_total": 50.32,
+    "gold_rank": 1,
+    "top_hard_neg": [
+     {
+      "emp": "JZ0013",
+      "total": 46.87,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0022",
+      "total": 45.61,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0025",
+      "total": 42.24,
+      "seq_mismatch": false
+     }
+    ],
+    "margin": 3.45,
+    "seq_mismatch_in_top10": "JZ0050"
+   },
+   "JOB_B04": {
+    "gold_total": 53.37,
+    "gold_rank": 3,
+    "top_hard_neg": [
+     {
+      "emp": "JZ0030",
+      "total": 58.2,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0044",
+      "total": 54.43,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0032",
+      "total": 51.73,
+      "seq_mismatch": false
+     }
+    ],
+    "margin": -4.83,
+    "seq_mismatch_in_top10": null
+   },
+   "JOB_B05": {
+    "gold_total": 59.4,
+    "gold_rank": 2,
+    "top_hard_neg": [
+     {
+      "emp": "JZ0044",
+      "total": 60.25,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0033",
+      "total": 58.87,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0030",
+      "total": 57.56,
+      "seq_mismatch": false
+     }
+    ],
+    "margin": -0.85,
+    "seq_mismatch_in_top10": null
+   }
+  },
+  "min_margin": -4.83,
+  "mean_margin": -0.12,
+  "gold_ranks": [
+   1,
+   1,
+   1,
+   3,
+   2
+  ]
+ },
+ "V2a": {
+  "label": "V1+密度D2（单命中降权）",
+  "per_job": {
+   "JOB_B01": {
+    "gold_total": 41.07,
+    "gold_rank": 1,
+    "top_hard_neg": [
+     {
+      "emp": "JZ0022",
+      "total": 40.33,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0012",
+      "total": 39.61,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0013",
+      "total": 38.27,
+      "seq_mismatch": false
+     }
+    ],
+    "margin": 0.75,
+    "seq_mismatch_in_top10": "JZ0038"
+   },
+   "JOB_B02": {
+    "gold_total": 51.68,
+    "gold_rank": 2,
+    "top_hard_neg": [
+     {
+      "emp": "JZ0020",
+      "total": 52.04,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0021",
+      "total": 49.47,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0014",
+      "total": 46.55,
+      "seq_mismatch": false
+     }
+    ],
+    "margin": -0.36,
+    "seq_mismatch_in_top10": null
+   },
+   "JOB_B03": {
+    "gold_total": 45.77,
+    "gold_rank": 1,
+    "top_hard_neg": [
+     {
+      "emp": "JZ0013",
+      "total": 42.32,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0020",
+      "total": 40.17,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0022",
+      "total": 38.34,
+      "seq_mismatch": false
+     }
+    ],
+    "margin": 3.45,
+    "seq_mismatch_in_top10": null
+   },
+   "JOB_B04": {
+    "gold_total": 45.87,
+    "gold_rank": 3,
+    "top_hard_neg": [
+     {
+      "emp": "JZ0030",
+      "total": 49.45,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0044",
+      "total": 48.18,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0026",
+      "total": 45.67,
+      "seq_mismatch": false
+     }
+    ],
+    "margin": -3.58,
+    "seq_mismatch_in_top10": null
+   },
+   "JOB_B05": {
+    "gold_total": 55.4,
+    "gold_rank": 1,
+    "top_hard_neg": [
+     {
+      "emp": "JZ0044",
+      "total": 52.25,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0026",
+      "total": 50.23,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0030",
+      "total": 49.56,
+      "seq_mismatch": false
+     }
+    ],
+    "margin": 3.15,
+    "seq_mismatch_in_top10": null
+   }
+  },
+  "min_margin": -3.58,
+  "mean_margin": 0.68,
+  "gold_ranks": [
+   1,
+   2,
+   1,
+   3,
+   1
+  ]
+ },
+ "V2b": {
+  "label": "V1+密度D3（记录数封顶）",
+  "per_job": {
+   "JOB_B01": {
+    "gold_total": 41.07,
+    "gold_rank": 2,
+    "top_hard_neg": [
+     {
+      "emp": "JZ0012",
+      "total": 42.11,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0022",
+      "total": 40.33,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0003",
+      "total": 38.79,
+      "seq_mismatch": false
+     }
+    ],
+    "margin": -1.04,
+    "seq_mismatch_in_top10": "JZ0038"
+   },
+   "JOB_B02": {
+    "gold_total": 54.18,
+    "gold_rank": 2,
+    "top_hard_neg": [
+     {
+      "emp": "JZ0020",
+      "total": 54.54,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0021",
+      "total": 51.97,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0014",
+      "total": 51.55,
+      "seq_mismatch": false
+     }
+    ],
+    "margin": -0.36,
+    "seq_mismatch_in_top10": null
+   },
+   "JOB_B03": {
+    "gold_total": 48.04,
+    "gold_rank": 1,
+    "top_hard_neg": [
+     {
+      "emp": "JZ0013",
+      "total": 42.32,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0020",
+      "total": 40.62,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0003",
+      "total": 38.41,
+      "seq_mismatch": false
+     }
+    ],
+    "margin": 5.72,
+    "seq_mismatch_in_top10": null
+   },
+   "JOB_B04": {
+    "gold_total": 47.12,
+    "gold_rank": 3,
+    "top_hard_neg": [
+     {
+      "emp": "JZ0030",
+      "total": 51.95,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0044",
+      "total": 48.18,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0027",
+      "total": 45.16,
+      "seq_mismatch": false
+     }
+    ],
+    "margin": -4.83,
+    "seq_mismatch_in_top10": null
+   },
+   "JOB_B05": {
+    "gold_total": 54.4,
+    "gold_rank": 1,
+    "top_hard_neg": [
+     {
+      "emp": "JZ0030",
+      "total": 52.56,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0044",
+      "total": 50.25,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0026",
+      "total": 50.23,
+      "seq_mismatch": false
+     }
+    ],
+    "margin": 1.83,
+    "seq_mismatch_in_top10": null
+   }
+  },
+  "min_margin": -4.83,
+  "mean_margin": 0.26,
+  "gold_ranks": [
+   2,
+   2,
+   1,
+   3,
+   1
+  ]
+ },
+ "V3": {
+  "label": "V1+权重再平衡（35/45/10/10）",
+  "per_job": {
+   "JOB_B01": {
+    "gold_total": 49.18,
+    "gold_rank": 1,
+    "top_hard_neg": [
+     {
+      "emp": "JZ0022",
+      "total": 48.85,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0012",
+      "total": 45.52,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0003",
+      "total": 45.47,
+      "seq_mismatch": false
+     }
+    ],
+    "margin": 0.33,
+    "seq_mismatch_in_top10": "JZ0038"
+   },
+   "JOB_B02": {
+    "gold_total": 53.86,
+    "gold_rank": 1,
+    "top_hard_neg": [
+     {
+      "emp": "JZ0001",
+      "total": 53.15,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0020",
+      "total": 45.87,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0013",
+      "total": 44.47,
+      "seq_mismatch": false
+     }
+    ],
+    "margin": 0.72,
+    "seq_mismatch_in_top10": "JZ0042"
+   },
+   "JOB_B03": {
+    "gold_total": 51.49,
+    "gold_rank": 1,
+    "top_hard_neg": [
+     {
+      "emp": "JZ0013",
+      "total": 49.12,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0022",
+      "total": 47.86,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0025",
+      "total": 45.71,
+      "seq_mismatch": false
+     }
+    ],
+    "margin": 2.38,
+    "seq_mismatch_in_top10": "JZ0050"
+   },
+   "JOB_B04": {
+    "gold_total": 53.55,
+    "gold_rank": 3,
+    "top_hard_neg": [
+     {
+      "emp": "JZ0030",
+      "total": 56.53,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0044",
+      "total": 54.47,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0032",
+      "total": 52.15,
+      "seq_mismatch": false
+     }
+    ],
+    "margin": -2.98,
+    "seq_mismatch_in_top10": null
+   },
+   "JOB_B05": {
+    "gold_total": 58.43,
+    "gold_rank": 2,
+    "top_hard_neg": [
+     {
+      "emp": "JZ0044",
+      "total": 59.19,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0033",
+      "total": 57.8,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0030",
+      "total": 56.58,
+      "seq_mismatch": false
+     }
+    ],
+    "margin": -0.77,
+    "seq_mismatch_in_top10": null
+   }
+  },
+  "min_margin": -2.98,
+  "mean_margin": -0.06,
+  "gold_ranks": [
+   1,
+   1,
+   1,
+   3,
+   2
+  ]
+ },
+ "V4": {
+  "label": "V1+密度D2+再平衡",
+  "per_job": {
+   "JOB_B01": {
+    "gold_total": 44.81,
+    "gold_rank": 1,
+    "top_hard_neg": [
+     {
+      "emp": "JZ0022",
+      "total": 44.47,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0012",
+      "total": 43.77,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0003",
+      "total": 42.85,
+      "seq_mismatch": false
+     }
+    ],
+    "margin": 0.33,
+    "seq_mismatch_in_top10": "JZ0038"
+   },
+   "JOB_B02": {
+    "gold_total": 52.11,
+    "gold_rank": 2,
+    "top_hard_neg": [
+     {
+      "emp": "JZ0020",
+      "total": 52.87,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0021",
+      "total": 50.2,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0001",
+      "total": 47.9,
+      "seq_mismatch": false
+     }
+    ],
+    "margin": -0.75,
+    "seq_mismatch_in_top10": null
+   },
+   "JOB_B03": {
+    "gold_total": 48.31,
+    "gold_rank": 1,
+    "top_hard_neg": [
+     {
+      "emp": "JZ0013",
+      "total": 45.94,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0020",
+      "total": 44.34,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0022",
+      "total": 42.77,
+      "seq_mismatch": false
+     }
+    ],
+    "margin": 2.38,
+    "seq_mismatch_in_top10": null
+   },
+   "JOB_B04": {
+    "gold_total": 48.3,
+    "gold_rank": 5,
+    "top_hard_neg": [
+     {
+      "emp": "JZ0030",
+      "total": 50.4,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0044",
+      "total": 50.09,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0026",
+      "total": 48.59,
+      "seq_mismatch": false
+     }
+    ],
+    "margin": -2.1,
+    "seq_mismatch_in_top10": null
+   },
+   "JOB_B05": {
+    "gold_total": 55.63,
+    "gold_rank": 1,
+    "top_hard_neg": [
+     {
+      "emp": "JZ0044",
+      "total": 53.59,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0026",
+      "total": 52.43,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0045",
+      "total": 51.41,
+      "seq_mismatch": false
+     }
+    ],
+    "margin": 2.03,
+    "seq_mismatch_in_top10": null
+   }
+  },
+  "min_margin": -2.1,
+  "mean_margin": 0.38,
+  "gold_ranks": [
+   1,
+   2,
+   1,
+   5,
+   1
+  ]
+ },
+ "V5": {
+  "label": "V1+别名补丁（W0）",
+  "per_job": {
+   "JOB_B01": {
+    "gold_total": 47.32,
+    "gold_rank": 1,
+    "top_hard_neg": [
+     {
+      "emp": "JZ0022",
+      "total": 46.58,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0012",
+      "total": 42.11,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0003",
+      "total": 41.91,
+      "seq_mismatch": false
+     }
+    ],
+    "margin": 0.75,
+    "seq_mismatch_in_top10": "JZ0038"
+   },
+   "JOB_B02": {
+    "gold_total": 54.18,
+    "gold_rank": 1,
+    "top_hard_neg": [
+     {
+      "emp": "JZ0001",
+      "total": 53.3,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0020",
+      "total": 42.04,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0012",
+      "total": 41.0,
+      "seq_mismatch": false
+     }
+    ],
+    "margin": 0.88,
+    "seq_mismatch_in_top10": "JZ0042"
+   },
+   "JOB_B03": {
+    "gold_total": 50.32,
+    "gold_rank": 1,
+    "top_hard_neg": [
+     {
+      "emp": "JZ0013",
+      "total": 46.87,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0022",
+      "total": 45.61,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0025",
+      "total": 42.24,
+      "seq_mismatch": false
+     }
+    ],
+    "margin": 3.45,
+    "seq_mismatch_in_top10": "JZ0050"
+   },
+   "JOB_B04": {
+    "gold_total": 53.37,
+    "gold_rank": 3,
+    "top_hard_neg": [
+     {
+      "emp": "JZ0030",
+      "total": 58.2,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0044",
+      "total": 54.43,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0032",
+      "total": 51.73,
+      "seq_mismatch": false
+     }
+    ],
+    "margin": -4.83,
+    "seq_mismatch_in_top10": null
+   },
+   "JOB_B05": {
+    "gold_total": 59.4,
+    "gold_rank": 2,
+    "top_hard_neg": [
+     {
+      "emp": "JZ0044",
+      "total": 60.25,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0033",
+      "total": 58.87,
+      "seq_mismatch": false
+     },
+     {
+      "emp": "JZ0030",
+      "total": 57.56,
+      "seq_mismatch": false
+     }
+    ],
+    "margin": -0.85,
+    "seq_mismatch_in_top10": null
+   }
+  },
+  "min_margin": -4.83,
+  "mean_margin": -0.12,
+  "gold_ranks": [
+   1,
+   1,
+   1,
+   3,
+   2
+  ]
+ }
+}

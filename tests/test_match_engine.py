@@ -14,11 +14,31 @@ from utils.evidence_index import EvidenceIndex
 from utils.match_engine import (
     calibrate_t1_with_ce,
     check_hard_gate,
+    display_score,
     rank_candidates,
     score_t0_direct,
     score_t2_behavior,
     score_t3_potential,
 )
+
+
+class TestDisplayScore:
+    """展示层金标锚定映射（Phase D）：分段线性，排序不变。"""
+
+    def test_anchors(self):
+        assert display_score(0) == 0
+        assert display_score(35) == 35          # 驳回区不变形
+        assert display_score(42.6) == pytest.approx(75)   # 金标带下沿
+        assert display_score(50.2) == pytest.approx(85)   # 金标带上沿
+        assert display_score(100) == 98          # 上限
+        assert display_score(120) == 98          # 超界钳制
+
+    def test_monotonic_and_identity_below_reject(self):
+        raws = [i * 2.5 for i in range(41)]  # 0..100
+        disp = [display_score(r) for r in raws]
+        assert all(d2 >= d1 - 1e-9 for d1, d2 in zip(disp, disp[1:]))
+        # 驳回区（<35）恒等
+        assert all(display_score(r) == r for r in (0, 10, 20, 34.9))
 
 
 DIM = 64
@@ -137,25 +157,52 @@ class TestT0:
         assert "高级会计师" in hits
 
     def test_normalization_space(self, emp_quality):
-        """「Power BI」JD 写法 vs 员工证据「PowerBI」：归一化后命中。"""
+        """「Power BI」JD 写法 vs 员工证据「PowerBI」：归一化后命中（密度 D2 单记录 0.6）。"""
         emp_quality["projects"].append(
             {"project_name": "人力平台", "role": "开发", "tools": ["PowerBI"],
              "description": "报表开发"})
         job = {"skill_requirements": [{"name": "Power BI", "detail": ""}],
                "hard_requirements": {"certificates": []}}
         score, hits = score_t0_direct(job, emp_quality)
-        assert hits == ["Power BI"] and score == 1.0
+        assert hits == ["Power BI"] and score == pytest.approx(0.6)
 
-    def test_synonym_not_literal_miss(self, emp_quality):
-        """同义改写（人力资源管理 ↔ 人力资源数字化平台）不算字面命中——
-        分层各司其职：字面层管精确，同义交给 T1 语义层（2026-10-21 标定）。"""
+    def test_synonym_via_alias_patch(self, emp_quality):
+        """同义改写经受控别名表命中（人力资源管理↔人力资源，JD 侧回归补丁）。
+        无别名时代此项不命中——别名是显式资产而非隐式放宽（2026-10-21 V2a）。"""
         emp_quality["projects"].append(
             {"project_name": "人力资源数字化平台", "role": "执行人",
              "tools": [], "description": "流程优化"})
         job = {"skill_requirements": [{"name": "人力资源管理", "detail": ""}],
                "hard_requirements": {"certificates": []}}
         score, hits = score_t0_direct(job, emp_quality)
-        assert hits == [] and score == 0.0
+        assert hits == ["人力资源管理"] and score == pytest.approx(0.6)
+
+    def test_density_multi_record_bonus(self, emp_quality):
+        """同一 term 多记录印证 → 密度升档（单记录 0.6，3 条封顶 1.0）。"""
+        emp_quality["projects"].append(
+            {"project_name": "质量工程平台二期", "role": "负责人",
+             "tools": [], "description": "质量工程体系落地"})
+        emp_quality["training"].append(
+            {"course_name": "质量工程高级研修", "status": "已完成", "score": 88})
+        job = {"skill_requirements": [{"name": "质量工程", "detail": ""}],
+               "hard_requirements": {"certificates": []}}
+        score, hits = score_t0_direct(job, emp_quality)
+        # 岗位记录 + 项目记录 + 培训记录 = 3 条 → 封顶 1.0
+        assert hits == ["质量工程"] and score == pytest.approx(1.0)
+
+    def test_binary_fallback_env(self, emp_quality, monkeypatch):
+        """TC_T0_BINARY=1 回退二值版（A/B 用）。"""
+        monkeypatch.setenv("TC_T0_BINARY", "1")
+        import importlib
+        import config as cfg
+        importlib.reload(cfg)
+        import utils.match_engine as me
+        job = {"skill_requirements": [{"name": "质量工程", "detail": ""}],
+               "hard_requirements": {"certificates": []}}
+        score, hits = score_t0_direct(job, emp_quality)
+        assert score == 1.0 and hits == ["质量工程"]
+        monkeypatch.delenv("TC_T0_BINARY")
+        importlib.reload(cfg)
 
     def test_duplicate_names_deduped(self, emp_quality):
         """同名 skill 项重复不撑大分母（上游去重失效时的引擎侧兜底）。"""
@@ -165,7 +212,7 @@ class TestT0:
             {"name": "智能制造", "detail": ""},
         ], "hard_requirements": {"certificates": []}}
         score, hits = score_t0_direct(job, emp_quality)
-        assert len(hits) <= 2 and score in (0.0, 0.5, 1.0)  # 分母=2 去重后
+        assert len(hits) <= 2 and score == pytest.approx(0.6)  # 分母=2 去重后，各单记录命中
 
     def test_keyword_miss_no_bridge(self, emp_quality):
         """name 不在证据 → 不命中（不放宽为部分子串）。"""

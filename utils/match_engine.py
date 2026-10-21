@@ -17,12 +17,14 @@
 
 from __future__ import annotations
 
+import json
 import math
+from pathlib import Path
 
 import numpy as np
 
 import config
-from utils.evidence_index import EvidenceIndex
+from utils.evidence_index import EvidenceIndex, chunk_employee
 
 __all__ = [
     "check_hard_gate",
@@ -87,15 +89,42 @@ def _norm_literal(s: str) -> str:
     return "".join(str(s).lower().split())
 
 
-# ── T0 直接技能（字面命中，50 分）───────────────────────────────
-def score_t0_direct(job_profile: dict, employee: dict) -> tuple[float, list[str]]:
-    """技能要求名 + 必备证书 在员工岗位/培训/项目证据中的字面命中率。
+# JD 侧受控别名表（模块级懒加载；data/jobs/alias_patches.json，逐对过盲测的回归补丁）
+_alias_patches: dict | None = None
 
-    命中判定：归一化（去空白/大小写：PowerBI ↔ Power BI）后的全子串。
-    2026-10-21 标定记录：① 不拆 detail 关键词入分母（分母膨胀失真）；
-    ② 不用标签库 keywords 桥接（泛化 kw 令全员 t0≈0.92+，失去区分度，
-    排名被 T2/T3 接管）——字面层只管精确命中，同义改写（人力资源管理 ↔
-    人力资源数字化平台、法务审计 ↔ 合规审计）交给 T1 语义层区分。
+
+def _load_alias_patches() -> dict:
+    global _alias_patches
+    if _alias_patches is None:
+        path = getattr(config, "T0_ALIAS_PATCHES_PATH", None)
+        try:
+            data = json.loads(Path(path).read_text(encoding="utf-8")) if path and Path(path).exists() else {}
+            _alias_patches = data.get("aliases", {}) or {}
+        except Exception:
+            _alias_patches = {}
+    return _alias_patches
+
+
+def _term_hits_record(term: str, record_norm: str) -> bool:
+    """term 是否命中一条记录：name 归一化子串 或 任一受控别名命中。"""
+    t_norm = _norm_literal(term)
+    if t_norm and t_norm in record_norm:
+        return True
+    aliases = _load_alias_patches().get(term, [])
+    return any(_norm_literal(a) and _norm_literal(a) in record_norm for a in aliases)
+
+
+# ── T0 直接技能（50 分）─────────────────────────────────────────
+def score_t0_direct(job_profile: dict, employee: dict) -> tuple[float, list[str]]:
+    """技能要求名 + 必备证书 的「去重记录密度」评分（V2a 新基线，2026-10-21）。
+
+    反事实模拟判定（docs/reports/counterfactual_sim_20261021.md）：
+    - D2 密度（单记录碰词 0.6，多源印证封顶 1.0）使 min_margin -4.81→-3.58、
+      金标排名 [2,2,1,5,1]→[1,2,1,3,1]——直接打击「单条记录偶发碰词」
+      （罗浩型），金标的多源印证（绩效/项目/培训反复命中）几乎不动
+    - 分母只取 skill name + 必备证书（detail 拆词曾致分母膨胀失真）
+    - 命中判定含 JD 侧受控别名（物联网↔IoT 等，margin 中性、语义正确性）
+    - TC_T0_BINARY=1 可回退二值版（A/B 用）
 
     Returns:
         (score01, hit_terms)：score01∈[0,1]，无要求项 → 0.5（中性分）。
@@ -113,9 +142,32 @@ def score_t0_direct(job_profile: dict, employee: dict) -> tuple[float, list[str]
     if not terms:
         return 0.5, []
 
-    pool_norm = _norm_literal(_employee_t0_pool(employee))
-    hits = [t for t in terms if _norm_literal(t) in pool_norm]
-    return len(hits) / len(terms), hits
+    records = [_norm_literal(c["text"]) for c in chunk_employee(employee)
+               if c["source"] in _T0_SOURCES]
+    # 结构化证书行不在 chunk 里（certificates="无" 被排除时），补一条
+    structured = employee.get("structured") or {}
+    certs_field = str(structured.get("certificates") or "")
+    if certs_field and certs_field != "无":
+        records.append(_norm_literal(certs_field))
+
+    hits: list[str] = []
+    vals: list[float] = []
+    for t in terms:
+        r = sum(1 for rec in records if _term_hits_record(t, rec))
+        if r > 0:
+            hits.append(t)
+        if config.T0_DENSITY_ENABLED:
+            vals.append(
+                0.0 if r == 0 else min(
+                    1.0,
+                    config.T0_DENSITY_BASE
+                    + config.T0_DENSITY_BONUS * min(r - 1, config.T0_DENSITY_CAP_RECORDS)
+                    / config.T0_DENSITY_CAP_RECORDS,
+                )
+            )
+        else:
+            vals.append(1.0 if r > 0 else 0.0)
+    return min(1.0, sum(vals) / len(terms)), hits
 
 
 # ── T1 语义匹配（30 分）─────────────────────────────────────────
@@ -161,6 +213,30 @@ def _sigmoid(x: float) -> float:
         return 1.0 / (1.0 + math.exp(-min(x, 30.0)))
     z = math.exp(max(x, -30.0))
     return z / (1.0 + z)
+
+
+def display_score(raw_total: float) -> float:
+    """展示层金标锚定映射（Phase D）：把公式原始分映射到直觉刻度。
+
+    锚点 config.MATCH_DISPLAY_ANCHORS（[raw, display] 分段线性）：
+    驳回区不变形，待审区拉伸，金标带 42.6-50.2 → 75-85。
+    只进展示层——排序、闸门、margin 全部仍用原始分（raw 恒在 API 保留）。
+    """
+    anchors = getattr(config, "MATCH_DISPLAY_ANCHORS", None)
+    if not anchors:
+        return float(raw_total)
+    pts = sorted((float(a), float(d)) for a, d in anchors)
+    x = float(raw_total)
+    if x <= pts[0][0]:
+        return pts[0][1]
+    if x >= pts[-1][0]:
+        return pts[-1][1]
+    for (x0, y0), (x1, y1) in zip(pts, pts[1:]):
+        if x0 <= x <= x1:
+            if x1 == x0:
+                return y1
+            return y0 + (y1 - y0) * (x - x0) / (x1 - x0)
+    return float(raw_total)
 
 
 def calibrate_t1_with_ce(

@@ -178,8 +178,8 @@ function renderCard(c, idx) {
           </div>
           <div class="emp-sub" style="margin-top:.35rem" data-emp="${esc(c.emp_id)}"></div>
         </div>
-        <div class="score-box top-score">
-          <div class="score-num" data-target="${s.total}">0</div>
+        <div class="score-box top-score" title="公式原始分 ${s.total}（金标锚定映射后的展示分）">
+          <div class="score-num" data-target="${c.display_score ?? s.total}">0</div>
           <div class="score-sub">综合匹配 / 100</div>
         </div>
       </div>
