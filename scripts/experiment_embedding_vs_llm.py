@@ -84,6 +84,10 @@ def parse_args() -> argparse.Namespace:
         "--output-dir", type=str, default=str(INTERMEDIATE_DIR),
         help="实验结果 JSON 输出目录",
     )
+    p.add_argument(
+        "--employees", type=str, default=None,
+        help="逗号分隔的员工 ID 列表（覆盖 TARGET_EMPLOYEES 常量；batch2 预注册分析用）",
+    )
     return p.parse_args()
 
 
@@ -589,8 +593,10 @@ def main() -> int:
     print(f"▶ 加载 phase1 输出: {args.from_phase1}")
     all_emps = load_phase1_employees(args.from_phase1)
     emps_by_id = {e.get("employee_id"): e for e in all_emps if isinstance(e, dict)}
-    target_emps = [emps_by_id[eid] for eid in TARGET_EMPLOYEES if eid in emps_by_id]
-    missing = [eid for eid in TARGET_EMPLOYEES if eid not in emps_by_id]
+    target_ids = ([x.strip() for x in args.employees.split(",") if x.strip()]
+                  if args.employees else TARGET_EMPLOYEES)
+    target_emps = [emps_by_id[eid] for eid in target_ids if eid in emps_by_id]
+    missing = [eid for eid in target_ids if eid not in emps_by_id]
     if missing:
         print(f"⚠ phase1 缺失员工: {missing}")
     print(f"▶ 实验员工: {[e.get('employee_id') for e in target_emps]}")

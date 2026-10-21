@@ -1,0 +1,40 @@
+▶ trace_id: TC-20261022-749367-bd47
+▶ 加载 phase1 输出: D:\workplace\talent-compass\data\intermediate\phase1_output.json
+▶ 实验员工: ['JZ0025', 'JZ0009', 'JZ0006', 'JZ0019', 'JZ0013', 'JZ0036', 'JZ0029', 'JZ0037', 'JZ0043', 'JZ0046']
+▶ 加载 ground truth: data/experiment/ground_truth_batch2_adjudicated.json
+▶ 加载标签库 corpus（T1/T2/T3，registry 融合进 T1）...
+  corpus 项数: 121
+Loading weights:   0%|          | 0/393 [00:00<?, ?it/s]Loading weights: 100%|██████████| 393/393 [00:00<00:00, 6573.15it/s]
+
+============================================================
+Day 2 5 员工对比实验结果
+============================================================
+员工数: 10  LLM 尝试: 10  成功: 10  失败: 0
+阈值: threshold=0.5, confidence<0.6
+
+路径 A (LLM 提议→embedding 自动纠正):
+  总映射数: 137
+  验证通过: 41 (29.9%)
+  纠正正确: 11 (8.0%)
+  纠正错误: 53 (38.7%)
+  pending:  32 (23.4%)  其中命中GT: 14
+  最终正确率: 31.4%  (recall@1)
+  recall@GT: 37/58 = 63.8%  (公平口径)
+
+路径 B (Embedding 纯映射):
+  Top-1 命中: 40 (29.2%)  (recall@1)
+  Top-3 命中: 105 (76.6%)
+  Top-1 recall@GT: 34/58 = 58.6%
+
+路径 C (Stage 3 LLM 重排: embedding 召回→LLM 精排):
+  总映射数: 137
+  最终正确率: 27.7%  (recall@1)
+  recall@GT: 34/58 = 58.6%  (公平口径)
+  新标签: 16  重排失败降级: 0
+  重排入口调用: 10  真实 LLM 触发项: 9  cross-encoder 打分项: 128
+  LLM 终裁: 救回 0  维持新标签 0  终裁项合计: 0
+
+决策: Plan B: Day 3 改 Top-3 推荐，不做自动纠正（Path A < 80%）
+⚠ 触发 Plan B — 错误纠正比不纠正更危险，Day 3 改 Top-3 推荐
+============================================================
+▶ 结果已保存: D:\workplace\talent-compass\data\intermediate\experiment_5emp_live_20261022_004248_367-bd47.json
