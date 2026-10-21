@@ -273,6 +273,9 @@ MATCH_FORMULA_WEIGHTS = {
 #   REJECT 对齐新 P80（相关性低于全员前 20% → 驳回）；
 #   REVIEW = 金标带下沿 0.426 减 2 分余量 → 0.40（5 金标全部 ≥REVIEW+2 分：
 #   实际余量 2.6/2.2/2.6/2.8/10.2 分）。历史：V0 期曾为 0.32/0.45。
+# ⚠ 泄漏声明（2026-10-21，docs/eval_log.md）：本阈值与金标 holdout 联合拟合，
+#   「金标 ≥ 推荐线」验收是自洽性检查而非独立效度验证；对负例的排斥力
+#   待 GT batch2 复核后验证。batch2 复核前本阈值冻结不得改动。
 MATCH_REJECT_THRESHOLD = 0.35
 MATCH_REVIEW_THRESHOLD = 0.40
 MATCH_TOP_K = 5                    # Top-N 推荐

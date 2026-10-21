@@ -335,14 +335,28 @@ def score_t3_potential(employee: dict) -> float:
 
 
 # ── 汇总排序（两段式：全员 bi 初排 → Top-N CE 校准 → 终排）──────
+# 证据来源 → 展示标签（与 server/app.SOURCE_LABELS 同源，同步维护）
+_SOURCE_LABELS = {
+    "position": "岗位与证书", "projects": "项目经历", "performance": "绩效记录",
+    "training": "培训记录", "summary_performance": "绩效摘要",
+    "summary_project": "项目摘要", "summary_evaluation": "360 评价摘要",
+}
+
+
 def _template_reason(hit_terms: list[str], evidence: list[dict], scores: dict) -> str:
-    """离线模板推荐理由（零 LLM；LLM 富化留 hook，默认不启用）。"""
+    """离线模板推荐理由（零 LLM；LLM 富化留 hook，默认不启用）。
+
+    anchor 为证据原文前 10 字截断（PLACEHOLDER_ANCHOR_LEN，与 Agent① 锚点
+    同语义），「…」提示截断、完整原文走证据链溯源；来源标签入句指明
+    截断文本的出处（2026-10-21 改进：用户质询省略号指向不明）。
+    """
     parts: list[str] = []
     if hit_terms:
         parts.append(f"字面命中技能证据 {len(hit_terms)} 项（如「{hit_terms[0]}」）")
     if evidence:
         ev = evidence[0]
-        parts.append(f"语义最相关证据：{ev['anchor']}…（sim {ev['sim']:.2f}）")
+        src = _SOURCE_LABELS.get(ev.get("source", ""), ev.get("source", ""))
+        parts.append(f"语义最相关证据（{src}）：{ev['anchor']}…（sim {ev['sim']:.2f}，完整原文见证据链溯源）")
     parts.append(
         f"T1语义 {scores['t1'] * 100:.0f}／T2行为 {scores['t2'] * 100:.0f}"
         f"／T3潜力 {scores['t3'] * 100:.0f}"

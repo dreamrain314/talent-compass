@@ -12,6 +12,7 @@ import pytest
 import config
 from utils.evidence_index import EvidenceIndex
 from utils.match_engine import (
+    _template_reason,
     calibrate_t1_with_ce,
     check_hard_gate,
     display_score,
@@ -20,6 +21,23 @@ from utils.match_engine import (
     score_t2_behavior,
     score_t3_potential,
 )
+
+
+class TestTemplateReason:
+    def test_source_label_and_ellipsis(self):
+        reason = _template_reason(
+            ["数据分析"],
+            [{"query": "数据分析", "source": "projects", "text": "项目「工业大数据分析平台」",
+              "anchor": "项目「工业大数据分", "sim": 0.71}],
+            {"t1": 0.48, "t2": 0.75, "t3": 0.73})
+        assert "项目经历" in reason          # 来源标签入句（省略号指向明确）
+        assert "项目「工业大数据分…" in reason  # 锚点截断 + 省略号
+        assert "完整原文见证据链溯源" in reason
+        assert "sim 0.71" in reason
+
+    def test_no_evidence(self):
+        reason = _template_reason([], [], {"t1": 0, "t2": 0, "t3": 0})
+        assert "语义最相关" not in reason and "T1语义 0" in reason
 
 
 class TestDisplayScore:
