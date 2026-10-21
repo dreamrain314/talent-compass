@@ -144,6 +144,12 @@ def score_t0_direct(job_profile: dict, employee: dict) -> tuple[float, list[str]
 
     records = [_norm_literal(c["text"]) for c in chunk_employee(employee)
                if c["source"] in _T0_SOURCES]
+    # 负向证据护栏（2026-10-21 复核类1「只证做过、未证达标」）：含负向标记的记录
+    # （如「部分节点延迟」）不得作为命中依据——即使未来 _T0_SOURCES 扩展纳入
+    # performance/summary 也防住「做砸了 ≠ 会做」
+    neg_markers = [_norm_literal(m) for m in getattr(config, "T0_NEGATIVE_MARKERS", [])]
+    if neg_markers:
+        records = [rec for rec in records if not any(m in rec for m in neg_markers)]
     # 结构化证书行不在 chunk 里（certificates="无" 被排除时），补一条
     structured = employee.get("structured") or {}
     certs_field = str(structured.get("certificates") or "")

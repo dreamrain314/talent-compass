@@ -232,6 +232,25 @@ class TestT0:
         score, hits = score_t0_direct(job, emp_quality)
         assert len(hits) <= 2 and score == pytest.approx(0.6)  # 分母=2 去重后，各单记录命中
 
+    def test_negative_marker_guard(self, emp_quality):
+        """负向证据护栏（2026-10-21 复核类1）：含负向标记的记录不得作为 T0 命中
+        依据——「工业大数据分析中部分节点延迟」不支撑「数据分析」达标。即使未来
+        _T0_SOURCES 扩展纳入 performance，护栏仍生效（孟华 JZ0003 案例）。"""
+        emp_quality["performance"].append(
+            {"year": 2025, "grade": "C",
+             "comment": "工业大数据分析中部分节点延迟"})
+        job = {"skill_requirements": [{"name": "数据分析", "detail": ""}],
+               "hard_requirements": {"certificates": []}}
+        # 绩效不在 T0 池：命中为 0；负向标记护栏保证即使扩展 sources 也不命中
+        score, hits = score_t0_direct(job, emp_quality)
+        assert hits == [] and score == 0.0
+
+        # 对照相证：同一 term 出现在无负向标记的培训记录 → 正常命中
+        emp_quality["training"].append(
+            {"course_name": "数据分析实战", "status": "已完成", "score": 85})
+        score2, hits2 = score_t0_direct(job, emp_quality)
+        assert hits2 == ["数据分析"] and score2 == pytest.approx(0.6)
+
     def test_keyword_miss_no_bridge(self, emp_quality):
         """name 不在证据 → 不命中（不放宽为部分子串）。"""
         job = {"skill_requirements": [{"name": "量子计算", "detail": ""}],

@@ -296,6 +296,10 @@ T0_DENSITY_BONUS = 0.4
 T0_DENSITY_CAP_RECORDS = 2
 # JD 侧受控别名表（每对来自金标 miss 归因；扩充须逐对过盲测——回归驱动打补丁）
 T0_ALIAS_PATCHES_PATH = DATA_DIR / "jobs" / "alias_patches.json"
+# 负向证据标记（2026-10-21 batch2/gt5 复核类1「只证做过、未证达标」）：含任一标记的
+# 记录不得作为 T0 直接技能命中依据（「做砸了」≠「会做」）。当前 _T0_SOURCES 本就
+# 不含 performance/summary，此护栏防未来 sources 扩展时负向证据混入（用户指令）。
+T0_NEGATIVE_MARKERS = ["延迟", "返工", "不稳定", "事故", "质量差", "失误", "整改", "绩效有改进空间"]
 # 展示层金标锚定映射（Phase D）：分段线性 [raw, display]，锚点来自 V2a 实测分布
 # （硬负例带顶 ~52.9、金标带 42.6-50.2，见 docs/reports/blind_test_report_20261021.md）。
 # 语义：驳回区（<35）不变形；待审区拉伸到 35-75；金标带 42.6-50.2 → 75-85；上限 98。
