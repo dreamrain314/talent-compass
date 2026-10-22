@@ -52,3 +52,11 @@ tmp/
 
 # 例外：匹配工作台的演示数据（50 人 mock，phase1 产物）——网站运行必需
 !data/intermediate/phase1_output.json
+
+# 多 agent 共存运行时的私有状态目录（antisync / patrol 心跳、契约、注册表）
+.antisync/
+.patrol/
+
+# Server 运行时日志（已跟踪的 server.log 见下方例外处理）
+server/server.log
+server/tunnel.log

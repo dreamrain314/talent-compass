@@ -1,0 +1,520 @@
+{
+ "generated_at": "2026-10-22T10:26:24",
+ "protocol": "Round3 Day1-2 预注册 §一（已封存 2026-10-22）｜L0 只读回放｜TC_OFFLINE=1",
+ "prereg": "docs/preregister_round3_evidence_alignment_20261022.md",
+ "n_employees": 50,
+ "rerank_topn_production": 10,
+ "blend_production": 0.5,
+ "chunk_stats": {
+  "n_chunks": 656,
+  "len_mean": 55.1,
+  "len_p50": 40.0,
+  "len_p95": 150.0,
+  "len_max": 150,
+  "chunks_per_emp_min": 10,
+  "chunks_per_emp_max": 17,
+  "long_chunks_over_400chars": []
+ },
+ "jobs": {
+  "JOB_B01": {
+   "title": "质量体系工程师（智能制造方向）",
+   "gold_emp_id": "JZ0001",
+   "n_queries": 8,
+   "gold_bi_rank": 3,
+   "gold_in_bi_top10": true,
+   "gold_ce_rank_all50": 9,
+   "gold_fused_rank": 1,
+   "ce_score_stats": {
+    "min": 0.5008,
+    "max": 0.5797,
+    "mean": 0.5192,
+    "gold": 0.5357
+   },
+   "bi_norm_stats": {
+    "min": 0.367,
+    "max": 0.4872,
+    "mean": 0.4266,
+    "gold": 0.4701
+   },
+   "spearman_ce_vs_bi_all50": 0.677,
+   "top5_bi": [
+    "JZ0022",
+    "JZ0005",
+    "JZ0001",
+    "JZ0013",
+    "JZ0008"
+   ],
+   "top5_ce": [
+    "JZ0038",
+    "JZ0022",
+    "JZ0005",
+    "JZ0029",
+    "JZ0013"
+   ],
+   "top5_fused": [
+    "JZ0001",
+    "JZ0022",
+    "JZ0012",
+    "JZ0003",
+    "JZ0013"
+   ],
+   "gold_fused_t1": 0.5029,
+   "blend_magnitude_check": {
+    "shortlist_n": 10,
+    "bi_mean": 0.4592,
+    "ce_mean": 0.5412,
+    "ce_minus_bi_mean": 0.082
+   }
+  },
+  "JOB_B02": {
+   "title": "工业大数据分析工程师（数字化平台方向）",
+   "gold_emp_id": "JZ0003",
+   "n_queries": 4,
+   "gold_bi_rank": 14,
+   "gold_in_bi_top10": false,
+   "gold_ce_rank_all50": 11,
+   "gold_fused_rank": 1,
+   "ce_score_stats": {
+    "min": 0.5004,
+    "max": 0.5705,
+    "mean": 0.5113,
+    "gold": 0.5096
+   },
+   "bi_norm_stats": {
+    "min": 0.3758,
+    "max": 0.5171,
+    "mean": 0.4273,
+    "gold": 0.4487
+   },
+   "spearman_ce_vs_bi_all50": 0.3496,
+   "top5_bi": [
+    "JZ0010",
+    "JZ0020",
+    "JZ0013",
+    "JZ0006",
+    "JZ0004"
+   ],
+   "top5_ce": [
+    "JZ0032",
+    "JZ0045",
+    "JZ0023",
+    "JZ0031",
+    "JZ0016"
+   ],
+   "top5_fused": [
+    "JZ0003",
+    "JZ0001",
+    "JZ0020",
+    "JZ0012",
+    "JZ0013"
+   ],
+   "gold_fused_t1": 0.4792,
+   "blend_magnitude_check": {
+    "shortlist_n": 10,
+    "bi_mean": 0.4724,
+    "ce_mean": 0.5114,
+    "ce_minus_bi_mean": 0.0389
+   }
+  },
+  "JOB_B03": {
+   "title": "Java后端开发工程师（ERP与系统集成方向）",
+   "gold_emp_id": "JZ0004",
+   "n_queries": 12,
+   "gold_bi_rank": 1,
+   "gold_in_bi_top10": true,
+   "gold_ce_rank_all50": 6,
+   "gold_fused_rank": 1,
+   "ce_score_stats": {
+    "min": 0.5016,
+    "max": 0.5366,
+    "mean": 0.5111,
+    "gold": 0.5276
+   },
+   "bi_norm_stats": {
+    "min": 0.4043,
+    "max": 0.5386,
+    "mean": 0.455,
+    "gold": 0.5386
+   },
+   "spearman_ce_vs_bi_all50": 0.2781,
+   "top5_bi": [
+    "JZ0004",
+    "JZ0014",
+    "JZ0022",
+    "JZ0007",
+    "JZ0013"
+   ],
+   "top5_ce": [
+    "JZ0025",
+    "JZ0005",
+    "JZ0013",
+    "JZ0008",
+    "JZ0023"
+   ],
+   "top5_fused": [
+    "JZ0004",
+    "JZ0013",
+    "JZ0022",
+    "JZ0017",
+    "JZ0025"
+   ],
+   "gold_fused_t1": 0.5331,
+   "blend_magnitude_check": {
+    "shortlist_n": 10,
+    "bi_mean": 0.4846,
+    "ce_mean": 0.5152,
+    "ce_minus_bi_mean": 0.0306
+   }
+  },
+  "JOB_B04": {
+   "title": "人力资源数字化项目负责人（薪酬与绩效方向）",
+   "gold_emp_id": "JZ0033",
+   "n_queries": 8,
+   "gold_bi_rank": 10,
+   "gold_in_bi_top10": true,
+   "gold_ce_rank_all50": 24,
+   "gold_fused_rank": 3,
+   "ce_score_stats": {
+    "min": 0.5028,
+    "max": 0.5677,
+    "mean": 0.5314,
+    "gold": 0.5322
+   },
+   "bi_norm_stats": {
+    "min": 0.3961,
+    "max": 0.5395,
+    "mean": 0.4601,
+    "gold": 0.4915
+   },
+   "spearman_ce_vs_bi_all50": 0.5428,
+   "top5_bi": [
+    "JZ0045",
+    "JZ0042",
+    "JZ0032",
+    "JZ0026",
+    "JZ0036"
+   ],
+   "top5_ce": [
+    "JZ0028",
+    "JZ0045",
+    "JZ0031",
+    "JZ0035",
+    "JZ0042"
+   ],
+   "top5_fused": [
+    "JZ0030",
+    "JZ0044",
+    "JZ0033",
+    "JZ0026",
+    "JZ0045"
+   ],
+   "gold_fused_t1": 0.5119,
+   "blend_magnitude_check": {
+    "shortlist_n": 10,
+    "bi_mean": 0.5056,
+    "ce_mean": 0.5391,
+    "ce_minus_bi_mean": 0.0335
+   }
+  },
+  "JOB_B05": {
+   "title": "内控体系建设专员（审计与流程合规方向）",
+   "gold_emp_id": "JZ0050",
+   "n_queries": 4,
+   "gold_bi_rank": 7,
+   "gold_in_bi_top10": true,
+   "gold_ce_rank_all50": 14,
+   "gold_fused_rank": 3,
+   "ce_score_stats": {
+    "min": 0.5035,
+    "max": 0.6227,
+    "mean": 0.5426,
+    "gold": 0.5593
+   },
+   "bi_norm_stats": {
+    "min": 0.3959,
+    "max": 0.5921,
+    "mean": 0.4876,
+    "gold": 0.5649
+   },
+   "spearman_ce_vs_bi_all50": 0.4703,
+   "top5_bi": [
+    "JZ0042",
+    "JZ0026",
+    "JZ0045",
+    "JZ0032",
+    "JZ0039"
+   ],
+   "top5_ce": [
+    "JZ0035",
+    "JZ0042",
+    "JZ0026",
+    "JZ0036",
+    "JZ0022"
+   ],
+   "top5_fused": [
+    "JZ0044",
+    "JZ0030",
+    "JZ0050",
+    "JZ0033",
+    "JZ0026"
+   ],
+   "gold_fused_t1": 0.5621,
+   "blend_magnitude_check": {
+    "shortlist_n": 10,
+    "bi_mean": 0.5669,
+    "ce_mean": 0.5595,
+    "ce_minus_bi_mean": -0.0075
+   }
+  },
+  "JOB_B06": {
+   "title": "嵌入式软件研发工程师（测试与质量方向）",
+   "gold_emp_id": "JZ0009",
+   "n_queries": 11,
+   "gold_bi_rank": 9,
+   "gold_in_bi_top10": true,
+   "gold_ce_rank_all50": 12,
+   "gold_fused_rank": 44,
+   "ce_score_stats": {
+    "min": 0.501,
+    "max": 0.5397,
+    "mean": 0.5103,
+    "gold": 0.5146
+   },
+   "bi_norm_stats": {
+    "min": 0.3903,
+    "max": 0.503,
+    "mean": 0.4591,
+    "gold": 0.4814
+   },
+   "spearman_ce_vs_bi_all50": 0.291,
+   "top5_bi": [
+    "JZ0025",
+    "JZ0017",
+    "JZ0020",
+    "JZ0013",
+    "JZ0022"
+   ],
+   "top5_ce": [
+    "JZ0025",
+    "JZ0002",
+    "JZ0050",
+    "JZ0005",
+    "JZ0021"
+   ],
+   "top5_fused": [
+    "JZ0025",
+    "JZ0050",
+    "JZ0026",
+    "JZ0027",
+    "JZ0022"
+   ],
+   "gold_fused_t1": 0.4814,
+   "blend_magnitude_check": {
+    "shortlist_n": 10,
+    "bi_mean": 0.4716,
+    "ce_mean": 0.5162,
+    "ce_minus_bi_mean": 0.0446
+   }
+  },
+  "JOB_B07": {
+   "title": "研发项目负责人（结构设计与数据应用方向）",
+   "gold_emp_id": "JZ0006",
+   "n_queries": 11,
+   "gold_bi_rank": 11,
+   "gold_in_bi_top10": false,
+   "gold_ce_rank_all50": 7,
+   "gold_fused_rank": 2,
+   "ce_score_stats": {
+    "min": 0.5015,
+    "max": 0.5514,
+    "mean": 0.5124,
+    "gold": 0.5233
+   },
+   "bi_norm_stats": {
+    "min": 0.39,
+    "max": 0.458,
+    "mean": 0.4236,
+    "gold": 0.4395
+   },
+   "spearman_ce_vs_bi_all50": 0.2372,
+   "top5_bi": [
+    "JZ0013",
+    "JZ0004",
+    "JZ0014",
+    "JZ0010",
+    "JZ0017"
+   ],
+   "top5_ce": [
+    "JZ0008",
+    "JZ0004",
+    "JZ0032",
+    "JZ0005",
+    "JZ0007"
+   ],
+   "top5_fused": [
+    "JZ0004",
+    "JZ0006",
+    "JZ0013",
+    "JZ0050",
+    "JZ0008"
+   ],
+   "gold_fused_t1": 0.4814,
+   "blend_magnitude_check": {
+    "shortlist_n": 10,
+    "bi_mean": 0.4354,
+    "ce_mean": 0.522,
+    "ce_minus_bi_mean": 0.0866
+   }
+  },
+  "JOB_B08": {
+   "title": "人力资源项目负责人（HR体系方向）",
+   "gold_emp_id": "JZ0029",
+   "n_queries": 5,
+   "gold_bi_rank": 19,
+   "gold_in_bi_top10": false,
+   "gold_ce_rank_all50": 9,
+   "gold_fused_rank": 9,
+   "ce_score_stats": {
+    "min": 0.5028,
+    "max": 0.5799,
+    "mean": 0.5253,
+    "gold": 0.5411
+   },
+   "bi_norm_stats": {
+    "min": 0.4063,
+    "max": 0.5181,
+    "mean": 0.4678,
+    "gold": 0.4795
+   },
+   "spearman_ce_vs_bi_all50": 0.5896,
+   "top5_bi": [
+    "JZ0042",
+    "JZ0027",
+    "JZ0049",
+    "JZ0037",
+    "JZ0050"
+   ],
+   "top5_ce": [
+    "JZ0035",
+    "JZ0005",
+    "JZ0008",
+    "JZ0050",
+    "JZ0004"
+   ],
+   "top5_fused": [
+    "JZ0035",
+    "JZ0004",
+    "JZ0050",
+    "JZ0025",
+    "JZ0013"
+   ],
+   "gold_fused_t1": 0.5103,
+   "blend_magnitude_check": {
+    "shortlist_n": 10,
+    "bi_mean": 0.4775,
+    "ce_mean": 0.5524,
+    "ce_minus_bi_mean": 0.0749
+   }
+  },
+  "JOB_B09": {
+   "title": "培训与人才发展负责人（教学方向）",
+   "gold_emp_id": "JZ0037",
+   "n_queries": 3,
+   "gold_bi_rank": 4,
+   "gold_in_bi_top10": true,
+   "gold_ce_rank_all50": 9,
+   "gold_fused_rank": 12,
+   "ce_score_stats": {
+    "min": 0.5022,
+    "max": 0.6146,
+    "mean": 0.5353,
+    "gold": 0.5624
+   },
+   "bi_norm_stats": {
+    "min": 0.4366,
+    "max": 0.5637,
+    "mean": 0.4888,
+    "gold": 0.5288
+   },
+   "spearman_ce_vs_bi_all50": 0.5713,
+   "top5_bi": [
+    "JZ0042",
+    "JZ0032",
+    "JZ0027",
+    "JZ0037",
+    "JZ0049"
+   ],
+   "top5_ce": [
+    "JZ0035",
+    "JZ0050",
+    "JZ0029",
+    "JZ0026",
+    "JZ0042"
+   ],
+   "top5_fused": [
+    "JZ0035",
+    "JZ0004",
+    "JZ0029",
+    "JZ0044",
+    "JZ0045"
+   ],
+   "gold_fused_t1": 0.5288,
+   "blend_magnitude_check": {
+    "shortlist_n": 10,
+    "bi_mean": 0.5147,
+    "ce_mean": 0.5599,
+    "ce_minus_bi_mean": 0.0452
+   }
+  },
+  "JOB_B10": {
+   "title": "Java全栈研发负责人（企业应用方向）",
+   "gold_emp_id": "JZ0025",
+   "n_queries": 6,
+   "gold_bi_rank": 7,
+   "gold_in_bi_top10": true,
+   "gold_ce_rank_all50": 2,
+   "gold_fused_rank": 2,
+   "ce_score_stats": {
+    "min": 0.5007,
+    "max": 0.5361,
+    "mean": 0.509,
+    "gold": 0.5356
+   },
+   "bi_norm_stats": {
+    "min": 0.3853,
+    "max": 0.5799,
+    "mean": 0.4792,
+    "gold": 0.5319
+   },
+   "spearman_ce_vs_bi_all50": 0.2177,
+   "top5_bi": [
+    "JZ0004",
+    "JZ0024",
+    "JZ0014",
+    "JZ0007",
+    "JZ0003"
+   ],
+   "top5_ce": [
+    "JZ0050",
+    "JZ0025",
+    "JZ0022",
+    "JZ0004",
+    "JZ0035"
+   ],
+   "top5_fused": [
+    "JZ0004",
+    "JZ0025",
+    "JZ0013",
+    "JZ0022",
+    "JZ0008"
+   ],
+   "gold_fused_t1": 0.5337,
+   "blend_magnitude_check": {
+    "shortlist_n": 10,
+    "bi_mean": 0.5222,
+    "ce_mean": 0.5176,
+    "ce_minus_bi_mean": -0.0046
+   }
+  }
+ }
+}
