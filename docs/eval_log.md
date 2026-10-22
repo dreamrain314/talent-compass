@@ -150,3 +150,13 @@ REVIEW=0.40 与金标联合拟合（金标带下沿 0.426 − 2 分余量），�
 **与 §十一 的关系**：§十一 T3 改道草案被本路线吸收——Round 3 §三 的 T3 离线版本化映射（LLM 提议→人工核验闭合表→运行时查表、unknown、cap 审计、360 防重复）与其方向一致，验收口径升级为同时报告 TP/FP/FN/unknown/cap 丢失量。§十一 DRAFT 状态由本封存取代。
 
 **基础修复（同日）**：新建 `pytest.ini`（testpaths=tests）——修复 `scripts/blind_test.py` 命中 pytest 默认 `*_test.py` 收集模式、L28 `setdefault("TC_OFFLINE","1")` 污染全局导致 test_llm_summarizer 6 测试失败的确定性 bug（非 flaky）；裸 pytest 556/556 全绿。`.gitignore` 补 `.antisync/`、`.patrol/`、server 日志。
+
+## 十三、Round 3 Day 3-5 实现入账（2026-10-23，ZCode 接手 WorkBuddy）
+
+**交付**：`utils/coverage_engine.py`（要求抽取/双通道召回 k≤3/五类关系/覆盖评分 80+10+10/证据矩阵/query 侧 query_embed 修复）+ 20 个确定性单测 + `scripts/day35_coverage_smoke.py` 冒烟。报告：`docs/reports/day35_coverage_skeleton_20261023.md`。
+
+**纪律状态**：开发资产冒烟（**非验收**）——要求集为解析初版未人工核验冻结（§2.1 验收前置）；等价表为空（alias 4 对种子），改写类证据全部如实报未证实。冒烟观察：金标排名两段分化（实例词面可命中者 Top-6：B03#1/B01#3/B02#3/B10#4；同义改写依赖者 22-47 名：B06#45/B07#47/B08#31），B07 病理解剖（金标 coverage=0 vs 全员均值 0.20）定量确认 Day 6-7 填等价表是唯一合法杠杆。CE 成本实测 0.18s/对（§四-6 验收输入）。
+
+**事件账本补行**：
+
+| 10-23 | Round 3 Day3-5 骨架实现 + 开发资产冒烟 | **L1（开发资产）** | 未触碰 holdout 验收口径；参数用 §七 已确认暂定值；CE 契约坑记录（CrossEncoder 必须 .predict 双契约）；Day6-7 待办=等价表离线裁决首批填充 + T3 版本化映射 |

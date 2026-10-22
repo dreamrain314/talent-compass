@@ -296,6 +296,17 @@ T0_DENSITY_BONUS = 0.4
 T0_DENSITY_CAP_RECORDS = 2
 # JD 侧受控别名表（每对来自金标 miss 归因；扩充须逐对过盲测——回归驱动打补丁）
 T0_ALIAS_PATCHES_PATH = DATA_DIR / "jobs" / "alias_patches.json"
+
+# ── Round 3 要求—证据对齐引擎（docs/preregister_round3_evidence_alignment_20261022.md
+#    §二/§七 已封存 2026-10-22；参数为「减少同时变动因素」的暂定值，Day 8 冻结定版）──
+COVERAGE_RECALL_K = 3            # §七-3 用户确认：每要求×每员工候选证据上限 k≤3
+COVERAGE_W_NECESSARY = 1.0       # §2.1 必要项权重（来自 JD 必要性定义，非候选拟合）
+COVERAGE_W_PREFERRED = 0.5       # §2.1 加分项（JD 明示「优先」）权重
+COVERAGE_W_COVERAGE = 80.0       # §七-2 暂定冻结：覆盖主项 80 分
+COVERAGE_W_BEHAVIOR = 10.0       # §七-2 暂定冻结：B 基座（复用冻结 T2 通道）
+COVERAGE_W_POTENTIAL = 10.0      # §七-2 暂定冻结：P 基座（复用冻结 T3 通道）
+# 人工核验等价表（§2.3 等价表达唯一入口；不存在/无条目 → 相关改写如实报未证实）
+COVERAGE_EQUIVALENCE_PATH = DATA_DIR / "jobs" / "equivalence_table.json"
 # 负向证据标记（2026-10-21 batch2/gt5 复核类1「只证做过、未证达标」）：含任一标记的
 # 记录不得作为 T0 直接技能命中依据（「做砸了」≠「会做」）。当前 _T0_SOURCES 本就
 # 不含 performance/summary，此护栏防未来 sources 扩展时负向证据混入（用户指令）。
