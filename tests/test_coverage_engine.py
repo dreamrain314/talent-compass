@@ -11,10 +11,10 @@ import pytest
 import config
 from utils.coverage_engine import (
     COVERAGE_RELATION_VALUES,
-    _apply_behavior_decay,
     build_evidence_matrix,
     classify_relation,
     extract_requirements,
+    job_weight_triple,
     load_verified_equivalences,
     recall_candidates,
     requirement_type,
@@ -46,13 +46,13 @@ class TestExtractRequirements:
         r = reqs[0]
         assert r["head"] == "嵌入式开发"
         assert r["instances"] == ["MCU", "STM32", "ARM", "RTOS", "驱动开发"]
-        assert r["kind"] == "necessary" and r["weight"] == config.COVERAGE_W_NECESSARY
+        assert r["kind"] == "necessary" and r["weight"] == config.COVERAGE_W_MUST
 
     def test_preferred_item_gets_lower_weight(self):
         job = {"requirements": ["有工业物联网项目质量工作经验者优先"]}
         reqs = extract_requirements(job)
         assert reqs[0]["kind"] == "preferred"
-        assert reqs[0]["weight"] == config.COVERAGE_W_PREFERRED
+        assert reqs[0]["kind"] == "preferred" and reqs[0]["weight"] == config.COVERAGE_W_MUST
 
     def test_gate_items_excluded(self):
         job = {"requirements": [
@@ -163,23 +163,24 @@ def _employee(eid="E1", s360=None, grades=None, training=None):
 
 class TestScoreCoverage:
     def test_full_coverage_math(self):
-        job = {"requirements": ["熟悉嵌入式开发（STM32）"]}
+        # 技术类矩阵：total = 70·S_prof + 15·S_behav + 15·P + bonus
+        job = {"requirements": ["熟悉嵌入式开发（STM32）", "具备良好的沟通能力"]}
         reqs = extract_requirements(job)
         emp = _employee(grades=[(2026, "B")], training=["Python"])
         chunks = [{"emp_id": "E1", "source": "projects",
-                   "text": "项目「x」：STM32 固件", "anchor": "a"}]
+                   "text": "项目「x」：STM32 固件 + 沟通能力良好", "anchor": "a"}]
         from utils.evidence_index import EvidenceIndex
-        idx = EvidenceIndex(chunks, char_bucket_encode([c["text"] for c in chunks]),
-                            encode_fn=char_bucket_encode)
+        idx = EvidenceIndex(chunks, char_bucket_encode([c["text"] for c in chunks]), encode_fn=char_bucket_encode)
         res = score_coverage(reqs, [emp], idx, cross_encoder_fn=None,
-                             equivalences={}, encode_fn=char_bucket_encode)
+                             equivalences={}, encode_fn=char_bucket_encode,
+                             atomic_splits={}, job_type="技术类")
         r = res["E1"]
-        assert r["coverage"] == 1.0
-        # S = 80·1 + 10·B + 10·P；单年绩效 B → B=(3-1)/4=0.5；1 条培训 → 0.2·(0.2)=...
-        assert r["total"] == pytest.approx(
-            config.COVERAGE_W_COVERAGE * 1.0
-            + config.COVERAGE_W_BEHAVIOR * 0.5
-            + config.COVERAGE_W_POTENTIAL * r["p"], abs=0.01)
+        w = job_weight_triple("技术类")
+        expect = w[0] * r["s_prof"] + w[1] * r["s_behav"] + w[2] * r["p"] + r["bonus"]
+        if r["required_skill_gate"]:
+            expect *= config.COVERAGE_REQUIRED_SKILL_GATE
+        assert r["total"] == pytest.approx(expect, abs=0.05)
+        assert r["w_matrix"] == [70.0, 15.0, 15.0]
 
     def test_uncovered_requirement_reports_unverified(self):
         job = {"requirements": ["熟悉嵌入式开发（STM32）"]}
@@ -299,46 +300,88 @@ class TestTableActivation:
         assert len(out) == 1 and out[0] is req
 
 
-# ── 杠杆三：三分类 / 行为衰减 / 必要技能闸门 ─────────────────────
-class TestLever3:
-    def test_requirement_typing(self):
-        assert requirement_type(_req(head="软件测试", instances=["STM32"])) == "skill_required"
-        assert requirement_type({**_req(head="高级会计师职称"), "kind": "preferred"}) == "professional"
-        assert requirement_type(_req(head="沟通表达与执行推进能力")) == "behavior"
-        assert requirement_type(_req(head="质量导向：标准合规、过程规范")) == "behavior"  # T2 名称优先于顿号实例
+# ── 两类划分（行为/专业 × 必须/优先 + 矩阵 + 加分 + total 级闸门）────────
+class TestTwoClass:
+    def test_requirement_typing_binary(self):
+        assert requirement_type(_req(head="软件测试", instances=["STM32"])) == "professional"
+        assert requirement_type(_req(head="数据分析与建模")) == "professional"
+        assert requirement_type(_req(head="沟通表达与执行推进能力")) == "behavioral"
+        assert requirement_type(_req(head="质量导向：标准合规、过程规范")) == "behavioral"  # T2 名称优先
+        assert requirement_type(_req(head="团队管理经验或潜力")) == "behavioral"
 
-    def test_behavior_decay_beyond_free_n(self):
-        reqs = [_req(head=f"沟通表达变体{i}") for i in range(4)]
-        for r in reqs:
-            r["rtype"] = "behavior"
-        _apply_behavior_decay(reqs)
-        full = [r for r in reqs if not r.get("behavior_decayed")]
-        dec = [r for r in reqs if r.get("behavior_decayed")]
-        assert len(full) == config.COVERAGE_BEHAVIOR_FREE_N
-        assert len(dec) == 2
-        assert dec[0]["weight"] == pytest.approx(_req(head="x")["weight"] * config.COVERAGE_BEHAVIOR_DECAY)
+    def test_matrix_lookup_and_default(self):
+        assert job_weight_triple("技术类") == (70.0, 15.0, 15.0)
+        assert job_weight_triple("职能类") == (40.0, 30.0, 30.0)
+        assert job_weight_triple("不存在的类") == job_weight_triple("业务类")  # _default
 
-    def test_required_skill_gate(self):
+    def test_preferred_bonus_not_in_weighted(self):
+        # 优先项不进加权求和：只加 bonus = k×Σv/N_must
+        job = {"requirements": ["熟悉嵌入式开发（STM32）", "有ISO9001证书者优先"]}
+        reqs = extract_requirements(job)
+        emp = _employee()
+        chunks = [{"emp_id": "E1", "source": "training", "text": "培训：STM32（已完成）；证书：ISO9001", "anchor": "a"}]
+        from utils.evidence_index import EvidenceIndex
+        idx = EvidenceIndex(chunks, char_bucket_encode([c["text"] for c in chunks]), encode_fn=char_bucket_encode)
+        res = score_coverage(reqs, [emp], idx, cross_encoder_fn=None,
+                             equivalences={"有iso9001证书者优先": ["iso9001"]},
+                             encode_fn=char_bucket_encode,
+                             atomic_splits={}, job_type="技术类")
+        r = res["E1"]
+        assert r["s_prof"] == 1.0                      # 只有 1 条专业必须项且成立
+        expect_bonus = config.COVERAGE_PREFERRED_K * 1.0 / 1  # 1 优先项成立 / 1 必须项
+        assert r["bonus"] == pytest.approx(expect_bonus, abs=0.01)
+
+    def test_prof_must_gate_on_total(self):
         job = {"requirements": ["熟悉嵌入式开发（STM32）", "具备良好的沟通能力"]}
         reqs = extract_requirements(job)
-        emp = _employee(grades=[(2026, "B")], training=["Python"])
+        emp = _employee()
         chunks = [{"emp_id": "E1", "source": "training", "text": "培训：瑜伽入门（已完成）", "anchor": "a"}]
         from utils.evidence_index import EvidenceIndex
         idx = EvidenceIndex(chunks, char_bucket_encode([c["text"] for c in chunks]), encode_fn=char_bucket_encode)
         res = score_coverage(reqs, [emp], idx, cross_encoder_fn=None,
-                             equivalences={}, encode_fn=char_bucket_encode, atomic_splits={})
+                             equivalences={}, encode_fn=char_bucket_encode,
+                             atomic_splits={}, job_type="技术类")
         r = res["E1"]
-        assert r["required_skill_gate"] is not None      # 必要技能 STM32 未成立
-        assert r["coverage"] == pytest.approx(r["coverage_raw"] * config.COVERAGE_REQUIRED_SKILL_GATE)
+        assert r["required_skill_gate"] is not None    # 专业必须 STM32 未成立
+        w = job_weight_triple("技术类")
+        core = w[0] * r["s_prof"] + w[1] * r["s_behav"] + w[2] * r["p"] + r["bonus"]
+        assert r["total"] == pytest.approx(core * config.COVERAGE_REQUIRED_SKILL_GATE, abs=0.05)
 
-    def test_gate_not_triggered_when_skill_met(self):
-        job = {"requirements": ["熟悉嵌入式开发（STM32）"]}
+    def test_behav_must_unmet_no_gate(self):
+        # 行为类必须项未成立不触发闸门（仅专业必须触发）
+        job = {"requirements": ["熟悉嵌入式开发（STM32）", "具备良好的沟通能力"]}
         reqs = extract_requirements(job)
         emp = _employee()
         chunks = [{"emp_id": "E1", "source": "projects", "text": "项目：STM32 固件开发", "anchor": "a"}]
         from utils.evidence_index import EvidenceIndex
         idx = EvidenceIndex(chunks, char_bucket_encode([c["text"] for c in chunks]), encode_fn=char_bucket_encode)
         res = score_coverage(reqs, [emp], idx, cross_encoder_fn=None,
-                             equivalences={}, encode_fn=char_bucket_encode, atomic_splits={})
-        assert res["E1"]["required_skill_gate"] is None
-        assert res["E1"]["coverage"] == res["E1"]["coverage_raw"] == 1.0
+                             equivalences={}, encode_fn=char_bucket_encode,
+                             atomic_splits={}, job_type="技术类")
+        r = res["E1"]
+        assert r["required_skill_gate"] is None        # 专业必须成立（行为必须未成立无闸门）
+        assert r["s_behav"] == 0.0
+
+    def test_empty_class_neutral_half(self):
+        # 只有行为要求 → 专业池空 → S_prof=0.5 中性
+        job = {"requirements": ["具备良好的沟通表达能力"]}
+        reqs = extract_requirements(job)
+        emp = _employee()
+        chunks = [{"emp_id": "E1", "source": "summary_evaluation", "text": "口头表达清晰", "anchor": "a"}]
+        from utils.evidence_index import EvidenceIndex
+        idx = EvidenceIndex(chunks, char_bucket_encode([c["text"] for c in chunks]), encode_fn=char_bucket_encode)
+        res = score_coverage(reqs, [emp], idx, cross_encoder_fn=None,
+                             equivalences={}, encode_fn=char_bucket_encode,
+                             atomic_splits={}, job_type="职能类")
+        r = res["E1"]
+        assert r["class_neutral"] == ["professional"]
+        assert r["s_prof"] == 0.5
+
+    def test_evidence_multifaceted_no_discount(self):
+        # 证据多面性：同一条 chunk 同时支撑专业要求与行为要求，无跨类打折
+        equiv = {"团队管理": ["项目负责人"]}
+        chunk = {"text": "项目「ERP升级」角色：项目负责人；负责方案设计与交付", "anchor": "a"}
+        cls_prof = classify_relation(_req(head="项目管理"), chunk, equiv)
+        cls_behav = classify_relation(_req(head="团队管理"), chunk, equiv)
+        assert cls_behav["value"] == 1.0              # 行为要求被项目证据满足，不打折
+        assert "跨类" not in cls_behav["note"]

@@ -1,97 +1,99 @@
-# 逐岗要求划界表（杠杆三c：必要技能/专业技能/行为技能）
+# 逐岗要求划界表（两类：behavioral/professional × must/preferred，2026-10-24 两类划分重构）
 
-| 岗位 | rid | 要求（截断） | 分类 | 权重(衰减后) |
-|---|---|---|---|---|
-| JOB_B01 | R03 | 质量管理体系与质量工具 | behavior | 1.0（原1.0） |
-| JOB_B01 | R04 | 有工业物联网、智慧园区等数字化项目质量工作经验者优先 | behavior | 0.5（原0.5） |
-| JOB_B01 | R05-a | 沟通协调 | behavior | 0.5（原0.5） |
-| JOB_B01 | R05-b | 质量意识 | behavior | 0.5（原0.5） |
-| JOB_B01 | R06 | 负责智能制造平台类项目的全过程质量管控与验收 | behavior | 1.0（原1.0） |
-| JOB_B01 | R07 | 主导质量管理体系建设、内审与持续改进 | behavior | 1.0（原1.0） |
-| JOB_B01 | R08 | 跨部门质量改进推动，处理试制与交付过程中的质量问题闭 | behavior | 1.0（原1.0） |
-| JOB_B01 | R09 | 参与工业物联网/智慧园区类项目的质量策划与评审 | behavior | 1.0（原1.0） |
-| JOB_B02 | R01 | Spark/Flink等大数据调度组件 | behavior | 1.0（原1.0） |
-| JOB_B02 | R02 | Python数据分析与SQL取数建模 | skill_required | 1.0（原1.0） |
-| JOB_B02 | R03 | 有数据治理或数据平台项目交付经验者优先 | behavior | 0.5（原0.5） |
-| JOB_B02 | R04 | 学习能力强，能快速掌握新技术栈 | behavior | 1.0（原1.0） |
-| JOB_B02 | R05 | 良好的沟通协作能力 | behavior | 1.0（原1.0） |
-| JOB_B02 | R06 | 负责工业大数据调度平台的开发与优化，处理数据链路性能 | behavior | 1.0（原1.0） |
-| JOB_B02 | R07 | 承担数据治理专项建设，保障数据质量与项目交付 | behavior | 1.0（原1.0） |
-| JOB_B02 | R08 | 运用Python/Pandas/SQL进行日常取数与 | skill_required | 1.0（原1.0） |
-| JOB_B02 | R09 | 输出数据分析结果，支撑平台迭代决策 | behavior | 1.0（原1.0） |
-| JOB_B02 | R10 | 与业务团队沟通协作，推进数据需求落地 | behavior | 1.0（原1.0） |
-| JOB_B03 | R03 | Java及微服务架构，熟悉Linux环境部署 | skill_required | 1.0（原1.0） |
-| JOB_B03 | R04 | 有ERP系统、工业大数据平台开发经验者优先 | professional | 0.5（原0.5） |
-| JOB_B03 | R05 | 持有信息系统项目管理师或PMP认证者优先 | professional | 0.5（原0.5） |
-| JOB_B03 | R06 | 负责ERP系统定制开发与Java微服务方案设计实现 | behavior | 1.0（原1.0） |
-| JOB_B03 | R07 | 承担工业大数据分析平台的数据集成与任务调度开发 | behavior | 1.0（原1.0） |
-| JOB_B03 | R08 | 参与边缘计算网关与后端系统的联调集成 | skill_required | 1.0（原1.0） |
-| JOB_B03 | R09 | 主导跨系统集成项目的方案设计与进度管理 | behavior | 1.0（原1.0） |
-| JOB_B04 | R01 | 人力资源综合管理实务 | skill_required | 1.0（原1.0） |
-| JOB_B04 | R02 | 薪酬体系设计或改革项目经验 | skill_required | 1.0（原1.0） |
-| JOB_B04 | R03 | 有HR数字化或信息化平台项目经验者优先 | professional | 0.5（原0.5） |
-| JOB_B04 | R04 | 项目管理方法论 | skill_required | 1.0（原1.0） |
-| JOB_B04 | R05 | 跨部门协调与团队管理能力 | behavior | 1.0（原1.0） |
-| JOB_B04 | R06 | 统筹人力资源综合管理：规划、绩效、培训与员工关系 | behavior | 1.0（原1.0） |
-| JOB_B04 | R07 | 主导薪酬体系设计与改革落地 | skill_required | 1.0（原1.0） |
-| JOB_B04 | R08 | 承担人力资源数字化平台项目管理，推进流程线上化 | behavior | 1.0（原1.0） |
-| JOB_B04 | R09 | 跨部门协调资源，推动项目按期交付 | behavior | 1.0（原1.0） |
-| JOB_B04 | R10 | 带领项目团队，分配职责并激励成员 | behavior | 1.0（原1.0） |
-| JOB_B05 | R03 | COSO内控框架与风险矩阵方法 | behavior | 1.0（原1.0） |
-| JOB_B05 | R04 | 较强的流程梳理与交付管理能力 | behavior | 1.0（原1.0） |
-| JOB_B05 | R05 | 持有高级会计师职称者优先 | professional | 0.5（原0.5） |
-| JOB_B05 | R06 | 负责企业内控体系建设项目统筹与协调 | behavior | 1.0（原1.0） |
-| JOB_B05 | R07 | 主导内控审计协调与流程梳理优化 | behavior | 1.0（原1.0） |
-| JOB_B05 | R08 | 配合薪酬福利体系与人才盘点项目的内控支持 | skill_required | 1.0（原1.0） |
-| JOB_B05 | R09 | 使用审计软件开展内控测试与整改跟踪 | skill_required | 1.0（原1.0） |
-| JOB_B06 | R01 | 嵌入式开发 | skill_required | 1.0（原1.0） |
-| JOB_B06 | R02 | 软件测试 | skill_required | 1.0（原1.0） |
-| JOB_B06 | R03 | 质量导向：标准合规、过程规范、可靠性、持续改进 | behavior | 1.0（原1.0） |
-| JOB_B06 | R04 | 学习敏捷性：快速学习新知识新技能、迁移已有经验 | behavior | 1.0（原1.0） |
-| JOB_B06 | R05-a | 沟通表达 | behavior | 0.25（原0.25） |
-| JOB_B06 | R05-b | 执行推进 | behavior | 0.25（原0.25） |
-| JOB_B06 | R06 | 负责嵌入式平台软硬件协同设计与系统级调试 | skill_required | 1.0（原1.0） |
-| JOB_B06 | R07 | 承担软件测试方案设计、自动化测试与缺陷管理，保障交付 | behavior | 1.0（原1.0） |
-| JOB_B06 | R08 | 建立测试用例库与测试验证规范，推动过程规范与持续改进 | behavior | 1.0（原1.0） |
-| JOB_B06 | R09 | 与跨职能团队沟通协作，推动研发任务按期闭环交付 | behavior | 1.0（原1.0） |
-| JOB_B06 | R10 | 以骨干身份带动团队，发挥影响力与担当 | behavior | 1.0（原1.0） |
-| JOB_B07 | R01 | 结构设计工具与仿真分析 | skill_required | 1.0（原1.0） |
-| JOB_B07 | R02 | 数据分析完整能力链 | skill_required | 1.0（原1.0） |
-| JOB_B07 | R03 | 项目管理方法论实践 | skill_required | 1.0（原1.0） |
-| JOB_B07 | R04 | 团队管理经验或潜力；质量导向、执行推进与学习敏捷性突 | behavior | 1.0（原1.0） |
-| JOB_B07 | R05 | 负责机械结构三维设计、结构仿真分析与工程图纸输出 | skill_required | 1.0（原1.0） |
-| JOB_B07 | R06 | 主导业务数据分析，输出决策建议 | behavior | 1.0（原1.0） |
-| JOB_B07 | R07-a | 交付验收 | behavior | 0.5（原0.5） |
-| JOB_B07 | R07-b | 风险管理 | behavior | 0.5（原0.5） |
-| JOB_B07 | R08 | 组建与管理研发小组：分配职责、激励成员、目标驱动 | behavior | 1.0（原1.0） |
-| JOB_B07 | R09 | 关注标准合规与可靠性，快速吸收新技术并迁移应用到产品 | behavior | 1.0（原1.0） |
-| JOB_B08 | R01 | 人力资源六大模块综合实务 | skill_required | 1.0（原1.0） |
-| JOB_B08 | R02 | 项目管理方法论 | skill_required | 1.0（原1.0） |
-| JOB_B08 | R03 | 跨部门协调与团队管理行为能力突出 | behavior | 1.0（原1.0） |
-| JOB_B08 | R04 | 执行推进可靠；学习敏捷；具备成长型思维 | behavior | 1.0（原1.0） |
-| JOB_B08 | R05 | 统筹人力资源规划、招聘配置、培训开发、绩效管理、薪酬 | behavior | 1.0（原1.0） |
-| JOB_B08 | R06-a | 交付验收 | behavior | 0.5（原0.5） |
-| JOB_B08 | R06-b | 风险管理 | behavior | 0.5（原0.5） |
-| JOB_B08 | R07 | 跨部门协调：主动沟通、消除信息壁垒、推动共识达成与信 | behavior | 1.0（原1.0） |
-| JOB_B08 | R08 | 带领项目团队：分配职责、激励成员、目标驱动达成 | behavior | 1.0（原1.0） |
-| JOB_B08 | R09 | 持续学习新方法新工具并迁移到HR场景，拥抱挑战、自我 | behavior | 1.0（原1.0） |
-| JOB_B09 | R01 | 教学设计/课程设计/教学管理/教研实务 | skill_required | 1.0（原1.0） |
-| JOB_B09 | R02 | 人力资源综合管理知识 | skill_required | 1.0（原1.0） |
-| JOB_B09 | R03 | 沟通表达出色 | behavior | 1.0（原1.0） |
-| JOB_B09 | R04-a | 团队管理 | behavior | 0.25（原0.25） |
-| JOB_B09 | R04-b | 执行推进 | behavior | 0.25（原0.25） |
-| JOB_B09 | R05 | 负责专业技能教学、课程设计与教学管理，含教研、实习指 | behavior | 1.0（原1.0） |
-| JOB_B09 | R06 | 协同人力资源体系：培训开发、绩效管理、组织发展落地 | skill_required | 1.0（原1.0） |
-| JOB_B09 | R07 | 面向不同受众清晰表达与汇报，有效倾听、适配表达风格 | behavior | 1.0（原1.0） |
-| JOB_B09 | R08 | 组建与管理讲师团队：分配职责、激励成员、处理冲突 | behavior | 1.0（原1.0） |
-| JOB_B09 | R09 | 推动培训项目按期闭环交付；持续学习、反思与自我迭代 | behavior | 1.0（原1.0） |
-| JOB_B09 | R10 | 以骨干影响力构建课程愿景、激励学员 | behavior | 1.0（原1.0） |
-| JOB_B10 | R01 | Java及相关框架 | skill_required | 1.0（原1.0） |
-| JOB_B10 | R02 | 全栈交付能力 | behavior | 1.0（原1.0） |
-| JOB_B10 | R03 | 团队管理经验或潜力；沟通表达清晰 | behavior | 1.0（原1.0） |
-| JOB_B10 | R04 | 执行推进闭环意识强；自驱力突出 | behavior | 1.0（原1.0） |
-| JOB_B10 | R05 | 负责Java后端服务与企业应用开发 | skill_required | 1.0（原1.0） |
-| JOB_B10 | R06 | 独立完成前端到后端的端到端产品交付与部署 | behavior | 1.0（原1.0） |
-| JOB_B10 | R07 | 带领研发小组：组建团队、分配职责、激励成员、处理冲突 | behavior | 1.0（原1.0） |
-| JOB_B10 | R08 | 与产品/业务方沟通汇报，推动版本按期闭环交付 | behavior | 1.0（原1.0） |
-| JOB_B10 | R09 | 自我设定目标、持续推进、自我监督与激励 | behavior | 1.0（原1.0） |
+> 词典=T2 标签库名称+关键词∪行为词根；行为优先判定；分类正确性=唯一类间守门人（证据侧不隔离）。**每条类归属你可裁决，词典修订留痕。**
+
+| 岗位 | 矩阵W(prof/behav/P) | rid | 要求（截断） | 类 | 必须/优先 |
+|---|---|---|---|---|---|
+| JOB_B01 | 70/15/15 | R03 | 质量管理体系与质量工具 | behavioral | necessary |
+| JOB_B01 | 70/15/15 | R04 | 有工业物联网、智慧园区等数字化项目质量工作经验者优先 | behavioral | preferred |
+| JOB_B01 | 70/15/15 | R05-a | 沟通协调 | behavioral | necessary |
+| JOB_B01 | 70/15/15 | R05-b | 质量意识 | behavioral | necessary |
+| JOB_B01 | 70/15/15 | R06 | 负责智能制造平台类项目的全过程质量管控与验收 | behavioral | necessary |
+| JOB_B01 | 70/15/15 | R07 | 主导质量管理体系建设、内审与持续改进 | behavioral | necessary |
+| JOB_B01 | 70/15/15 | R08 | 跨部门质量改进推动，处理试制与交付过程中的质量问题闭 | behavioral | necessary |
+| JOB_B01 | 70/15/15 | R09 | 参与工业物联网/智慧园区类项目的质量策划与评审 | behavioral | necessary |
+| JOB_B02 | 70/15/15 | R01 | Spark/Flink等大数据调度组件 | behavioral | necessary |
+| JOB_B02 | 70/15/15 | R02 | Python数据分析与SQL取数建模 | professional | necessary |
+| JOB_B02 | 70/15/15 | R03 | 有数据治理或数据平台项目交付经验者优先 | behavioral | preferred |
+| JOB_B02 | 70/15/15 | R04 | 学习能力强，能快速掌握新技术栈 | behavioral | necessary |
+| JOB_B02 | 70/15/15 | R05 | 良好的沟通协作能力 | behavioral | necessary |
+| JOB_B02 | 70/15/15 | R06 | 负责工业大数据调度平台的开发与优化，处理数据链路性能 | behavioral | necessary |
+| JOB_B02 | 70/15/15 | R07 | 承担数据治理专项建设，保障数据质量与项目交付 | behavioral | necessary |
+| JOB_B02 | 70/15/15 | R08 | 运用Python/Pandas/SQL进行日常取数与 | professional | necessary |
+| JOB_B02 | 70/15/15 | R09 | 输出数据分析结果，支撑平台迭代决策 | behavioral | necessary |
+| JOB_B02 | 70/15/15 | R10 | 与业务团队沟通协作，推进数据需求落地 | behavioral | necessary |
+| JOB_B03 | 70/15/15 | R03 | Java及微服务架构，熟悉Linux环境部署 | professional | necessary |
+| JOB_B03 | 70/15/15 | R04 | 有ERP系统、工业大数据平台开发经验者优先 | professional | preferred |
+| JOB_B03 | 70/15/15 | R05 | 持有信息系统项目管理师或PMP认证者优先 | professional | preferred |
+| JOB_B03 | 70/15/15 | R06 | 负责ERP系统定制开发与Java微服务方案设计实现 | behavioral | necessary |
+| JOB_B03 | 70/15/15 | R07 | 承担工业大数据分析平台的数据集成与任务调度开发 | behavioral | necessary |
+| JOB_B03 | 70/15/15 | R08 | 参与边缘计算网关与后端系统的联调集成 | professional | necessary |
+| JOB_B03 | 70/15/15 | R09 | 主导跨系统集成项目的方案设计与进度管理 | behavioral | necessary |
+| JOB_B04 | 40/30/30 | R01 | 人力资源综合管理实务 | professional | necessary |
+| JOB_B04 | 40/30/30 | R02 | 薪酬体系设计或改革项目经验 | professional | necessary |
+| JOB_B04 | 40/30/30 | R03 | 有HR数字化或信息化平台项目经验者优先 | professional | preferred |
+| JOB_B04 | 40/30/30 | R04 | 项目管理方法论 | professional | necessary |
+| JOB_B04 | 40/30/30 | R05 | 跨部门协调与团队管理能力 | behavioral | necessary |
+| JOB_B04 | 40/30/30 | R06 | 统筹人力资源综合管理：规划、绩效、培训与员工关系 | behavioral | necessary |
+| JOB_B04 | 40/30/30 | R07 | 主导薪酬体系设计与改革落地 | professional | necessary |
+| JOB_B04 | 40/30/30 | R08 | 承担人力资源数字化平台项目管理，推进流程线上化 | behavioral | necessary |
+| JOB_B04 | 40/30/30 | R09 | 跨部门协调资源，推动项目按期交付 | behavioral | necessary |
+| JOB_B04 | 40/30/30 | R10 | 带领项目团队，分配职责并激励成员 | behavioral | necessary |
+| JOB_B05 | 40/30/30 | R03 | COSO内控框架与风险矩阵方法 | behavioral | necessary |
+| JOB_B05 | 40/30/30 | R04 | 较强的流程梳理与交付管理能力 | behavioral | necessary |
+| JOB_B05 | 40/30/30 | R05 | 持有高级会计师职称者优先 | professional | preferred |
+| JOB_B05 | 40/30/30 | R06 | 负责企业内控体系建设项目统筹与协调 | behavioral | necessary |
+| JOB_B05 | 40/30/30 | R07 | 主导内控审计协调与流程梳理优化 | behavioral | necessary |
+| JOB_B05 | 40/30/30 | R08 | 配合薪酬福利体系与人才盘点项目的内控支持 | professional | necessary |
+| JOB_B05 | 40/30/30 | R09 | 使用审计软件开展内控测试与整改跟踪 | professional | necessary |
+| JOB_B06 | 70/15/15 | R01 | 嵌入式开发 | professional | necessary |
+| JOB_B06 | 70/15/15 | R02 | 软件测试 | professional | necessary |
+| JOB_B06 | 70/15/15 | R03 | 质量导向：标准合规、过程规范、可靠性、持续改进 | behavioral | necessary |
+| JOB_B06 | 70/15/15 | R04 | 学习敏捷性：快速学习新知识新技能、迁移已有经验 | behavioral | necessary |
+| JOB_B06 | 70/15/15 | R05-a | 沟通表达 | behavioral | preferred |
+| JOB_B06 | 70/15/15 | R05-b | 执行推进 | behavioral | preferred |
+| JOB_B06 | 70/15/15 | R06 | 负责嵌入式平台软硬件协同设计与系统级调试 | professional | necessary |
+| JOB_B06 | 70/15/15 | R07 | 承担软件测试方案设计、自动化测试与缺陷管理，保障交付 | behavioral | necessary |
+| JOB_B06 | 70/15/15 | R08 | 建立测试用例库与测试验证规范，推动过程规范与持续改进 | behavioral | necessary |
+| JOB_B06 | 70/15/15 | R09 | 与跨职能团队沟通协作，推动研发任务按期闭环交付 | behavioral | necessary |
+| JOB_B06 | 70/15/15 | R10 | 以骨干身份带动团队，发挥影响力与担当 | behavioral | necessary |
+| JOB_B07 | 70/15/15 | R01 | 结构设计工具与仿真分析 | professional | necessary |
+| JOB_B07 | 70/15/15 | R02 | 数据分析完整能力链 | professional | necessary |
+| JOB_B07 | 70/15/15 | R03 | 项目管理方法论实践 | professional | necessary |
+| JOB_B07 | 70/15/15 | R04 | 团队管理经验或潜力；质量导向、执行推进与学习敏捷性突 | behavioral | necessary |
+| JOB_B07 | 70/15/15 | R05 | 负责机械结构三维设计、结构仿真分析与工程图纸输出 | professional | necessary |
+| JOB_B07 | 70/15/15 | R06 | 主导业务数据分析，输出决策建议 | behavioral | necessary |
+| JOB_B07 | 70/15/15 | R07-a | 交付验收 | behavioral | necessary |
+| JOB_B07 | 70/15/15 | R07-b | 风险管理 | behavioral | necessary |
+| JOB_B07 | 70/15/15 | R08 | 组建与管理研发小组：分配职责、激励成员、目标驱动 | behavioral | necessary |
+| JOB_B07 | 70/15/15 | R09 | 关注标准合规与可靠性，快速吸收新技术并迁移应用到产品 | behavioral | necessary |
+| JOB_B08 | 40/30/30 | R01 | 人力资源六大模块综合实务 | professional | necessary |
+| JOB_B08 | 40/30/30 | R02 | 项目管理方法论 | professional | necessary |
+| JOB_B08 | 40/30/30 | R03 | 跨部门协调与团队管理行为能力突出 | behavioral | necessary |
+| JOB_B08 | 40/30/30 | R04 | 执行推进可靠；学习敏捷；具备成长型思维 | behavioral | necessary |
+| JOB_B08 | 40/30/30 | R05 | 统筹人力资源规划、招聘配置、培训开发、绩效管理、薪酬 | behavioral | necessary |
+| JOB_B08 | 40/30/30 | R06-a | 交付验收 | behavioral | necessary |
+| JOB_B08 | 40/30/30 | R06-b | 风险管理 | behavioral | necessary |
+| JOB_B08 | 40/30/30 | R07 | 跨部门协调：主动沟通、消除信息壁垒、推动共识达成与信 | behavioral | necessary |
+| JOB_B08 | 40/30/30 | R08 | 带领项目团队：分配职责、激励成员、目标驱动达成 | behavioral | necessary |
+| JOB_B08 | 40/30/30 | R09 | 持续学习新方法新工具并迁移到HR场景，拥抱挑战、自我 | behavioral | necessary |
+| JOB_B09 | 40/30/30 | R01 | 教学设计/课程设计/教学管理/教研实务 | professional | necessary |
+| JOB_B09 | 40/30/30 | R02 | 人力资源综合管理知识 | professional | necessary |
+| JOB_B09 | 40/30/30 | R03 | 沟通表达出色 | behavioral | necessary |
+| JOB_B09 | 40/30/30 | R04-a | 团队管理 | behavioral | preferred |
+| JOB_B09 | 40/30/30 | R04-b | 执行推进 | behavioral | preferred |
+| JOB_B09 | 40/30/30 | R05 | 负责专业技能教学、课程设计与教学管理，含教研、实习指 | behavioral | necessary |
+| JOB_B09 | 40/30/30 | R06 | 协同人力资源体系：培训开发、绩效管理、组织发展落地 | professional | necessary |
+| JOB_B09 | 40/30/30 | R07 | 面向不同受众清晰表达与汇报，有效倾听、适配表达风格 | behavioral | necessary |
+| JOB_B09 | 40/30/30 | R08 | 组建与管理讲师团队：分配职责、激励成员、处理冲突 | behavioral | necessary |
+| JOB_B09 | 40/30/30 | R09 | 推动培训项目按期闭环交付；持续学习、反思与自我迭代 | behavioral | necessary |
+| JOB_B09 | 40/30/30 | R10 | 以骨干影响力构建课程愿景、激励学员 | behavioral | necessary |
+| JOB_B10 | 70/15/15 | R01 | Java及相关框架 | professional | necessary |
+| JOB_B10 | 70/15/15 | R02 | 全栈交付能力 | behavioral | necessary |
+| JOB_B10 | 70/15/15 | R03 | 团队管理经验或潜力；沟通表达清晰 | behavioral | necessary |
+| JOB_B10 | 70/15/15 | R04 | 执行推进闭环意识强；自驱力突出 | behavioral | necessary |
+| JOB_B10 | 70/15/15 | R05 | 负责Java后端服务与企业应用开发 | professional | necessary |
+| JOB_B10 | 70/15/15 | R06 | 独立完成前端到后端的端到端产品交付与部署 | behavioral | necessary |
+| JOB_B10 | 70/15/15 | R07 | 带领研发小组：组建团队、分配职责、激励成员、处理冲突 | behavioral | necessary |
+| JOB_B10 | 70/15/15 | R08 | 与产品/业务方沟通汇报，推动版本按期闭环交付 | behavioral | necessary |
+| JOB_B10 | 70/15/15 | R09 | 自我设定目标、持续推进、自我监督与激励 | behavioral | necessary |

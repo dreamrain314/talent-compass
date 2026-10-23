@@ -1,7 +1,10 @@
-"""要求—证据对齐引擎（Round 3，预注册 docs/preregister_round3_evidence_alignment_20261022.md §二，2026-10-22 封存）。
+"""要求—证据对齐引擎（Round 3，预注册 §二 2026-10-22 封存 + 两类划分修订 §十八 2026-10-24）。
 
 更换比较单元：不再「员工↔岗位整段语义相似度」，而是「岗位原子要求 ↔ 原始证据片段」
-逐要求对齐，覆盖评分 S = 80·Σ(w_r·v)/Σw_r + 10·B + 10·P。
+逐要求对齐。两类划分（用户 2026-10-24 五决议，结构=开题报告四类职业矩阵）：
+total = [W1·S_prof + W2·S_behav + W3·P] + 优先项加分(k)；
+S_prof/S_behav = 各类必须项加权覆盖分；W 矩阵按 job_type 选档；
+专业类必须项未成立 → total×0.6；证据侧不隔离不打折（证据天然多面）。
 
 预注册硬约束（只执行不发挥）：
 - §2.1 斜杠枚举默认「上位概念+实例」：命中其一即满足，不机械计成三项
@@ -25,7 +28,7 @@ from pathlib import Path
 import numpy as np
 
 import config
-from utils.match_engine import _norm_literal, score_t2_behavior, score_t3_potential
+from utils.match_engine import _norm_literal, score_t3_potential
 
 __all__ = [
     "extract_requirements",
@@ -146,7 +149,7 @@ def extract_requirements(job: dict) -> list[dict]:
             "head": head,
             "instances": instances,
             "kind": kind,
-            "weight": config.COVERAGE_W_PREFERRED if kind == "preferred" else config.COVERAGE_W_NECESSARY,
+            "weight": config.COVERAGE_W_MUST,  # 必须项类内等权；优先项不进加权（加分制）
             # 斜杠枚举 = 上位+实例，命中其一即满足（§2.1）；v=max 聚合天然实现，
             # 本标志仅作展示。显式「同时具备」的并列拆分 mock 未见，保守不拆。
             "either_ok": bool(instances),
@@ -399,34 +402,32 @@ def _get_behavior_lexicon() -> set[str]:
 
 
 def requirement_type(req: dict) -> str:
-    """要求三分类（用户杠杆三c 划界决议）。
+    """要求二分类（用户 2026-10-24 决议：行为类/专业类）。
 
-    判定次序：①行为词典命中（head 文本，T2 名称/关键词/行为词根）→ behavior；
-    ②有具体实例（工具/平台/方法名）或无行为词 → 技能类：
-      kind=necessary → skill_required（必要技能，受闸门约束）；
-      kind=preferred → professional（专业技能，不受闸门）。
-    实例存在与否不影响行为判定次序（「质量导向：标准合规…」带顿号实例仍是行为）。
+    行为词典（T2 标签库名称+关键词 ∪ 行为词根）命中 → behavioral（软实力：
+    团队领导/沟通/协调/执行/学习适应等）；否则 professional（硬技能：数据
+    分析/编程/审计/工具方法等）。必须/优先（kind）是正交维度不参与类判定。
+    分类正确性是唯一的类间守门人——证据侧不隔离不打折（证据天然多面，
+    同一条记录可同时支撑两类要求）。
     """
     h = _norm_literal(req.get("head") or "")
     lex = _get_behavior_lexicon()
     if any(w in h for w in lex):
-        return "behavior"
-    return "skill_required" if req.get("kind") == "necessary" else "professional"
+        return "behavioral"
+    return "professional"
 
 
-def _apply_behavior_decay(reqs: list[dict]) -> None:
-    """杠杆三a：行为类要求超过 FREE_N 条后，超出部分权重 ×DECAY（原位修改）。
+def job_weight_triple(job_type: str | None) -> tuple[float, float, float]:
+    """四类职业权重矩阵选档（W1 专业, W2 行为, W3 潜力，百分数）。
 
-    排序：权重降序（necessary 优先）+ 原顺序稳定——前 FREE_N 条全额，其余衰减。
+    来源=开题报告《五层匹配评分体系细化方案_2026-07-24.md》§2.8.1；
+    职能类（管理职能）映射Ⅲ管理领导档；未识别用 _default。
     """
-    free_n = getattr(config, "COVERAGE_BEHAVIOR_FREE_N", 2)
-    decay = getattr(config, "COVERAGE_BEHAVIOR_DECAY", 0.3)
-    beh = [(i, r) for i, r in enumerate(reqs) if r.get("rtype") == "behavior"]
-    beh.sort(key=lambda t: (-float(t[1]["weight"]), t[0]))
-    for rank, (i, r) in enumerate(beh):
-        if rank >= free_n:
-            reqs[i]["weight"] = round(float(r["weight"]) * decay, 4)
-            reqs[i]["behavior_decayed"] = True
+    matrix = getattr(config, "COVERAGE_JOB_WEIGHT_MATRIX", {})
+    key = str(job_type or "").strip()
+    if key in matrix:
+        return tuple(float(x) for x in matrix[key])
+    return tuple(float(x) for x in matrix.get("_default", (45.0, 35.0, 20.0)))
 
 
 def _expand_requirements(reqs: list[dict], splits: dict[str, list[str]]) -> list[dict]:
@@ -461,6 +462,7 @@ def score_coverage(
     equivalences: dict[str, list[str]] | None = None,
     encode_fn=None,
     atomic_splits: dict[str, list[str]] | None = None,
+    job_type: str | None = None,
 ) -> dict[str, dict]:
     """全员工 × 全要求覆盖评分（预注册 §2.4 骨架，暂定权重已封存）。
 
@@ -486,15 +488,20 @@ def score_coverage(
     if atomic_splits is None:
         atomic_splits = load_atomic_splits()
     reqs = _expand_requirements(reqs, atomic_splits)
-    # 杠杆三c：三分类（必要技能/专业技能/行为技能）→ 三a：行为条数衰减
+    # 两类划分（behavioral/professional）；必须/优先为正交维度 kind
     for r in reqs:
         r["rtype"] = requirement_type(r)
-    _apply_behavior_decay(reqs)
     equiv = equivalences if equivalences is not None else load_verified_equivalences()
     chunk_emp = np.array([c["emp_id"] for c in index.chunks]) if len(index.chunks) else np.array([])
     query_vecs = encode_query_texts([r["text"] for r in reqs], encode_fn)
     if query_vecs is None or query_vecs.size == 0:
         return {}
+    w1, w2, w3 = job_weight_triple(job_type)
+    # 分池索引：专业必须 / 行为必须 / 优先项（加分池，不进加权求和）
+    prof_must = [r for r in reqs if r["rtype"] == "professional" and r["kind"] == "necessary"]
+    behav_must = [r for r in reqs if r["rtype"] == "behavioral" and r["kind"] == "necessary"]
+    preferred_reqs = [r for r in reqs if r["kind"] == "preferred"]
+    n_must = len(prof_must) + len(behav_must)
 
     out: dict[str, dict] = {}
     for emp in employees:
@@ -504,8 +511,7 @@ def score_coverage(
         idxs = np.where(chunk_emp == eid)[0] if chunk_emp.size else []
         emp_chunks = [index.chunks[i] for i in idxs]
         emp_vecs = index.matrix[idxs] if len(idxs) else np.array([])
-        b = score_t2_behavior(emp)
-        p = score_t3_potential(emp)
+        p = score_t3_potential(emp)  # P 潜力基座（W3 列；B 基座已并入行为类实测，取消）
         # 第一遍：全要求召回（CE 在后——§2.2 次序：召回截断在先，CE 对候选逐对评分）
         all_cands: dict[str, list[dict]] = {}
         for ri, req in enumerate(reqs):
@@ -532,8 +538,6 @@ def score_coverage(
                     all_cands[req["rid"]].sort(
                         key=lambda c: -(c["ce"] if c["ce"] is not None else 0.0))
         req_results: dict[str, dict] = {}
-        w_sum = 0.0
-        w_cov = 0.0
         for req in reqs:
             cands = all_cands[req["rid"]]
             best: dict | None = None
@@ -548,8 +552,6 @@ def score_coverage(
                 if cls["value"] >= 1.0:
                     break  # v=max：已达上限，后续候选不再改变该要求贡献
             v = best_cls["value"] if best_cls else 0.0
-            w_sum += float(req["weight"])
-            w_cov += float(req["weight"]) * v
             req_results[req["rid"]] = {
                 "v": v,
                 "relation": best_cls["relation"] if best_cls else "no_candidate",
@@ -557,25 +559,45 @@ def score_coverage(
                 "hit_terms": best_cls["hit_terms"] if best_cls else [],
                 "evidence": [_ev_row(c, best_cls) for c in cands],
             }
-        coverage = w_cov / w_sum if w_sum else 0.0
-        # 杠杆三b：必要技能要求未成立（v=0）→ 整岗 coverage ×GATE（一次，不叠乘）
-        gate_hit = [r["rid"] for r in reqs
-                    if r.get("rtype") == "skill_required"
-                    and req_results[r["rid"]]["v"] <= 0.0 + 1e-9]
+        # 分池聚合（两类 × 必须项加权覆盖；优先项走加分池不进加权）
+        def _pool_score(pool: list[dict]) -> float | None:
+            if not pool:
+                return None
+            ws = sum(float(r["weight"]) for r in pool)
+            wv = sum(float(r["weight"]) * req_results[r["rid"]]["v"] for r in pool)
+            return wv / ws if ws else 0.0
+
+        s_prof_raw = _pool_score(prof_must)
+        s_behav_raw = _pool_score(behav_must)
+        s_prof = 0.5 if s_prof_raw is None else s_prof_raw          # 空类中性（缺失层惯例）
+        s_behav = 0.5 if s_behav_raw is None else s_behav_raw
+        s_prof_flagged = s_prof_raw is None
+        s_behav_flagged = s_behav_raw is None
+        # 全部必须项综合覆盖（展示连续性字段）
+        must_all = prof_must + behav_must
+        coverage = (lambda ws: (sum(float(r["weight"]) * req_results[r["rid"]]["v"] for r in must_all) / ws) if ws else 0.0)(
+            sum(float(r["weight"]) for r in must_all))
+        # 优先项加分（原案 §2.6 加分制）：bonus = k × Σ(优先项 v) / max(1, N_must)
+        bonus = (getattr(config, "COVERAGE_PREFERRED_K", 2.0)
+                 * sum(req_results[r["rid"]]["v"] for r in preferred_reqs)
+                 / max(1, n_must)) if preferred_reqs else 0.0
+        # total = [W1·S_prof + W2·S_behav + W3·P] + bonus（W 百分数 × S∈[0,1] → 满分 100）
+        total = w1 * s_prof + w2 * s_behav + w3 * p + bonus
+        # 闸门：专业类必须项未成立（v=0）→ total ×GATE（一次不叠乘；行为类必须项不触发）
+        gate_hit = [r["rid"] for r in prof_must
+                    if req_results[r["rid"]]["v"] <= 0.0 + 1e-9]
         if gate_hit:
-            coverage *= getattr(config, "COVERAGE_REQUIRED_SKILL_GATE", 0.6)
-        total = (
-            config.COVERAGE_W_COVERAGE * coverage
-            + config.COVERAGE_W_BEHAVIOR * b
-            + config.COVERAGE_W_POTENTIAL * p
-        )
+            total *= getattr(config, "COVERAGE_REQUIRED_SKILL_GATE", 0.6)
         out[eid] = {
             "total": round(total, 2),
             "coverage": round(coverage, 4),
-            "coverage_raw": round(w_cov / w_sum, 4) if w_sum else 0.0,
-            "required_skill_gate": gate_hit or None,
-            "b": round(b, 4),
+            "s_prof": round(s_prof, 4),
+            "s_behav": round(s_behav, 4),
             "p": round(p, 4),
+            "bonus": round(bonus, 4),
+            "w_matrix": [w1, w2, w3],
+            "class_neutral": [c for c, f in (("professional", s_prof_flagged), ("behavioral", s_behav_flagged)) if f] or None,
+            "required_skill_gate": gate_hit or None,
             "requirements": req_results,
         }
     return out

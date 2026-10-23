@@ -1,14 +1,20 @@
 {
- "generated_at": "2026-10-24T03:36:33",
+ "generated_at": "2026-10-24T04:09:38",
  "protocol": "Round3 Day3-5 冒烟（开发资产调试，非验收；要求集未人工核验冻结）",
  "prereg": "docs/preregister_round3_evidence_alignment_20261022.md",
  "ce_enabled": false,
- "elapsed_seconds": 1.8,
+ "elapsed_seconds": 2.4,
  "ce_pairs_estimated": 0,
  "equivalence_table_size": 137,
  "jobs": {
   "JOB_B01": {
    "title": "质量体系工程师（智能制造方向）",
+   "job_type": "技术类",
+   "w_matrix": [
+    70.0,
+    15.0,
+    15.0
+   ],
    "gold_emp_id": "JZ0051",
    "n_requirements": 7,
    "requirements": [
@@ -22,7 +28,7 @@
       "8D"
      ],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "behavioral"
     },
     {
      "rid": "R04",
@@ -32,21 +38,21 @@
       "智慧园区"
      ],
      "kind": "preferred",
-     "weight": 0.15
+     "rtype": "behavioral"
     },
     {
      "rid": "R05",
      "head": "良好的沟通协调能力与质量意识",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": null
     },
     {
      "rid": "R06",
      "head": "负责智能制造平台类项目的全过程质量管控与验收",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "behavioral"
     },
     {
      "rid": "R07",
@@ -55,14 +61,14 @@
       "ISO9001"
      ],
      "kind": "necessary",
-     "weight": 0.3
+     "rtype": "behavioral"
     },
     {
      "rid": "R08",
      "head": "跨部门质量改进推动，处理试制与交付过程中的质量问题闭环",
      "instances": [],
      "kind": "necessary",
-     "weight": 0.3
+     "rtype": "behavioral"
     },
     {
      "rid": "R09",
@@ -72,26 +78,37 @@
       "智慧园区类项目的质量策划与评审"
      ],
      "kind": "necessary",
-     "weight": 0.3
+     "rtype": "behavioral"
     }
    ],
-   "gold_total": 80.99,
-   "gold_coverage": 0.8657,
-   "gold_rank_among_50": 2,
+   "gold_total": 54.39,
+   "gold_s_prof": 0.5,
+   "gold_s_behav": 0.75,
+   "gold_p": 0.5233,
+   "gold_bonus": 0.2857,
+   "gold_gate": null,
+   "gold_coverage": 0.75,
+   "gold_rank_among_50": 3,
    "coverage_stats": {
-    "mean": 0.2076,
-    "max": 0.8657
+    "mean": 0.2268,
+    "max": 0.75
    },
    "top5": [
+    "JZ0012",
     "JZ0001",
     "JZ0051",
-    "JZ0022",
-    "JZ0012",
-    "JZ0013"
+    "JZ0029",
+    "JZ0019"
    ]
   },
   "JOB_B02": {
    "title": "工业大数据开发工程师（调度与治理方向）",
+   "job_type": "技术类",
+   "w_matrix": [
+    70.0,
+    15.0,
+    15.0
+   ],
    "gold_emp_id": "JZ0052",
    "n_requirements": 10,
    "requirements": [
@@ -103,49 +120,49 @@
       "Flink等大数据调度组件"
      ],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "behavioral"
     },
     {
      "rid": "R02",
      "head": "Python数据分析与SQL取数建模",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "professional"
     },
     {
      "rid": "R03",
      "head": "有数据治理或数据平台项目交付经验者优先",
      "instances": [],
      "kind": "preferred",
-     "weight": 0.15
+     "rtype": "behavioral"
     },
     {
      "rid": "R04",
      "head": "学习能力强，能快速掌握新技术栈",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "behavioral"
     },
     {
      "rid": "R05",
      "head": "良好的沟通协作能力",
      "instances": [],
      "kind": "necessary",
-     "weight": 0.3
+     "rtype": "behavioral"
     },
     {
      "rid": "R06",
      "head": "负责工业大数据调度平台的开发与优化，处理数据链路性能问题",
      "instances": [],
      "kind": "necessary",
-     "weight": 0.3
+     "rtype": "behavioral"
     },
     {
      "rid": "R07",
      "head": "承担数据治理专项建设，保障数据质量与项目交付",
      "instances": [],
      "kind": "necessary",
-     "weight": 0.3
+     "rtype": "behavioral"
     },
     {
      "rid": "R08",
@@ -156,40 +173,51 @@
       "SQL进行日常取数与建模分析"
      ],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "professional"
     },
     {
      "rid": "R09",
      "head": "输出数据分析结果，支撑平台迭代决策",
      "instances": [],
      "kind": "necessary",
-     "weight": 0.3
+     "rtype": "behavioral"
     },
     {
      "rid": "R10",
      "head": "与业务团队沟通协作，推进数据需求落地",
      "instances": [],
      "kind": "necessary",
-     "weight": 0.3
+     "rtype": "behavioral"
     }
    ],
-   "gold_total": 69.93,
-   "gold_coverage": 0.708,
+   "gold_total": 83.72,
+   "gold_s_prof": 1.0,
+   "gold_s_behav": 0.2857,
+   "gold_p": 0.6289,
+   "gold_bonus": 0.0,
+   "gold_gate": null,
+   "gold_coverage": 0.4444,
    "gold_rank_among_50": 2,
    "coverage_stats": {
-    "mean": 0.1442,
-    "max": 0.7876
+    "mean": 0.1358,
+    "max": 0.5556
    },
    "top5": [
     "JZ0013",
     "JZ0052",
     "JZ0018",
     "JZ0016",
-    "JZ0010"
+    "JZ0025"
    ]
   },
   "JOB_B03": {
    "title": "Java后端开发工程师（ERP与系统集成方向）",
+   "job_type": "技术类",
+   "w_matrix": [
+    70.0,
+    15.0,
+    15.0
+   ],
    "gold_emp_id": "JZ0053",
    "n_requirements": 7,
    "requirements": [
@@ -198,28 +226,28 @@
      "head": "Java及微服务架构，熟悉Linux环境部署",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "professional"
     },
     {
      "rid": "R04",
      "head": "有ERP系统、工业大数据平台开发经验者优先",
      "instances": [],
      "kind": "preferred",
-     "weight": 0.5
+     "rtype": "professional"
     },
     {
      "rid": "R05",
      "head": "持有信息系统项目管理师或PMP认证者优先",
      "instances": [],
      "kind": "preferred",
-     "weight": 0.5
+     "rtype": "professional"
     },
     {
      "rid": "R06",
      "head": "负责ERP系统定制开发与Java微服务方案设计实现",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "behavioral"
     },
     {
      "rid": "R07",
@@ -228,7 +256,7 @@
       "Airflow"
      ],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "behavioral"
     },
     {
      "rid": "R08",
@@ -238,33 +266,44 @@
       "MQTT 环境"
      ],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "professional"
     },
     {
      "rid": "R09",
      "head": "主导跨系统集成项目的方案设计与进度管理",
      "instances": [],
      "kind": "necessary",
-     "weight": 0.3
+     "rtype": "behavioral"
     }
    ],
-   "gold_total": 65.62,
-   "gold_coverage": 0.6604,
+   "gold_total": 84.08,
+   "gold_s_prof": 1.0,
+   "gold_s_behav": 0.3333,
+   "gold_p": 0.5789,
+   "gold_bonus": 0.4,
+   "gold_gate": null,
+   "gold_coverage": 0.6,
    "gold_rank_among_50": 2,
    "coverage_stats": {
-    "mean": 0.1057,
-    "max": 0.9434
+    "mean": 0.1259,
+    "max": 0.8
    },
    "top5": [
     "JZ0004",
     "JZ0053",
+    "JZ0023",
     "JZ0007",
-    "JZ0022",
-    "JZ0023"
+    "JZ0022"
    ]
   },
   "JOB_B04": {
    "title": "人力资源项目负责人（薪酬与数字化方向）",
+   "job_type": "职能类",
+   "w_matrix": [
+    40.0,
+    30.0,
+    30.0
+   ],
    "gold_emp_id": "JZ0054",
    "n_requirements": 10,
    "requirements": [
@@ -273,21 +312,21 @@
      "head": "人力资源综合管理实务",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "professional"
     },
     {
      "rid": "R02",
      "head": "薪酬体系设计或改革项目经验",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "professional"
     },
     {
      "rid": "R03",
      "head": "有HR数字化或信息化平台项目经验者优先",
      "instances": [],
      "kind": "preferred",
-     "weight": 0.5
+     "rtype": "professional"
     },
     {
      "rid": "R04",
@@ -297,68 +336,79 @@
       "Scrum"
      ],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "professional"
     },
     {
      "rid": "R05",
      "head": "跨部门协调与团队管理能力",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "behavioral"
     },
     {
      "rid": "R06",
      "head": "统筹人力资源综合管理：规划、绩效、培训与员工关系",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "behavioral"
     },
     {
      "rid": "R07",
      "head": "主导薪酬体系设计与改革落地",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "professional"
     },
     {
      "rid": "R08",
      "head": "承担人力资源数字化平台项目管理，推进流程线上化",
      "instances": [],
      "kind": "necessary",
-     "weight": 0.3
+     "rtype": "behavioral"
     },
     {
      "rid": "R09",
      "head": "跨部门协调资源，推动项目按期交付",
      "instances": [],
      "kind": "necessary",
-     "weight": 0.3
+     "rtype": "behavioral"
     },
     {
      "rid": "R10",
      "head": "带领项目团队，分配职责并激励成员",
      "instances": [],
      "kind": "necessary",
-     "weight": 0.3
+     "rtype": "behavioral"
     }
    ],
-   "gold_total": 72.75,
-   "gold_coverage": 0.7432,
+   "gold_total": 65.09,
+   "gold_s_prof": 1.0,
+   "gold_s_behav": 0.2,
+   "gold_p": 0.6289,
+   "gold_bonus": 0.2222,
+   "gold_gate": null,
+   "gold_coverage": 0.5556,
    "gold_rank_among_50": 1,
    "coverage_stats": {
-    "mean": 0.1897,
-    "max": 0.7432
+    "mean": 0.3004,
+    "max": 0.5556
    },
    "top5": [
     "JZ0054",
     "JZ0029",
+    "JZ0031",
     "JZ0037",
-    "JZ0035",
-    "JZ0031"
+    "JZ0048"
    ]
   },
   "JOB_B05": {
    "title": "内控体系建设专员（审计与流程合规方向）",
+   "job_type": "职能类",
+   "w_matrix": [
+    40.0,
+    30.0,
+    30.0
+   ],
    "gold_emp_id": "JZ0036",
    "n_requirements": 7,
    "requirements": [
@@ -367,21 +417,21 @@
      "head": "COSO内控框架与风险矩阵方法",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "behavioral"
     },
     {
      "rid": "R04",
      "head": "较强的流程梳理与交付管理能力",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "behavioral"
     },
     {
      "rid": "R05",
      "head": "持有高级会计师职称者优先",
      "instances": [],
      "kind": "preferred",
-     "weight": 0.5
+     "rtype": "professional"
     },
     {
      "rid": "R06",
@@ -391,47 +441,58 @@
       "风险矩阵"
      ],
      "kind": "necessary",
-     "weight": 0.3
+     "rtype": "behavioral"
     },
     {
      "rid": "R07",
      "head": "主导内控审计协调与流程梳理优化",
      "instances": [],
      "kind": "necessary",
-     "weight": 0.3
+     "rtype": "behavioral"
     },
     {
      "rid": "R08",
      "head": "配合薪酬福利体系与人才盘点项目的内控支持",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "professional"
     },
     {
      "rid": "R09",
      "head": "使用审计软件开展内控测试与整改跟踪",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "professional"
     }
    ],
-   "gold_total": 91.94,
+   "gold_total": 84.8,
+   "gold_s_prof": 1.0,
+   "gold_s_behav": 1.0,
+   "gold_p": 0.4822,
+   "gold_bonus": 0.3333,
+   "gold_gate": null,
    "gold_coverage": 1.0,
-   "gold_rank_among_50": 1,
+   "gold_rank_among_50": 5,
    "coverage_stats": {
-    "mean": 0.2772,
+    "mean": 0.3272,
     "max": 1.0
    },
    "top5": [
-    "JZ0036",
     "JZ0027",
-    "JZ0048",
     "JZ0042",
-    "JZ0045"
+    "JZ0048",
+    "JZ0045",
+    "JZ0036"
    ]
   },
   "JOB_B06": {
    "title": "嵌入式软件研发工程师（测试与质量方向）",
+   "job_type": "技术类",
+   "w_matrix": [
+    70.0,
+    15.0,
+    15.0
+   ],
    "gold_emp_id": "JZ0009",
    "n_requirements": 10,
    "requirements": [
@@ -446,7 +507,7 @@
       "驱动开发"
      ],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "professional"
     },
     {
      "rid": "R02",
@@ -459,28 +520,28 @@
       "缺陷管理"
      ],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "professional"
     },
     {
      "rid": "R03",
      "head": "质量导向：标准合规、过程规范、可靠性、持续改进",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "behavioral"
     },
     {
      "rid": "R04",
      "head": "学习敏捷性：快速学习新知识新技能、迁移已有经验",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "behavioral"
     },
     {
      "rid": "R05",
      "head": "沟通表达与执行推进良好；有领导潜质者优先",
      "instances": [],
      "kind": "preferred",
-     "weight": 0.5
+     "rtype": null
     },
     {
      "rid": "R06",
@@ -491,28 +552,28 @@
       "FPGA"
      ],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "professional"
     },
     {
      "rid": "R07",
      "head": "承担软件测试方案设计、自动化测试与缺陷管理，保障交付质量",
      "instances": [],
      "kind": "necessary",
-     "weight": 0.3
+     "rtype": "behavioral"
     },
     {
      "rid": "R08",
      "head": "建立测试用例库与测试验证规范，推动过程规范与持续改进",
      "instances": [],
      "kind": "necessary",
-     "weight": 0.3
+     "rtype": "behavioral"
     },
     {
      "rid": "R09",
      "head": "与跨职能团队沟通协作，推动研发任务按期闭环交付",
      "instances": [],
      "kind": "necessary",
-     "weight": 0.3
+     "rtype": "behavioral"
     },
     {
      "rid": "R10",
@@ -521,26 +582,39 @@
       "领导潜质发展通道"
      ],
      "kind": "necessary",
-     "weight": 0.3
+     "rtype": "behavioral"
     }
    ],
-   "gold_total": 49.08,
-   "gold_coverage": 0.4701,
+   "gold_total": 39.83,
+   "gold_s_prof": 0.6667,
+   "gold_s_behav": 0.8333,
+   "gold_p": 0.4667,
+   "gold_bonus": 0.2222,
+   "gold_gate": [
+    "R06"
+   ],
+   "gold_coverage": 0.7778,
    "gold_rank_among_50": 1,
    "coverage_stats": {
-    "mean": 0.1521,
-    "max": 0.4701
+    "mean": 0.3127,
+    "max": 0.7778
    },
    "top5": [
     "JZ0009",
     "JZ0019",
     "JZ0023",
-    "JZ0002",
-    "JZ0018"
+    "JZ0005",
+    "JZ0002"
    ]
   },
   "JOB_B07": {
    "title": "研发项目负责人（结构设计与数据应用方向）",
+   "job_type": "技术类",
+   "w_matrix": [
+    70.0,
+    15.0,
+    15.0
+   ],
    "gold_emp_id": "JZ0006",
    "n_requirements": 9,
    "requirements": [
@@ -554,7 +628,7 @@
       "有限元"
      ],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "professional"
     },
     {
      "rid": "R02",
@@ -567,7 +641,7 @@
       "可视化"
      ],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "professional"
     },
     {
      "rid": "R03",
@@ -580,14 +654,14 @@
       "交付"
      ],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "professional"
     },
     {
      "rid": "R04",
      "head": "团队管理经验或潜力；质量导向、执行推进与学习敏捷性突出",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "behavioral"
     },
     {
      "rid": "R05",
@@ -599,7 +673,7 @@
       "有限元"
      ],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "professional"
     },
     {
      "rid": "R06",
@@ -611,47 +685,60 @@
       "可视化报表"
      ],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "behavioral"
     },
     {
      "rid": "R07",
      "head": "承担项目全生命周期管理：范围界定、进度控制、风险管理与交付验收",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": null
     },
     {
      "rid": "R08",
      "head": "组建与管理研发小组：分配职责、激励成员、目标驱动",
      "instances": [],
      "kind": "necessary",
-     "weight": 0.3
+     "rtype": "behavioral"
     },
     {
      "rid": "R09",
      "head": "关注标准合规与可靠性，快速吸收新技术并迁移应用到产品场景",
      "instances": [],
      "kind": "necessary",
-     "weight": 0.3
+     "rtype": "behavioral"
     }
    ],
-   "gold_total": 50.73,
-   "gold_coverage": 0.4739,
+   "gold_total": 42.82,
+   "gold_s_prof": 0.75,
+   "gold_s_behav": 0.7,
+   "gold_p": 0.5578,
+   "gold_bonus": 0.0,
+   "gold_gate": [
+    "R05"
+   ],
+   "gold_coverage": 0.7222,
    "gold_rank_among_50": 1,
    "coverage_stats": {
-    "mean": 0.3117,
-    "max": 0.4739
+    "mean": 0.4681,
+    "max": 0.7222
    },
    "top5": [
     "JZ0006",
-    "JZ0008",
     "JZ0004",
+    "JZ0008",
     "JZ0027",
-    "JZ0048"
+    "JZ0029"
    ]
   },
   "JOB_B08": {
    "title": "人力资源项目负责人（HR体系方向）",
+   "job_type": "职能类",
+   "w_matrix": [
+    40.0,
+    30.0,
+    30.0
+   ],
    "gold_emp_id": "JZ0029",
    "n_requirements": 9,
    "requirements": [
@@ -666,7 +753,7 @@
       "组织发展"
      ],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "professional"
     },
     {
      "rid": "R02",
@@ -679,14 +766,14 @@
       "交付"
      ],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "professional"
     },
     {
      "rid": "R03",
      "head": "跨部门协调与团队管理行为能力突出",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "behavioral"
     },
     {
      "rid": "R04",
@@ -697,61 +784,72 @@
       "自我迭代"
      ],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "behavioral"
     },
     {
      "rid": "R05",
      "head": "统筹人力资源规划、招聘配置、培训开发、绩效管理、薪酬福利与劳动关系管理",
      "instances": [],
      "kind": "necessary",
-     "weight": 0.3
+     "rtype": "behavioral"
     },
     {
      "rid": "R06",
      "head": "主导HR领域项目全生命周期管理：范围界定、进度控制、风险管理与交付验收",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": null
     },
     {
      "rid": "R07",
      "head": "跨部门协调：主动沟通、消除信息壁垒、推动共识达成与信息同步",
      "instances": [],
      "kind": "necessary",
-     "weight": 0.3
+     "rtype": "behavioral"
     },
     {
      "rid": "R08",
      "head": "带领项目团队：分配职责、激励成员、目标驱动达成",
      "instances": [],
      "kind": "necessary",
-     "weight": 0.3
+     "rtype": "behavioral"
     },
     {
      "rid": "R09",
      "head": "持续学习新方法新工具并迁移到HR场景，拥抱挑战、自我迭代",
      "instances": [],
      "kind": "necessary",
-     "weight": 0.3
+     "rtype": "behavioral"
     }
    ],
-   "gold_total": 87.54,
-   "gold_coverage": 0.9182,
+   "gold_total": 85.87,
+   "gold_s_prof": 1.0,
+   "gold_s_behav": 0.7857,
+   "gold_p": 0.7433,
+   "gold_bonus": 0.0,
+   "gold_gate": null,
+   "gold_coverage": 0.8333,
    "gold_rank_among_50": 1,
    "coverage_stats": {
-    "mean": 0.6181,
-    "max": 0.9182
+    "mean": 0.5586,
+    "max": 0.8333
    },
    "top5": [
     "JZ0029",
-    "JZ0048",
     "JZ0019",
-    "JZ0016",
-    "JZ0026"
+    "JZ0048",
+    "JZ0026",
+    "JZ0023"
    ]
   },
   "JOB_B09": {
    "title": "培训与人才发展负责人（教学方向）",
+   "job_type": "职能类",
+   "w_matrix": [
+    40.0,
+    30.0,
+    30.0
+   ],
    "gold_emp_id": "JZ0037",
    "n_requirements": 10,
    "requirements": [
@@ -765,7 +863,7 @@
       "教研实务"
      ],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "professional"
     },
     {
      "rid": "R02",
@@ -776,7 +874,7 @@
       "组织发展"
      ],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "professional"
     },
     {
      "rid": "R03",
@@ -787,49 +885,49 @@
       "书面表达"
      ],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "behavioral"
     },
     {
      "rid": "R04",
      "head": "团队管理与执行推进可靠；成长型思维与领导潜质者优先",
      "instances": [],
      "kind": "preferred",
-     "weight": 0.5
+     "rtype": null
     },
     {
      "rid": "R05",
      "head": "负责专业技能教学、课程设计与教学管理，含教研、实习指导与教学评估",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "behavioral"
     },
     {
      "rid": "R06",
      "head": "协同人力资源体系：培训开发、绩效管理、组织发展落地",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "professional"
     },
     {
      "rid": "R07",
      "head": "面向不同受众清晰表达与汇报，有效倾听、适配表达风格",
      "instances": [],
      "kind": "necessary",
-     "weight": 0.3
+     "rtype": "behavioral"
     },
     {
      "rid": "R08",
      "head": "组建与管理讲师团队：分配职责、激励成员、处理冲突",
      "instances": [],
      "kind": "necessary",
-     "weight": 0.3
+     "rtype": "behavioral"
     },
     {
      "rid": "R09",
      "head": "推动培训项目按期闭环交付；持续学习、反思与自我迭代",
      "instances": [],
      "kind": "necessary",
-     "weight": 0.3
+     "rtype": "behavioral"
     },
     {
      "rid": "R10",
@@ -838,26 +936,39 @@
       "领导潜质发展通道"
      ],
      "kind": "necessary",
-     "weight": 0.3
+     "rtype": "behavioral"
     }
    ],
-   "gold_total": 42.88,
-   "gold_coverage": 0.3756,
-   "gold_rank_among_50": 3,
+   "gold_total": 39.89,
+   "gold_s_prof": 0.6667,
+   "gold_s_behav": 0.6667,
+   "gold_p": 0.6533,
+   "gold_bonus": 0.2222,
+   "gold_gate": [
+    "R01"
+   ],
+   "gold_coverage": 0.6667,
+   "gold_rank_among_50": 4,
    "coverage_stats": {
-    "mean": 0.2498,
-    "max": 0.3983
+    "mean": 0.4774,
+    "max": 0.7556
    },
    "top5": [
     "JZ0031",
     "JZ0026",
-    "JZ0037",
     "JZ0050",
-    "JZ0044"
+    "JZ0037",
+    "JZ0027"
    ]
   },
   "JOB_B10": {
    "title": "Java全栈研发负责人（企业应用方向）",
+   "job_type": "技术类",
+   "w_matrix": [
+    70.0,
+    15.0,
+    15.0
+   ],
    "gold_emp_id": "JZ0025",
    "n_requirements": 9,
    "requirements": [
@@ -871,7 +982,7 @@
       "后端开发"
      ],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "professional"
     },
     {
      "rid": "R02",
@@ -883,14 +994,14 @@
       "部署"
      ],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "behavioral"
     },
     {
      "rid": "R03",
      "head": "团队管理经验或潜力；沟通表达清晰",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "behavioral"
     },
     {
      "rid": "R04",
@@ -900,7 +1011,7 @@
       "目标设定"
      ],
      "kind": "necessary",
-     "weight": 0.3
+     "rtype": "behavioral"
     },
     {
      "rid": "R05",
@@ -911,7 +1022,7 @@
       "JVM"
      ],
      "kind": "necessary",
-     "weight": 1.0
+     "rtype": "professional"
     },
     {
      "rid": "R06",
@@ -921,14 +1032,14 @@
       "Web应用"
      ],
      "kind": "necessary",
-     "weight": 0.3
+     "rtype": "behavioral"
     },
     {
      "rid": "R07",
      "head": "带领研发小组：组建团队、分配职责、激励成员、处理冲突",
      "instances": [],
      "kind": "necessary",
-     "weight": 0.3
+     "rtype": "behavioral"
     },
     {
      "rid": "R08",
@@ -938,7 +1049,7 @@
       "业务方沟通汇报，推动版本按期闭环交付"
      ],
      "kind": "necessary",
-     "weight": 0.3
+     "rtype": "behavioral"
     },
     {
      "rid": "R09",
@@ -947,22 +1058,27 @@
       "自驱力"
      ],
      "kind": "necessary",
-     "weight": 0.3
+     "rtype": "behavioral"
     }
    ],
-   "gold_total": 74.58,
-   "gold_coverage": 0.7636,
-   "gold_rank_among_50": 3,
+   "gold_total": 90.13,
+   "gold_s_prof": 1.0,
+   "gold_s_behav": 0.7143,
+   "gold_p": 0.6278,
+   "gold_bonus": 0.0,
+   "gold_gate": null,
+   "gold_coverage": 0.7778,
+   "gold_rank_among_50": 2,
    "coverage_stats": {
-    "mean": 0.3344,
+    "mean": 0.4588,
     "max": 1.0
    },
    "top5": [
     "JZ0012",
-    "JZ0017",
     "JZ0025",
+    "JZ0017",
     "JZ0018",
-    "JZ0013"
+    "JZ0022"
    ]
   }
  }

@@ -74,23 +74,32 @@ def main() -> int:
         gold_id = gold.get(jid, "")
         t_job = time.time()
         res = score_coverage(reqs, employees, index, cross_encoder_fn=encoder,
-                             equivalences=equiv)
+                             equivalences=equiv,
+                             job_type=str(job.get("job_type", "")))
         totals = {eid: r["total"] for eid, r in res.items()}
         gold_rank = rank_of(totals, gold_id)
         gold_res = res.get(gold_id, {})
         # CE 成本：每要求×每员工×k
         n_pairs += len(reqs) * len(employees) * (config.COVERAGE_RECALL_K if encoder else 0)
         cov_vals = [r["coverage"] for r in res.values()]
+        jt = str(job.get("job_type", ""))
         out_jobs[jid] = {
             "title": str(job.get("title", "")),
+            "job_type": jt,
+            "w_matrix": gold_res.get("w_matrix"),
             "gold_emp_id": gold_id,
             "n_requirements": len(reqs),
             "requirements": [
                 {"rid": r["rid"], "head": r["head"], "instances": r["instances"],
-                 "kind": r["kind"], "weight": r["weight"]}
+                 "kind": r["kind"], "rtype": r.get("rtype")}
                 for r in reqs
             ],
             "gold_total": gold_res.get("total"),
+            "gold_s_prof": gold_res.get("s_prof"),
+            "gold_s_behav": gold_res.get("s_behav"),
+            "gold_p": gold_res.get("p"),
+            "gold_bonus": gold_res.get("bonus"),
+            "gold_gate": gold_res.get("required_skill_gate"),
             "gold_coverage": gold_res.get("coverage"),
             "gold_rank_among_50": gold_rank,
             "coverage_stats": {
@@ -99,9 +108,11 @@ def main() -> int:
             },
             "top5": [eid for eid, _ in sorted(totals.items(), key=lambda kv: (-kv[1], kv[0]))[:5]],
         }
-        print(f"  {jid}: m={len(reqs)} 金标 total={gold_res.get('total')} "
-              f"coverage={gold_res.get('coverage')} rank={gold_rank} "
-              f"（{time.time() - t_job:.1f}s）")
+        print(f"  {jid}[{jt} W={gold_res.get('w_matrix')}]: m={len(reqs)} 金标 "
+              f"total={gold_res.get('total')} prof={gold_res.get('s_prof')} "
+              f"behav={gold_res.get('s_behav')} P={gold_res.get('p')} "
+              f"bonus={gold_res.get('bonus')} gate={'Y' if gold_res.get('required_skill_gate') else '-'} "
+              f"rank={gold_rank}（{time.time() - t_job:.1f}s）")
 
     result = {
         "generated_at": datetime.now().isoformat(timespec="seconds"),
@@ -124,7 +135,8 @@ def main() -> int:
     if b06:
         reqs = extract_requirements(b06)
         res = score_coverage(reqs, [e for e in employees if e.get("employee_id") == gold.get("JOB_B06")],
-                             index, cross_encoder_fn=None, equivalences=equiv)
+                             index, cross_encoder_fn=None, equivalences=equiv,
+                             job_type="技术类")
         gold_res = res.get(gold.get("JOB_B06"))
         if gold_res:
             for row in build_evidence_matrix(reqs, gold_res):

@@ -300,21 +300,26 @@ T0_ALIAS_PATCHES_PATH = DATA_DIR / "jobs" / "alias_patches.json"
 # ── Round 3 要求—证据对齐引擎（docs/preregister_round3_evidence_alignment_20261022.md
 #    §二/§七 已封存 2026-10-22；参数为「减少同时变动因素」的暂定值，Day 8 冻结定版）──
 COVERAGE_RECALL_K = 3            # §七-3 用户确认：每要求×每员工候选证据上限 k≤3
-COVERAGE_W_NECESSARY = 1.0       # §2.1 必要项权重（来自 JD 必要性定义，非候选拟合）
-COVERAGE_W_PREFERRED = 0.5       # §2.1 加分项（JD 明示「优先」）权重
-COVERAGE_W_COVERAGE = 80.0       # §七-2 暂定冻结：覆盖主项 80 分
-COVERAGE_W_BEHAVIOR = 10.0       # §七-2 暂定冻结：B 基座（复用冻结 T2 通道）
-COVERAGE_W_POTENTIAL = 10.0      # §七-2 暂定冻结：P 基座（复用冻结 T3 通道）
+# 必须项类内等权（原案 Demo 期等权兜底）；优先项不进加权求和、走加分制（见下）
+COVERAGE_W_MUST = 1.0
 # 人工核验等价表（§2.3 等价表达唯一入口；不存在/无条目 → 相关改写如实报未证实）
 COVERAGE_EQUIVALENCE_PATH = DATA_DIR / "jobs" / "equivalence_table.json"
 # 等价表 deduct 条目的计分值（用户 D组 #10 决议：受众错位映射「酌情减分」按 0.8 计）
 COVERAGE_DEDUCTION_VALUE = 0.8
-# ── 杠杆三（用户 2026-10-23 决议；预注册修订见 eval_log §十七）──
-# a) 行为类要求条数超过 FREE_N 后，超出部分权重 ×DECAY（大幅下降）——
-#    行为证据来自 360 同质词面，多条行为要求不叠加区分度
-COVERAGE_BEHAVIOR_FREE_N = 2
-COVERAGE_BEHAVIOR_DECAY = 0.3
-# b) 必要技能要求未成立（v=0）→ 整岗 coverage ×GATE（一次封顶，不叠乘）
+# ── 两类能力划分（用户 2026-10-24 五决议；预注册修订见 eval_log §十八；
+#    结构来源=开题报告《五层匹配评分体系细化方案_2026-07-24.md》§2.8 四类职业矩阵）──
+# total = [ W1·S_prof + W2·S_behav + W3·P ]×100 + bonus；闸门：专业必须未成立→total×GATE
+# 矩阵键匹配 JD 的 job_type 字段；未识别用 _default（业务运营档，三类最均衡）
+COVERAGE_JOB_WEIGHT_MATRIX = {
+    "技术类": (70.0, 15.0, 15.0),   # Ⅰ 技术研发：技术深度核心
+    "职能类": (40.0, 30.0, 30.0),   # Ⅲ 管理领导：潜力至关重要（管理职能类映射此档）
+    "业务类": (45.0, 35.0, 20.0),   # Ⅱ 业务运营：行为沟通几乎与专业同等重要
+    "创意类": (45.0, 20.0, 35.0),   # Ⅳ 创意创新：潜力和学习速度决定未来产出
+    "_default": (45.0, 35.0, 20.0),
+}
+# 优先项加分制（原案 §2.6）：bonus = k×Σ(优先项v)/max(1,N_must)，不进加权、不满足不扣分
+COVERAGE_PREFERRED_K = 2.0
+# 专业类必须项未成立（v=0）→ 整个 total ×0.6（一次不叠乘；行为类必须项不触发）
 COVERAGE_REQUIRED_SKILL_GATE = 0.6
 # 负向证据标记（2026-10-21 batch2/gt5 复核类1「只证做过、未证达标」）：含任一标记的
 # 记录不得作为 T0 直接技能命中依据（「做砸了」≠「会做」）。当前 _T0_SOURCES 本就
