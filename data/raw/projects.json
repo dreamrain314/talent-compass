@@ -1246,6 +1246,20 @@
  },
  {
   "employee_id": "JZ0036",
+  "project_name": "企业内控体系建设与优化",
+  "role": "项目负责人",
+  "start_date": "2023-03-01",
+  "end_date": "2024-08-31",
+  "description": "主导企业内控体系建设，运用COSO框架与风险矩阵方法开展内控审计协调与流程梳理优化。",
+  "team_size": 5,
+  "tools_used": [
+   "COSO",
+   "风险矩阵",
+   "审计软件"
+  ]
+ },
+ {
+  "employee_id": "JZ0036",
   "project_name": "组织架构优化项目",
   "role": "协调人",
   "start_date": "2024-07-09",
@@ -1287,6 +1301,18 @@
    "BI报表",
    "用友NC",
    "Excel"
+  ]
+ },
+ {
+  "employee_id": "JZ0036",
+  "project_name": "内控测试与整改跟踪专项",
+  "role": "核心成员",
+  "start_date": "2025-03-10",
+  "end_date": "2026-05-20",
+  "description": "参与内控测试与整改跟踪，运用审计软件完成测试执行与问题闭环。",
+  "team_size": 4,
+  "tools_used": [
+   "审计软件"
   ]
  },
  {

@@ -370,6 +370,65 @@ def load_atomic_splits() -> dict[str, list[str]]:
         return {}
 
 
+# ── 杠杆三c：要求三分类（必要技能 skill_required / 专业技能 professional / 行为技能 behavior）──
+# 词典 = 标签库 T2 名称与关键词（懒加载）+ 行为词根补充；用户决议：按 JD 划界
+_BEHAVIOR_EXTRA = (
+    "沟通", "协作", "团队", "激励", "倾听", "表达", "协调", "跨部门", "学习",
+    "担当", "影响力", "带动", "骨干", "意识", "态度", "靠谱", "自驱", "成长",
+    "适应", "亲和", "反馈", "迁移", "敏捷", "推动", "按时", "闭环意识",
+)
+_behavior_lexicon: set[str] | None = None
+
+
+def _get_behavior_lexicon() -> set[str]:
+    """T2 标签库名称+关键词 ∪ 行为词根补充（确定性，懒加载一次）。"""
+    global _behavior_lexicon
+    if _behavior_lexicon is not None:
+        return _behavior_lexicon
+    lex = set(_BEHAVIOR_EXTRA)
+    try:
+        lib = json.loads((config.DATA_DIR / "standard_label_library_v1.json").read_text(encoding="utf-8"))
+        for item in (lib.get("labels") or {}).get("T2_行为能力") or []:
+            lex.add(_norm_literal(item.get("name", "")))
+            for kw in item.get("keywords") or []:
+                lex.add(_norm_literal(kw))
+    except Exception:
+        pass
+    _behavior_lexicon = {w for w in lex if len(w) >= 2}
+    return _behavior_lexicon
+
+
+def requirement_type(req: dict) -> str:
+    """要求三分类（用户杠杆三c 划界决议）。
+
+    判定次序：①行为词典命中（head 文本，T2 名称/关键词/行为词根）→ behavior；
+    ②有具体实例（工具/平台/方法名）或无行为词 → 技能类：
+      kind=necessary → skill_required（必要技能，受闸门约束）；
+      kind=preferred → professional（专业技能，不受闸门）。
+    实例存在与否不影响行为判定次序（「质量导向：标准合规…」带顿号实例仍是行为）。
+    """
+    h = _norm_literal(req.get("head") or "")
+    lex = _get_behavior_lexicon()
+    if any(w in h for w in lex):
+        return "behavior"
+    return "skill_required" if req.get("kind") == "necessary" else "professional"
+
+
+def _apply_behavior_decay(reqs: list[dict]) -> None:
+    """杠杆三a：行为类要求超过 FREE_N 条后，超出部分权重 ×DECAY（原位修改）。
+
+    排序：权重降序（necessary 优先）+ 原顺序稳定——前 FREE_N 条全额，其余衰减。
+    """
+    free_n = getattr(config, "COVERAGE_BEHAVIOR_FREE_N", 2)
+    decay = getattr(config, "COVERAGE_BEHAVIOR_DECAY", 0.3)
+    beh = [(i, r) for i, r in enumerate(reqs) if r.get("rtype") == "behavior"]
+    beh.sort(key=lambda t: (-float(t[1]["weight"]), t[0]))
+    for rank, (i, r) in enumerate(beh):
+        if rank >= free_n:
+            reqs[i]["weight"] = round(float(r["weight"]) * decay, 4)
+            reqs[i]["behavior_decayed"] = True
+
+
 def _expand_requirements(reqs: list[dict], splits: dict[str, list[str]]) -> list[dict]:
     """A组原子拆解（用户核验决议）：含复合词的要求 → 等权原子子要求。
 
@@ -427,6 +486,10 @@ def score_coverage(
     if atomic_splits is None:
         atomic_splits = load_atomic_splits()
     reqs = _expand_requirements(reqs, atomic_splits)
+    # 杠杆三c：三分类（必要技能/专业技能/行为技能）→ 三a：行为条数衰减
+    for r in reqs:
+        r["rtype"] = requirement_type(r)
+    _apply_behavior_decay(reqs)
     equiv = equivalences if equivalences is not None else load_verified_equivalences()
     chunk_emp = np.array([c["emp_id"] for c in index.chunks]) if len(index.chunks) else np.array([])
     query_vecs = encode_query_texts([r["text"] for r in reqs], encode_fn)
@@ -495,6 +558,12 @@ def score_coverage(
                 "evidence": [_ev_row(c, best_cls) for c in cands],
             }
         coverage = w_cov / w_sum if w_sum else 0.0
+        # 杠杆三b：必要技能要求未成立（v=0）→ 整岗 coverage ×GATE（一次，不叠乘）
+        gate_hit = [r["rid"] for r in reqs
+                    if r.get("rtype") == "skill_required"
+                    and req_results[r["rid"]]["v"] <= 0.0 + 1e-9]
+        if gate_hit:
+            coverage *= getattr(config, "COVERAGE_REQUIRED_SKILL_GATE", 0.6)
         total = (
             config.COVERAGE_W_COVERAGE * coverage
             + config.COVERAGE_W_BEHAVIOR * b
@@ -503,6 +572,8 @@ def score_coverage(
         out[eid] = {
             "total": round(total, 2),
             "coverage": round(coverage, 4),
+            "coverage_raw": round(w_cov / w_sum, 4) if w_sum else 0.0,
+            "required_skill_gate": gate_hit or None,
             "b": round(b, 4),
             "p": round(p, 4),
             "requirements": req_results,

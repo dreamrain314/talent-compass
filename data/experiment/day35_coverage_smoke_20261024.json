@@ -1,11 +1,11 @@
 {
- "generated_at": "2026-10-24T03:10:42",
+ "generated_at": "2026-10-24T03:36:33",
  "protocol": "Round3 Day3-5 冒烟（开发资产调试，非验收；要求集未人工核验冻结）",
  "prereg": "docs/preregister_round3_evidence_alignment_20261022.md",
  "ce_enabled": false,
- "elapsed_seconds": 7.5,
+ "elapsed_seconds": 1.8,
  "ce_pairs_estimated": 0,
- "equivalence_table_size": 127,
+ "equivalence_table_size": 137,
  "jobs": {
   "JOB_B01": {
    "title": "质量体系工程师（智能制造方向）",
@@ -32,7 +32,7 @@
       "智慧园区"
      ],
      "kind": "preferred",
-     "weight": 0.5
+     "weight": 0.15
     },
     {
      "rid": "R05",
@@ -55,14 +55,14 @@
       "ISO9001"
      ],
      "kind": "necessary",
-     "weight": 1.0
+     "weight": 0.3
     },
     {
      "rid": "R08",
      "head": "跨部门质量改进推动，处理试制与交付过程中的质量问题闭环",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "weight": 0.3
     },
     {
      "rid": "R09",
@@ -72,92 +72,120 @@
       "智慧园区类项目的质量策划与评审"
      ],
      "kind": "necessary",
-     "weight": 1.0
+     "weight": 0.3
     }
    ],
-   "gold_total": 73.27,
-   "gold_coverage": 0.7692,
+   "gold_total": 80.99,
+   "gold_coverage": 0.8657,
    "gold_rank_among_50": 2,
    "coverage_stats": {
-    "mean": 0.2151,
-    "max": 0.7692
+    "mean": 0.2076,
+    "max": 0.8657
    },
    "top5": [
     "JZ0001",
     "JZ0051",
-    "JZ0012",
     "JZ0022",
-    "JZ0018"
+    "JZ0012",
+    "JZ0013"
    ]
   },
   "JOB_B02": {
-   "title": "工业大数据分析工程师（数字化平台方向）",
+   "title": "工业大数据开发工程师（调度与治理方向）",
    "gold_emp_id": "JZ0052",
-   "n_requirements": 7,
+   "n_requirements": 10,
    "requirements": [
     {
-     "rid": "R03",
-     "head": "数据处理与分析方法，了解大数据平台调度工具",
+     "rid": "R01",
+     "head": "Spark/Flink等大数据调度组件",
+     "instances": [
+      "Spark",
+      "Flink等大数据调度组件"
+     ],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R02",
+     "head": "Python数据分析与SQL取数建模",
      "instances": [],
      "kind": "necessary",
      "weight": 1.0
     },
     {
+     "rid": "R03",
+     "head": "有数据治理或数据平台项目交付经验者优先",
+     "instances": [],
+     "kind": "preferred",
+     "weight": 0.15
+    },
+    {
      "rid": "R04",
-     "head": "学习能力强，能快速承担产品迭代中的关键任务",
+     "head": "学习能力强，能快速掌握新技术栈",
      "instances": [],
      "kind": "necessary",
      "weight": 1.0
     },
     {
      "rid": "R05",
-     "head": "良好的沟通表达与执行推进能力",
+     "head": "良好的沟通协作能力",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "weight": 0.3
     },
     {
      "rid": "R06",
-     "head": "负责工业大数据分析平台的开发与优化，处理数据链路性能问题",
+     "head": "负责工业大数据调度平台的开发与优化，处理数据链路性能问题",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "weight": 0.3
     },
     {
      "rid": "R07",
-     "head": "参与数字孪生可视化平台的数据分析与功能迭代",
+     "head": "承担数据治理专项建设，保障数据质量与项目交付",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "weight": 0.3
     },
     {
      "rid": "R08",
-     "head": "承担工业IoT平台产品迭代开发中的关键模块",
-     "instances": [],
+     "head": "运用Python/Pandas/SQL进行日常取数与建模分析",
+     "instances": [
+      "运用Python",
+      "Pandas",
+      "SQL进行日常取数与建模分析"
+     ],
      "kind": "necessary",
      "weight": 1.0
     },
     {
      "rid": "R09",
-     "head": "输出数据分析报告，支撑制造过程改进决策",
+     "head": "输出数据分析结果，支撑平台迭代决策",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "weight": 0.3
+    },
+    {
+     "rid": "R10",
+     "head": "与业务团队沟通协作，推进数据需求落地",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 0.3
     }
    ],
-   "gold_total": 47.57,
-   "gold_coverage": 0.4286,
-   "gold_rank_among_50": 9,
+   "gold_total": 69.93,
+   "gold_coverage": 0.708,
+   "gold_rank_among_50": 2,
    "coverage_stats": {
-    "mean": 0.2632,
-    "max": 0.7857
+    "mean": 0.1442,
+    "max": 0.7876
    },
    "top5": [
     "JZ0013",
-    "JZ0003",
-    "JZ0020",
-    "JZ0010",
-    "JZ0001"
+    "JZ0052",
+    "JZ0018",
+    "JZ0016",
+    "JZ0010"
    ]
   },
   "JOB_B03": {
@@ -217,94 +245,116 @@
      "head": "主导跨系统集成项目的方案设计与进度管理",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "weight": 0.3
     }
    ],
-   "gold_total": 59.46,
-   "gold_coverage": 0.5833,
+   "gold_total": 65.62,
+   "gold_coverage": 0.6604,
    "gold_rank_among_50": 2,
    "coverage_stats": {
-    "mean": 0.1389,
-    "max": 0.8333
+    "mean": 0.1057,
+    "max": 0.9434
    },
    "top5": [
     "JZ0004",
     "JZ0053",
-    "JZ0017",
-    "JZ0013",
-    "JZ0007"
+    "JZ0007",
+    "JZ0022",
+    "JZ0023"
    ]
   },
   "JOB_B04": {
-   "title": "人力资源数字化项目负责人（薪酬与绩效方向）",
+   "title": "人力资源项目负责人（薪酬与数字化方向）",
    "gold_emp_id": "JZ0054",
-   "n_requirements": 7,
+   "n_requirements": 10,
    "requirements": [
     {
+     "rid": "R01",
+     "head": "人力资源综合管理实务",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R02",
+     "head": "薪酬体系设计或改革项目经验",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
      "rid": "R03",
-     "head": "薪酬体系设计与合规审计流程",
-     "instances": [],
-     "kind": "necessary",
-     "weight": 1.0
-    },
-    {
-     "rid": "R04",
-     "head": "有数字化平台项目管理与跨部门资源协调经验",
-     "instances": [],
-     "kind": "necessary",
-     "weight": 1.0
-    },
-    {
-     "rid": "R05",
-     "head": "持有中级会计师等职称者优先",
+     "head": "有HR数字化或信息化平台项目经验者优先",
      "instances": [],
      "kind": "preferred",
      "weight": 0.5
     },
     {
-     "rid": "R06",
-     "head": "主导人力资源数字化平台建设与BI分析落地",
+     "rid": "R04",
+     "head": "项目管理方法论",
      "instances": [
-      "PowerBI"
+      "PMP",
+      "Scrum"
      ],
      "kind": "necessary",
      "weight": 1.0
     },
     {
+     "rid": "R05",
+     "head": "跨部门协调与团队管理能力",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R06",
+     "head": "统筹人力资源综合管理：规划、绩效、培训与员工关系",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
      "rid": "R07",
-     "head": "负责薪酬体系改革方案设计与合规审计推动",
+     "head": "主导薪酬体系设计与改革落地",
      "instances": [],
      "kind": "necessary",
      "weight": 1.0
     },
     {
      "rid": "R08",
-     "head": "统筹人才盘点与全面预算管理项目",
+     "head": "承担人力资源数字化平台项目管理，推进流程线上化",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "weight": 0.3
     },
     {
      "rid": "R09",
-     "head": "协调多部门资源，主导方案设计与流程优化",
+     "head": "跨部门协调资源，推动项目按期交付",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "weight": 0.3
+    },
+    {
+     "rid": "R10",
+     "head": "带领项目团队，分配职责并激励成员",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 0.3
     }
    ],
-   "gold_total": 37.9,
-   "gold_coverage": 0.3077,
-   "gold_rank_among_50": 21,
+   "gold_total": 72.75,
+   "gold_coverage": 0.7432,
+   "gold_rank_among_50": 1,
    "coverage_stats": {
-    "mean": 0.2308,
-    "max": 0.6923
+    "mean": 0.1897,
+    "max": 0.7432
    },
    "top5": [
-    "JZ0033",
-    "JZ0030",
-    "JZ0027",
-    "JZ0026",
-    "JZ0037"
+    "JZ0054",
+    "JZ0029",
+    "JZ0037",
+    "JZ0035",
+    "JZ0031"
    ]
   },
   "JOB_B05": {
@@ -341,14 +391,14 @@
       "风险矩阵"
      ],
      "kind": "necessary",
-     "weight": 1.0
+     "weight": 0.3
     },
     {
      "rid": "R07",
      "head": "主导内控审计协调与流程梳理优化",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "weight": 0.3
     },
     {
      "rid": "R08",
@@ -365,19 +415,19 @@
      "weight": 1.0
     }
    ],
-   "gold_total": 24.25,
-   "gold_coverage": 0.1538,
-   "gold_rank_among_50": 38,
+   "gold_total": 91.94,
+   "gold_coverage": 1.0,
+   "gold_rank_among_50": 1,
    "coverage_stats": {
-    "mean": 0.2535,
-    "max": 0.9231
+    "mean": 0.2772,
+    "max": 1.0
    },
    "top5": [
-    "JZ0042",
+    "JZ0036",
     "JZ0027",
     "JZ0048",
-    "JZ0045",
-    "JZ0041"
+    "JZ0042",
+    "JZ0045"
    ]
   },
   "JOB_B06": {
@@ -448,21 +498,21 @@
      "head": "承担软件测试方案设计、自动化测试与缺陷管理，保障交付质量",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "weight": 0.3
     },
     {
      "rid": "R08",
      "head": "建立测试用例库与测试验证规范，推动过程规范与持续改进",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "weight": 0.3
     },
     {
      "rid": "R09",
      "head": "与跨职能团队沟通协作，推动研发任务按期闭环交付",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "weight": 0.3
     },
     {
      "rid": "R10",
@@ -471,22 +521,22 @@
       "领导潜质发展通道"
      ],
      "kind": "necessary",
-     "weight": 1.0
+     "weight": 0.3
     }
    ],
-   "gold_total": 47.26,
-   "gold_coverage": 0.4474,
-   "gold_rank_among_50": 8,
+   "gold_total": 49.08,
+   "gold_coverage": 0.4701,
+   "gold_rank_among_50": 1,
    "coverage_stats": {
-    "mean": 0.3017,
-    "max": 0.5526
+    "mean": 0.1521,
+    "max": 0.4701
    },
    "top5": [
+    "JZ0009",
     "JZ0019",
     "JZ0023",
-    "JZ0018",
-    "JZ0027",
-    "JZ0050"
+    "JZ0002",
+    "JZ0018"
    ]
   },
   "JOB_B07": {
@@ -575,29 +625,29 @@
      "head": "组建与管理研发小组：分配职责、激励成员、目标驱动",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "weight": 0.3
     },
     {
      "rid": "R09",
      "head": "关注标准合规与可靠性，快速吸收新技术并迁移应用到产品场景",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "weight": 0.3
     }
    ],
-   "gold_total": 57.26,
-   "gold_coverage": 0.5556,
-   "gold_rank_among_50": 10,
+   "gold_total": 50.73,
+   "gold_coverage": 0.4739,
+   "gold_rank_among_50": 1,
    "coverage_stats": {
-    "mean": 0.4516,
-    "max": 0.6667
+    "mean": 0.3117,
+    "max": 0.4739
    },
    "top5": [
-    "JZ0048",
+    "JZ0006",
+    "JZ0008",
+    "JZ0004",
     "JZ0027",
-    "JZ0017",
-    "JZ0045",
-    "JZ0030"
+    "JZ0048"
    ]
   },
   "JOB_B08": {
@@ -654,7 +704,7 @@
      "head": "统筹人力资源规划、招聘配置、培训开发、绩效管理、薪酬福利与劳动关系管理",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "weight": 0.3
     },
     {
      "rid": "R06",
@@ -668,36 +718,36 @@
      "head": "跨部门协调：主动沟通、消除信息壁垒、推动共识达成与信息同步",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "weight": 0.3
     },
     {
      "rid": "R08",
      "head": "带领项目团队：分配职责、激励成员、目标驱动达成",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "weight": 0.3
     },
     {
      "rid": "R09",
      "head": "持续学习新方法新工具并迁移到HR场景，拥抱挑战、自我迭代",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "weight": 0.3
     }
    ],
-   "gold_total": 58.53,
-   "gold_coverage": 0.5556,
-   "gold_rank_among_50": 22,
+   "gold_total": 87.54,
+   "gold_coverage": 0.9182,
+   "gold_rank_among_50": 1,
    "coverage_stats": {
-    "mean": 0.534,
-    "max": 0.7778
+    "mean": 0.6181,
+    "max": 0.9182
    },
    "top5": [
+    "JZ0029",
     "JZ0048",
     "JZ0019",
-    "JZ0041",
-    "JZ0032",
-    "JZ0020"
+    "JZ0016",
+    "JZ0026"
    ]
   },
   "JOB_B09": {
@@ -765,21 +815,21 @@
      "head": "面向不同受众清晰表达与汇报，有效倾听、适配表达风格",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "weight": 0.3
     },
     {
      "rid": "R08",
      "head": "组建与管理讲师团队：分配职责、激励成员、处理冲突",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "weight": 0.3
     },
     {
      "rid": "R09",
      "head": "推动培训项目按期闭环交付；持续学习、反思与自我迭代",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "weight": 0.3
     },
     {
      "rid": "R10",
@@ -788,22 +838,22 @@
       "领导潜质发展通道"
      ],
      "kind": "necessary",
-     "weight": 1.0
+     "weight": 0.3
     }
    ],
-   "gold_total": 57.04,
-   "gold_coverage": 0.5526,
-   "gold_rank_among_50": 12,
+   "gold_total": 42.88,
+   "gold_coverage": 0.3756,
+   "gold_rank_among_50": 3,
    "coverage_stats": {
-    "mean": 0.459,
-    "max": 0.7421
+    "mean": 0.2498,
+    "max": 0.3983
    },
    "top5": [
     "JZ0031",
     "JZ0026",
-    "JZ0049",
-    "JZ0044",
-    "JZ0048"
+    "JZ0037",
+    "JZ0050",
+    "JZ0044"
    ]
   },
   "JOB_B10": {
@@ -850,7 +900,7 @@
       "目标设定"
      ],
      "kind": "necessary",
-     "weight": 1.0
+     "weight": 0.3
     },
     {
      "rid": "R05",
@@ -871,14 +921,14 @@
       "Web应用"
      ],
      "kind": "necessary",
-     "weight": 1.0
+     "weight": 0.3
     },
     {
      "rid": "R07",
      "head": "带领研发小组：组建团队、分配职责、激励成员、处理冲突",
      "instances": [],
      "kind": "necessary",
-     "weight": 1.0
+     "weight": 0.3
     },
     {
      "rid": "R08",
@@ -888,7 +938,7 @@
       "业务方沟通汇报，推动版本按期闭环交付"
      ],
      "kind": "necessary",
-     "weight": 1.0
+     "weight": 0.3
     },
     {
      "rid": "R09",
@@ -897,22 +947,22 @@
       "自驱力"
      ],
      "kind": "necessary",
-     "weight": 1.0
+     "weight": 0.3
     }
    ],
-   "gold_total": 75.71,
-   "gold_coverage": 0.7778,
+   "gold_total": 74.58,
+   "gold_coverage": 0.7636,
    "gold_rank_among_50": 3,
    "coverage_stats": {
-    "mean": 0.4465,
+    "mean": 0.3344,
     "max": 1.0
    },
    "top5": [
     "JZ0012",
     "JZ0017",
     "JZ0025",
-    "JZ0027",
-    "JZ0018"
+    "JZ0018",
+    "JZ0013"
    ]
   }
  }

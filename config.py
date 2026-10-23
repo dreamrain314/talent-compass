@@ -309,6 +309,13 @@ COVERAGE_W_POTENTIAL = 10.0      # §七-2 暂定冻结：P 基座（复用冻�
 COVERAGE_EQUIVALENCE_PATH = DATA_DIR / "jobs" / "equivalence_table.json"
 # 等价表 deduct 条目的计分值（用户 D组 #10 决议：受众错位映射「酌情减分」按 0.8 计）
 COVERAGE_DEDUCTION_VALUE = 0.8
+# ── 杠杆三（用户 2026-10-23 决议；预注册修订见 eval_log §十七）──
+# a) 行为类要求条数超过 FREE_N 后，超出部分权重 ×DECAY（大幅下降）——
+#    行为证据来自 360 同质词面，多条行为要求不叠加区分度
+COVERAGE_BEHAVIOR_FREE_N = 2
+COVERAGE_BEHAVIOR_DECAY = 0.3
+# b) 必要技能要求未成立（v=0）→ 整岗 coverage ×GATE（一次封顶，不叠乘）
+COVERAGE_REQUIRED_SKILL_GATE = 0.6
 # 负向证据标记（2026-10-21 batch2/gt5 复核类1「只证做过、未证达标」）：含任一标记的
 # 记录不得作为 T0 直接技能命中依据（「做砸了」≠「会做」）。当前 _T0_SOURCES 本就
 # 不含 performance/summary，此护栏防未来 sources 扩展时负向证据混入（用户指令）。

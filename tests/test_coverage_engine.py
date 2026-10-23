@@ -11,11 +11,13 @@ import pytest
 import config
 from utils.coverage_engine import (
     COVERAGE_RELATION_VALUES,
+    _apply_behavior_decay,
     build_evidence_matrix,
     classify_relation,
     extract_requirements,
     load_verified_equivalences,
     recall_candidates,
+    requirement_type,
     score_coverage,
 )
 
@@ -295,3 +297,48 @@ class TestTableActivation:
         req = _req(head="嵌入式开发", instances=["STM32"])
         out = _expand_requirements([req], {"良好的沟通表达与执行推进能力": ["沟通表达", "执行推进"]})
         assert len(out) == 1 and out[0] is req
+
+
+# ── 杠杆三：三分类 / 行为衰减 / 必要技能闸门 ─────────────────────
+class TestLever3:
+    def test_requirement_typing(self):
+        assert requirement_type(_req(head="软件测试", instances=["STM32"])) == "skill_required"
+        assert requirement_type({**_req(head="高级会计师职称"), "kind": "preferred"}) == "professional"
+        assert requirement_type(_req(head="沟通表达与执行推进能力")) == "behavior"
+        assert requirement_type(_req(head="质量导向：标准合规、过程规范")) == "behavior"  # T2 名称优先于顿号实例
+
+    def test_behavior_decay_beyond_free_n(self):
+        reqs = [_req(head=f"沟通表达变体{i}") for i in range(4)]
+        for r in reqs:
+            r["rtype"] = "behavior"
+        _apply_behavior_decay(reqs)
+        full = [r for r in reqs if not r.get("behavior_decayed")]
+        dec = [r for r in reqs if r.get("behavior_decayed")]
+        assert len(full) == config.COVERAGE_BEHAVIOR_FREE_N
+        assert len(dec) == 2
+        assert dec[0]["weight"] == pytest.approx(_req(head="x")["weight"] * config.COVERAGE_BEHAVIOR_DECAY)
+
+    def test_required_skill_gate(self):
+        job = {"requirements": ["熟悉嵌入式开发（STM32）", "具备良好的沟通能力"]}
+        reqs = extract_requirements(job)
+        emp = _employee(grades=[(2026, "B")], training=["Python"])
+        chunks = [{"emp_id": "E1", "source": "training", "text": "培训：瑜伽入门（已完成）", "anchor": "a"}]
+        from utils.evidence_index import EvidenceIndex
+        idx = EvidenceIndex(chunks, char_bucket_encode([c["text"] for c in chunks]), encode_fn=char_bucket_encode)
+        res = score_coverage(reqs, [emp], idx, cross_encoder_fn=None,
+                             equivalences={}, encode_fn=char_bucket_encode, atomic_splits={})
+        r = res["E1"]
+        assert r["required_skill_gate"] is not None      # 必要技能 STM32 未成立
+        assert r["coverage"] == pytest.approx(r["coverage_raw"] * config.COVERAGE_REQUIRED_SKILL_GATE)
+
+    def test_gate_not_triggered_when_skill_met(self):
+        job = {"requirements": ["熟悉嵌入式开发（STM32）"]}
+        reqs = extract_requirements(job)
+        emp = _employee()
+        chunks = [{"emp_id": "E1", "source": "projects", "text": "项目：STM32 固件开发", "anchor": "a"}]
+        from utils.evidence_index import EvidenceIndex
+        idx = EvidenceIndex(chunks, char_bucket_encode([c["text"] for c in chunks]), encode_fn=char_bucket_encode)
+        res = score_coverage(reqs, [emp], idx, cross_encoder_fn=None,
+                             equivalences={}, encode_fn=char_bucket_encode, atomic_splits={})
+        assert res["E1"]["required_skill_gate"] is None
+        assert res["E1"]["coverage"] == res["E1"]["coverage_raw"] == 1.0
