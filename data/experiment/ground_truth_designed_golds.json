@@ -1,0 +1,161 @@
+{
+ "_meta": {
+  "status": "[USER_DESIGNED_ADJUDICATED]",
+  "created": "2026-10-23",
+  "source": "抢人_无替代岗位·新金标设计表.xlsx（用户设计+裁定，16/16 支持）",
+  "provenance": "用户设计证据 → 注入 raw（JZ0051-54 原闲置身份替换）→ 引擎盲配；设计时点先于任何引擎运行（HR 预埋在先条件重建）",
+  "note": "★字段清单见 scripts/inject_designed_golds.py MANIFEST 注释（未指明字段中性化）"
+ },
+ "JZ0051": {
+  "name": "周清",
+  "profile": {},
+  "labels": [
+   {
+    "label": "质量体系",
+    "category": "skill",
+    "tier": "T1",
+    "evidence": "ISO9001内审员证书 + SPC/FMEA/8D工具实际应用项目（质量过程控制/问题闭环）",
+    "weighted": false,
+    "source_job": "JOB_B01"
+   },
+   {
+    "label": "智能制造",
+    "category": "skill",
+    "tier": "T1",
+    "evidence": "智慧园区工业IoT质量监控平台 质量负责人（项目主导+质量门禁交付）",
+    "weighted": false,
+    "source_job": "JOB_B01"
+   },
+   {
+    "label": "质量导向",
+    "category": "behavior",
+    "tier": "T2",
+    "evidence": "360: 质量意识强、零缺陷交付记录",
+    "weighted": false,
+    "source_job": "JOB_B01"
+   },
+   {
+    "label": "沟通表达",
+    "category": "behavior",
+    "tier": "T2",
+    "evidence": "360: 口头表达清晰、主导跨部门质量评审",
+    "weighted": false,
+    "source_job": "JOB_B01"
+   }
+  ]
+ },
+ "JZ0052": {
+  "name": "罗源",
+  "profile": {},
+  "labels": [
+   {
+    "label": "工业大数据分析",
+    "category": "skill",
+    "tier": "T1",
+    "evidence": "工业大数据调度平台 Spark/Flink 技术负责人 + 数据治理项目交付（绩效A）",
+    "weighted": false,
+    "source_job": "JOB_B02"
+   },
+   {
+    "label": "数据处理分析",
+    "category": "skill",
+    "tier": "T1",
+    "evidence": "Python数据分析工程师（Pandas/SQL 日常取数建模）",
+    "weighted": false,
+    "source_job": "JOB_B02"
+   },
+   {
+    "label": "学习敏捷性",
+    "category": "behavior",
+    "tier": "T2",
+    "evidence": "360: 学习速度快、快速掌握新调度框架（速度词根）",
+    "weighted": false,
+    "source_job": "JOB_B02"
+   },
+   {
+    "label": "沟通表达",
+    "category": "behavior",
+    "tier": "T2",
+    "evidence": "360: 沟通高效、协作顺畅",
+    "weighted": false,
+    "source_job": "JOB_B02"
+   }
+  ]
+ },
+ "JZ0053": {
+  "name": "韩正",
+  "profile": {},
+  "labels": [
+   {
+    "label": "Java开发",
+    "category": "skill",
+    "tier": "T1",
+    "evidence": "ERP系统后端架构师（Java/Spring Boot/微服务/Linux部署）技术负责人 + 2025绩效A",
+    "weighted": false,
+    "source_job": "JOB_B03"
+   },
+   {
+    "label": "智能制造",
+    "category": "skill",
+    "tier": "T1",
+    "evidence": "工业大数据平台 Java微服务后端 核心开发",
+    "weighted": false,
+    "source_job": "JOB_B03"
+   },
+   {
+    "label": "项目管理",
+    "category": "skill",
+    "tier": "T1",
+    "evidence": "信息系统项目管理师证书 + 项目负责人实践（证书+实践互证）",
+    "weighted": false,
+    "source_job": "JOB_B03"
+   },
+   {
+    "label": "学习敏捷性",
+    "category": "behavior",
+    "tier": "T2",
+    "evidence": "360: 学习速度快、钻研新技术栈",
+    "weighted": false,
+    "source_job": "JOB_B03"
+   }
+  ]
+ },
+ "JZ0054": {
+  "name": "方悦",
+  "profile": {},
+  "labels": [
+   {
+    "label": "人力资源管理",
+    "category": "skill",
+    "tier": "T1",
+    "evidence": "人力资源主管10年(P5) + HR管理师证书 + 薪酬体系改革 项目负责人（方案设计+落地交付）",
+    "weighted": false,
+    "source_job": "JOB_B04"
+   },
+   {
+    "label": "项目管理",
+    "category": "skill",
+    "tier": "T1",
+    "evidence": "人力资源数字化平台 项目负责人 + PMP证书（负责人实践+证书互证）",
+    "weighted": false,
+    "source_job": "JOB_B04"
+   },
+   {
+    "label": "跨部门协调",
+    "category": "behavior",
+    "tier": "T2",
+    "evidence": "360: 跨部门沟通顺畅、2026跨部门一致认可（绩效一级，无协调负面）",
+    "weighted": false,
+    "source_job": "JOB_B04"
+   },
+   {
+    "label": "团队管理",
+    "category": "behavior",
+    "tier": "T2",
+    "evidence": "360: 承担负责人角色、具备基层管理能力 + 主管岗",
+    "weighted": false,
+    "source_job": "JOB_B04"
+   }
+  ]
+ }
+}

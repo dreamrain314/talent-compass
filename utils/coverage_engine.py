@@ -58,6 +58,37 @@ _PAREN_RE = re.compile(r"[（(]([^（）()]*)[)）]")
 _REQ_PREFIX_RE = re.compile(
     r"^(熟悉|掌握|精通|具备|具有|了解|能够|能|会|熟练使用|熟练掌握)+"
 )
+# 顿号枚举（与斜杠枚举同类：上位概念+实例，§2.1）。两种保守模式：
+# P1「A、B等」显式等标记枚举；P2 ≥3 段、每段 2-8 字且无动词头的纯列举子句。
+# 如「工业物联网、智慧园区等数字化项目」→ [工业物联网, 智慧园区]。
+_ENUM_DENG_RE = re.compile(
+    r"([^，。；、（）()；;\s等]{2,8})、([^，。；、（）()；;\s等]{2,8})等"
+)
+_VERB_HEADS = ("熟悉", "掌握", "具备", "具有", "负责", "主导", "参与",
+               "承担", "了解", "输出", "使用", "持有", "能够", "开展", "完成")
+
+
+def _duhao_instances(item: str) -> list[str]:
+    """顿号枚举实例化（保守口径）：段长 2-8 字、段内不含请求性动词头。"""
+    def _strip_lead(s: str) -> str:
+        s2 = re.sub(r"^[有具熟掌精了具]|^具备|^具有|^熟悉|^掌握|^了解", "", s)
+        return s2 if len(s2) >= 2 else s
+
+    out: list[str] = []
+    for m in _ENUM_DENG_RE.finditer(item):  # P1: A、B等
+        segs = [_strip_lead(m.group(1).strip()), _strip_lead(m.group(2).strip())]
+        if all(2 <= len(s) <= 8 and not any(v in s for v in _VERB_HEADS) for s in segs):
+            out.extend(s for s in segs if s not in out)
+    if out:
+        return out
+    for clause in re.split(r"[，。；；]", item):  # P2: ≥3 段纯列举
+        if clause.count("、") >= 2:
+            segs = [_strip_lead(s.strip()) for s in clause.split("、") if s.strip()]
+            clean = [s for s in segs
+                     if 2 <= len(s) <= 8 and not any(v in s for v in _VERB_HEADS)]
+            if len(clean) == len(segs) and len(clean) >= 3:
+                out.extend(s for s in clean if s not in out)
+    return out
 
 
 # ── §2.1 要求抽取 ────────────────────────────────────────────────
@@ -102,6 +133,8 @@ def extract_requirements(job: dict) -> list[dict]:
             segs = [s.strip() for s in head.split("/") if len(s.strip()) >= 2]
             if len(segs) >= 2:
                 instances = segs
+        if not instances:
+            instances = _duhao_instances(item)  # 顿号枚举（§2.1 同类归并）
         kind = "preferred" if "优先" in item else "necessary"
         key = _norm_literal(head)
         if key in seen_heads:
