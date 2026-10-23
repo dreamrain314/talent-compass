@@ -266,7 +266,6 @@ def classify_relation(req: dict, chunk: dict, equivalences: dict[str, list[str]]
     text_n = _norm_literal(chunk["text"])
     terms = [req["head"]] + list(req["instances"])
     term_norms = [_norm_literal(t) for t in terms if _norm_literal(t)]
-    # head 归一后可能整句过长，取其 2-8 字滑窗核心词 + 实例做命中检测
     head_cores = _head_core_terms(req["head"])
     hit_terms = [t for t in term_norms if t and t in text_n]
     core_hits = [t for t in head_cores if t in text_n]
@@ -281,9 +280,12 @@ def classify_relation(req: dict, chunk: dict, equivalences: dict[str, list[str]]
     if term_hit and is_state:
         return {"relation": "state_different", "value": COVERAGE_RELATION_VALUES["state_different"],
                 "hit_terms": hit_terms or core_hits, "note": "证据状态为计划/学习中，非已完成"}
-    # 等价表达：仅限已核验表；表内命中 → 与字面同档
+    # 等价表达：仅限已核验表。查找键 = head_lookup_keys 全集（head+实例+长head分段），
+    # 不只「已命中词」——改写 miss 场景（调度工具↔调度平台）下命中集为空，
+    # 键集必须覆盖完整要求侧词表
+    lookup_keys = head_lookup_keys(req)
     eq_hits = []
-    for t in head_cores + hit_terms:
+    for t in lookup_keys:
         for equiv in equivalences.get(t, []):
             if equiv and equiv in text_n:
                 eq_hits.append(equiv)
@@ -309,6 +311,22 @@ def _head_core_terms(head: str) -> list[str]:
     if not h:
         return []
     return [h] if len(h) <= 6 else []
+
+
+def head_lookup_keys(req: dict) -> list[str]:
+    """等价表查找键全集（引擎与 Day6-7 裁决脚本共用，防口径漂移）：
+    短 head 整体 + 全部实例归一词 + 长 head 的分段子词（逗号切分、剥动词头、≥2 字）。"""
+    keys = _head_core_terms(req["head"])
+    keys += [_norm_literal(t) for t in req.get("instances", []) if _norm_literal(t)]
+    h = _norm_literal(req["head"])
+    if len(h) > 6:
+        seg_raw = re.split(r"[，。；、]", req["head"])
+        for seg in seg_raw:
+            seg2 = _REQ_PREFIX_RE.sub("", seg.strip()).strip()
+            n = _norm_literal(seg2)
+            if len(n) >= 2 and n not in keys:
+                keys.append(n)
+    return list(dict.fromkeys(keys))
 
 
 # ── §2.4 覆盖评分 + §2.5 证据矩阵 ────────────────────────────────
