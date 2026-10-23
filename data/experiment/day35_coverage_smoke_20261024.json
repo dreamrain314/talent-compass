@@ -1,0 +1,919 @@
+{
+ "generated_at": "2026-10-24T03:10:42",
+ "protocol": "Round3 Day3-5 冒烟（开发资产调试，非验收；要求集未人工核验冻结）",
+ "prereg": "docs/preregister_round3_evidence_alignment_20261022.md",
+ "ce_enabled": false,
+ "elapsed_seconds": 7.5,
+ "ce_pairs_estimated": 0,
+ "equivalence_table_size": 127,
+ "jobs": {
+  "JOB_B01": {
+   "title": "质量体系工程师（智能制造方向）",
+   "gold_emp_id": "JZ0051",
+   "n_requirements": 7,
+   "requirements": [
+    {
+     "rid": "R03",
+     "head": "质量管理体系与质量工具",
+     "instances": [
+      "ISO9001",
+      "SPC",
+      "FMEA",
+      "8D"
+     ],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R04",
+     "head": "有工业物联网、智慧园区等数字化项目质量工作经验者优先",
+     "instances": [
+      "工业物联网",
+      "智慧园区"
+     ],
+     "kind": "preferred",
+     "weight": 0.5
+    },
+    {
+     "rid": "R05",
+     "head": "良好的沟通协调能力与质量意识",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R06",
+     "head": "负责智能制造平台类项目的全过程质量管控与验收",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R07",
+     "head": "主导质量管理体系建设、内审与持续改进",
+     "instances": [
+      "ISO9001"
+     ],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R08",
+     "head": "跨部门质量改进推动，处理试制与交付过程中的质量问题闭环",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R09",
+     "head": "参与工业物联网/智慧园区类项目的质量策划与评审",
+     "instances": [
+      "参与工业物联网",
+      "智慧园区类项目的质量策划与评审"
+     ],
+     "kind": "necessary",
+     "weight": 1.0
+    }
+   ],
+   "gold_total": 73.27,
+   "gold_coverage": 0.7692,
+   "gold_rank_among_50": 2,
+   "coverage_stats": {
+    "mean": 0.2151,
+    "max": 0.7692
+   },
+   "top5": [
+    "JZ0001",
+    "JZ0051",
+    "JZ0012",
+    "JZ0022",
+    "JZ0018"
+   ]
+  },
+  "JOB_B02": {
+   "title": "工业大数据分析工程师（数字化平台方向）",
+   "gold_emp_id": "JZ0052",
+   "n_requirements": 7,
+   "requirements": [
+    {
+     "rid": "R03",
+     "head": "数据处理与分析方法，了解大数据平台调度工具",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R04",
+     "head": "学习能力强，能快速承担产品迭代中的关键任务",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R05",
+     "head": "良好的沟通表达与执行推进能力",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R06",
+     "head": "负责工业大数据分析平台的开发与优化，处理数据链路性能问题",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R07",
+     "head": "参与数字孪生可视化平台的数据分析与功能迭代",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R08",
+     "head": "承担工业IoT平台产品迭代开发中的关键模块",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R09",
+     "head": "输出数据分析报告，支撑制造过程改进决策",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    }
+   ],
+   "gold_total": 47.57,
+   "gold_coverage": 0.4286,
+   "gold_rank_among_50": 9,
+   "coverage_stats": {
+    "mean": 0.2632,
+    "max": 0.7857
+   },
+   "top5": [
+    "JZ0013",
+    "JZ0003",
+    "JZ0020",
+    "JZ0010",
+    "JZ0001"
+   ]
+  },
+  "JOB_B03": {
+   "title": "Java后端开发工程师（ERP与系统集成方向）",
+   "gold_emp_id": "JZ0053",
+   "n_requirements": 7,
+   "requirements": [
+    {
+     "rid": "R03",
+     "head": "Java及微服务架构，熟悉Linux环境部署",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R04",
+     "head": "有ERP系统、工业大数据平台开发经验者优先",
+     "instances": [],
+     "kind": "preferred",
+     "weight": 0.5
+    },
+    {
+     "rid": "R05",
+     "head": "持有信息系统项目管理师或PMP认证者优先",
+     "instances": [],
+     "kind": "preferred",
+     "weight": 0.5
+    },
+    {
+     "rid": "R06",
+     "head": "负责ERP系统定制开发与Java微服务方案设计实现",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R07",
+     "head": "承担工业大数据分析平台的数据集成与任务调度开发",
+     "instances": [
+      "Airflow"
+     ],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R08",
+     "head": "参与边缘计算网关与后端系统的联调集成",
+     "instances": [
+      "Linux",
+      "MQTT 环境"
+     ],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R09",
+     "head": "主导跨系统集成项目的方案设计与进度管理",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    }
+   ],
+   "gold_total": 59.46,
+   "gold_coverage": 0.5833,
+   "gold_rank_among_50": 2,
+   "coverage_stats": {
+    "mean": 0.1389,
+    "max": 0.8333
+   },
+   "top5": [
+    "JZ0004",
+    "JZ0053",
+    "JZ0017",
+    "JZ0013",
+    "JZ0007"
+   ]
+  },
+  "JOB_B04": {
+   "title": "人力资源数字化项目负责人（薪酬与绩效方向）",
+   "gold_emp_id": "JZ0054",
+   "n_requirements": 7,
+   "requirements": [
+    {
+     "rid": "R03",
+     "head": "薪酬体系设计与合规审计流程",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R04",
+     "head": "有数字化平台项目管理与跨部门资源协调经验",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R05",
+     "head": "持有中级会计师等职称者优先",
+     "instances": [],
+     "kind": "preferred",
+     "weight": 0.5
+    },
+    {
+     "rid": "R06",
+     "head": "主导人力资源数字化平台建设与BI分析落地",
+     "instances": [
+      "PowerBI"
+     ],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R07",
+     "head": "负责薪酬体系改革方案设计与合规审计推动",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R08",
+     "head": "统筹人才盘点与全面预算管理项目",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R09",
+     "head": "协调多部门资源，主导方案设计与流程优化",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    }
+   ],
+   "gold_total": 37.9,
+   "gold_coverage": 0.3077,
+   "gold_rank_among_50": 21,
+   "coverage_stats": {
+    "mean": 0.2308,
+    "max": 0.6923
+   },
+   "top5": [
+    "JZ0033",
+    "JZ0030",
+    "JZ0027",
+    "JZ0026",
+    "JZ0037"
+   ]
+  },
+  "JOB_B05": {
+   "title": "内控体系建设专员（审计与流程合规方向）",
+   "gold_emp_id": "JZ0036",
+   "n_requirements": 7,
+   "requirements": [
+    {
+     "rid": "R03",
+     "head": "COSO内控框架与风险矩阵方法",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R04",
+     "head": "较强的流程梳理与交付管理能力",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R05",
+     "head": "持有高级会计师职称者优先",
+     "instances": [],
+     "kind": "preferred",
+     "weight": 0.5
+    },
+    {
+     "rid": "R06",
+     "head": "负责企业内控体系建设项目统筹与协调",
+     "instances": [
+      "COSO框架",
+      "风险矩阵"
+     ],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R07",
+     "head": "主导内控审计协调与流程梳理优化",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R08",
+     "head": "配合薪酬福利体系与人才盘点项目的内控支持",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R09",
+     "head": "使用审计软件开展内控测试与整改跟踪",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    }
+   ],
+   "gold_total": 24.25,
+   "gold_coverage": 0.1538,
+   "gold_rank_among_50": 38,
+   "coverage_stats": {
+    "mean": 0.2535,
+    "max": 0.9231
+   },
+   "top5": [
+    "JZ0042",
+    "JZ0027",
+    "JZ0048",
+    "JZ0045",
+    "JZ0041"
+   ]
+  },
+  "JOB_B06": {
+   "title": "嵌入式软件研发工程师（测试与质量方向）",
+   "gold_emp_id": "JZ0009",
+   "n_requirements": 10,
+   "requirements": [
+    {
+     "rid": "R01",
+     "head": "嵌入式开发",
+     "instances": [
+      "MCU",
+      "STM32",
+      "ARM",
+      "RTOS",
+      "驱动开发"
+     ],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R02",
+     "head": "软件测试",
+     "instances": [
+      "测试用例",
+      "自动化测试",
+      "性能测试",
+      "测试框架",
+      "缺陷管理"
+     ],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R03",
+     "head": "质量导向：标准合规、过程规范、可靠性、持续改进",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R04",
+     "head": "学习敏捷性：快速学习新知识新技能、迁移已有经验",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R05",
+     "head": "沟通表达与执行推进良好；有领导潜质者优先",
+     "instances": [],
+     "kind": "preferred",
+     "weight": 0.5
+    },
+    {
+     "rid": "R06",
+     "head": "负责嵌入式平台软硬件协同设计与系统级调试",
+     "instances": [
+      "MCU",
+      "ARM",
+      "FPGA"
+     ],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R07",
+     "head": "承担软件测试方案设计、自动化测试与缺陷管理，保障交付质量",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R08",
+     "head": "建立测试用例库与测试验证规范，推动过程规范与持续改进",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R09",
+     "head": "与跨职能团队沟通协作，推动研发任务按期闭环交付",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R10",
+     "head": "以骨干身份带动团队，发挥影响力与担当",
+     "instances": [
+      "领导潜质发展通道"
+     ],
+     "kind": "necessary",
+     "weight": 1.0
+    }
+   ],
+   "gold_total": 47.26,
+   "gold_coverage": 0.4474,
+   "gold_rank_among_50": 8,
+   "coverage_stats": {
+    "mean": 0.3017,
+    "max": 0.5526
+   },
+   "top5": [
+    "JZ0019",
+    "JZ0023",
+    "JZ0018",
+    "JZ0027",
+    "JZ0050"
+   ]
+  },
+  "JOB_B07": {
+   "title": "研发项目负责人（结构设计与数据应用方向）",
+   "gold_emp_id": "JZ0006",
+   "n_requirements": 9,
+   "requirements": [
+    {
+     "rid": "R01",
+     "head": "结构设计工具与仿真分析",
+     "instances": [
+      "CAD",
+      "Pro-E",
+      "SolidWorks",
+      "有限元"
+     ],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R02",
+     "head": "数据分析完整能力链",
+     "instances": [
+      "SQL",
+      "BI",
+      "统计",
+      "数据挖掘",
+      "可视化"
+     ],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R03",
+     "head": "项目管理方法论实践",
+     "instances": [
+      "PMP",
+      "Scrum",
+      "进度管理",
+      "风险管理",
+      "交付"
+     ],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R04",
+     "head": "团队管理经验或潜力；质量导向、执行推进与学习敏捷性突出",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R05",
+     "head": "负责机械结构三维设计、结构仿真分析与工程图纸输出",
+     "instances": [
+      "CAD",
+      "Pro-E",
+      "SolidWorks",
+      "有限元"
+     ],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R06",
+     "head": "主导业务数据分析，输出决策建议",
+     "instances": [
+      "SQL",
+      "BI",
+      "数据挖掘",
+      "可视化报表"
+     ],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R07",
+     "head": "承担项目全生命周期管理：范围界定、进度控制、风险管理与交付验收",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R08",
+     "head": "组建与管理研发小组：分配职责、激励成员、目标驱动",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R09",
+     "head": "关注标准合规与可靠性，快速吸收新技术并迁移应用到产品场景",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    }
+   ],
+   "gold_total": 57.26,
+   "gold_coverage": 0.5556,
+   "gold_rank_among_50": 10,
+   "coverage_stats": {
+    "mean": 0.4516,
+    "max": 0.6667
+   },
+   "top5": [
+    "JZ0048",
+    "JZ0027",
+    "JZ0017",
+    "JZ0045",
+    "JZ0030"
+   ]
+  },
+  "JOB_B08": {
+   "title": "人力资源项目负责人（HR体系方向）",
+   "gold_emp_id": "JZ0029",
+   "n_requirements": 9,
+   "requirements": [
+    {
+     "rid": "R01",
+     "head": "人力资源六大模块综合实务",
+     "instances": [
+      "招聘",
+      "绩效管理",
+      "培训",
+      "薪酬",
+      "组织发展"
+     ],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R02",
+     "head": "项目管理方法论",
+     "instances": [
+      "PMP",
+      "Scrum",
+      "进度管理",
+      "风险管理",
+      "交付"
+     ],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R03",
+     "head": "跨部门协调与团队管理行为能力突出",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R04",
+     "head": "执行推进可靠；学习敏捷；具备成长型思维",
+     "instances": [
+      "持续学习",
+      "韧性",
+      "自我迭代"
+     ],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R05",
+     "head": "统筹人力资源规划、招聘配置、培训开发、绩效管理、薪酬福利与劳动关系管理",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R06",
+     "head": "主导HR领域项目全生命周期管理：范围界定、进度控制、风险管理与交付验收",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R07",
+     "head": "跨部门协调：主动沟通、消除信息壁垒、推动共识达成与信息同步",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R08",
+     "head": "带领项目团队：分配职责、激励成员、目标驱动达成",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R09",
+     "head": "持续学习新方法新工具并迁移到HR场景，拥抱挑战、自我迭代",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    }
+   ],
+   "gold_total": 58.53,
+   "gold_coverage": 0.5556,
+   "gold_rank_among_50": 22,
+   "coverage_stats": {
+    "mean": 0.534,
+    "max": 0.7778
+   },
+   "top5": [
+    "JZ0048",
+    "JZ0019",
+    "JZ0041",
+    "JZ0032",
+    "JZ0020"
+   ]
+  },
+  "JOB_B09": {
+   "title": "培训与人才发展负责人（教学方向）",
+   "gold_emp_id": "JZ0037",
+   "n_requirements": 10,
+   "requirements": [
+    {
+     "rid": "R01",
+     "head": "教学设计/课程设计/教学管理/教研实务",
+     "instances": [
+      "教学设计",
+      "课程设计",
+      "教学管理",
+      "教研实务"
+     ],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R02",
+     "head": "人力资源综合管理知识",
+     "instances": [
+      "培训",
+      "绩效管理",
+      "组织发展"
+     ],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R03",
+     "head": "沟通表达出色",
+     "instances": [
+      "汇报",
+      "演讲",
+      "书面表达"
+     ],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R04",
+     "head": "团队管理与执行推进可靠；成长型思维与领导潜质者优先",
+     "instances": [],
+     "kind": "preferred",
+     "weight": 0.5
+    },
+    {
+     "rid": "R05",
+     "head": "负责专业技能教学、课程设计与教学管理，含教研、实习指导与教学评估",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R06",
+     "head": "协同人力资源体系：培训开发、绩效管理、组织发展落地",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R07",
+     "head": "面向不同受众清晰表达与汇报，有效倾听、适配表达风格",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R08",
+     "head": "组建与管理讲师团队：分配职责、激励成员、处理冲突",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R09",
+     "head": "推动培训项目按期闭环交付；持续学习、反思与自我迭代",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R10",
+     "head": "以骨干影响力构建课程愿景、激励学员",
+     "instances": [
+      "领导潜质发展通道"
+     ],
+     "kind": "necessary",
+     "weight": 1.0
+    }
+   ],
+   "gold_total": 57.04,
+   "gold_coverage": 0.5526,
+   "gold_rank_among_50": 12,
+   "coverage_stats": {
+    "mean": 0.459,
+    "max": 0.7421
+   },
+   "top5": [
+    "JZ0031",
+    "JZ0026",
+    "JZ0049",
+    "JZ0044",
+    "JZ0048"
+   ]
+  },
+  "JOB_B10": {
+   "title": "Java全栈研发负责人（企业应用方向）",
+   "gold_emp_id": "JZ0025",
+   "n_requirements": 9,
+   "requirements": [
+    {
+     "rid": "R01",
+     "head": "Java及相关框架",
+     "instances": [
+      "Spring",
+      "微服务",
+      "JVM",
+      "后端开发"
+     ],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R02",
+     "head": "全栈交付能力",
+     "instances": [
+      "前后端",
+      "Web应用",
+      "端到端",
+      "部署"
+     ],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R03",
+     "head": "团队管理经验或潜力；沟通表达清晰",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R04",
+     "head": "执行推进闭环意识强；自驱力突出",
+     "instances": [
+      "主动承担",
+      "目标设定"
+     ],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R05",
+     "head": "负责Java后端服务与企业应用开发",
+     "instances": [
+      "Spring 体系",
+      "微服务架构",
+      "JVM"
+     ],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R06",
+     "head": "独立完成前端到后端的端到端产品交付与部署",
+     "instances": [
+      "前后端",
+      "Web应用"
+     ],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R07",
+     "head": "带领研发小组：组建团队、分配职责、激励成员、处理冲突",
+     "instances": [],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R08",
+     "head": "与产品/业务方沟通汇报，推动版本按期闭环交付",
+     "instances": [
+      "与产品",
+      "业务方沟通汇报，推动版本按期闭环交付"
+     ],
+     "kind": "necessary",
+     "weight": 1.0
+    },
+    {
+     "rid": "R09",
+     "head": "自我设定目标、持续推进、自我监督与激励",
+     "instances": [
+      "自驱力"
+     ],
+     "kind": "necessary",
+     "weight": 1.0
+    }
+   ],
+   "gold_total": 75.71,
+   "gold_coverage": 0.7778,
+   "gold_rank_among_50": 3,
+   "coverage_stats": {
+    "mean": 0.4465,
+    "max": 1.0
+   },
+   "top5": [
+    "JZ0012",
+    "JZ0017",
+    "JZ0025",
+    "JZ0027",
+    "JZ0018"
+   ]
+  }
+ }
+}

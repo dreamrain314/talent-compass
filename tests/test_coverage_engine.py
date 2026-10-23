@@ -249,3 +249,49 @@ class TestEquivalenceTable:
         monkeypatch.setattr(config, "COVERAGE_EQUIVALENCE_PATH", f, raising=False)
         eq = load_verified_equivalences()
         assert eq.get("嵌入式开发") == ["网关开发"]
+
+
+# ── 等价表 v1 新机制（子串激活 / deduct 减分 / 原子拆解）────────────
+class TestTableActivation:
+    def test_substring_activation(self):
+        # 表键「沟通表达」⊂ 要求「具备良好的沟通表达与执行推进能力」（改写 miss 场景）
+        req = _req(head="良好的沟通表达与执行推进能力")
+        req["text"] = "具备良好的沟通表达与执行推进能力"
+        equiv = {"沟通表达": ["跨部门沟通顺畅"]}
+        cls = classify_relation(req, {"text": "360: 跨部门沟通顺畅，协作融洽"}, equiv)
+        assert cls["relation"] == "equivalent" and cls["value"] == 1.0
+
+    def test_deduct_value(self, tmp_path, monkeypatch):
+        import json as _json
+        f = tmp_path / "eq.json"
+        f.write_text(_json.dumps({"equivalences": {"激励学员": ["能激发团队士气"]},
+                                  "deduct": [["激励学员", "能激发团队士气"]],
+                                  "atomic_splits": {}}), encoding="utf-8")
+        monkeypatch.setattr(config, "COVERAGE_EQUIVALENCE_PATH", f, raising=False)
+        req = _req(head="激励学员")
+        req["text"] = "以骨干影响力构建课程愿景、激励学员（领导潜质发展通道）"
+        cls = classify_relation(req, {"text": "360: 能激发团队士气"}, {"激励学员": ["能激发团队士气"]})
+        assert cls["relation"] == "equivalent"
+        assert cls["value"] == pytest.approx(config.COVERAGE_DEDUCTION_VALUE)
+        assert "减分" in cls["note"]
+
+    def test_atomic_split_weights_and_partial_credit(self):
+        from utils.coverage_engine import _expand_requirements
+        req = _req(head="良好的沟通表达与执行推进能力", instances=None)
+        req["text"] = "具备良好的沟通表达与执行推进能力"
+        splits = {"良好的沟通表达与执行推进能力": ["沟通表达", "执行推进"]}
+        out = _expand_requirements([req], splits)
+        assert len(out) == 2
+        assert sum(r["weight"] for r in out) == pytest.approx(req["weight"])
+        assert [r["head"] for r in out] == ["沟通表达", "执行推进"]
+        # 匹配半边经表命中 1.0；舍弃半边无表项保持未证实 → 整要求 0.5 而非 1.0
+        equiv = {"沟通表达": ["跨部门沟通顺畅"]}
+        hit = classify_relation(out[0], {"text": "跨部门沟通顺畅"}, equiv)
+        miss = classify_relation(out[1], {"text": "跨部门沟通顺畅"}, equiv)
+        assert hit["value"] == 1.0 and miss["value"] == 0.0
+
+    def test_no_split_when_compound_absent(self):
+        from utils.coverage_engine import _expand_requirements
+        req = _req(head="嵌入式开发", instances=["STM32"])
+        out = _expand_requirements([req], {"良好的沟通表达与执行推进能力": ["沟通表达", "执行推进"]})
+        assert len(out) == 1 and out[0] is req

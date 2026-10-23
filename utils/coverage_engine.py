@@ -280,18 +280,33 @@ def classify_relation(req: dict, chunk: dict, equivalences: dict[str, list[str]]
     if term_hit and is_state:
         return {"relation": "state_different", "value": COVERAGE_RELATION_VALUES["state_different"],
                 "hit_terms": hit_terms or core_hits, "note": "证据状态为计划/学习中，非已完成"}
-    # 等价表达：仅限已核验表。查找键 = head_lookup_keys 全集（head+实例+长head分段），
-    # 不只「已命中词」——改写 miss 场景（调度工具↔调度平台）下命中集为空，
-    # 键集必须覆盖完整要求侧词表
+    # 等价表达：仅限已核验表。两条激活路径：
+    # ① 查找键全集精确命中（head_lookup_keys：head+实例+长head分段）
+    # ② 子串激活：表键 ⊂ 要求文本（如「沟通表达」⊂「良好的沟通表达与执行推进能力」，
+    #    或「激励学员」⊂ B09 职责句）——改写 miss 场景键集为空，必须由表键反向激活
     lookup_keys = head_lookup_keys(req)
-    eq_hits = []
+    eq_hits: list[tuple[str, str]] = []  # (表键, 证据侧词)
+    req_full = _norm_literal(req["text"] + req["head"] + "".join(req.get("instances", [])))
     for t in lookup_keys:
         for equiv in equivalences.get(t, []):
             if equiv and equiv in text_n:
-                eq_hits.append(equiv)
+                eq_hits.append((t, equiv))
+    if not eq_hits:
+        for k in equivalences:
+            if len(k) >= 2 and k in req_full:
+                for equiv in equivalences[k]:
+                    if equiv and equiv in text_n:
+                        eq_hits.append((k, equiv))
     if eq_hits:
+        # deduct 条目（用户 D组决议）：受众错位映射按 0.8 计
+        deduct_set = _load_deduct_set()
+        if any((k, ev) in deduct_set for (k, ev) in eq_hits):
+            return {"relation": "equivalent", "value": config.COVERAGE_DEDUCTION_VALUE,
+                    "hit_terms": [ev for (_, ev) in eq_hits],
+                    "note": "经核验等价表命中（D组受众错位，按 0.8 酌情减分）"}
         return {"relation": "equivalent", "value": COVERAGE_RELATION_VALUES["equivalent"],
-                "hit_terms": eq_hits, "note": "经核验等价表命中（与字面同档，无字面加成）"}
+                "hit_terms": [ev for (_, ev) in eq_hits],
+                "note": "经核验等价表命中（与字面同档，无字面加成）"}
     if term_hit:
         return {"relation": "direct_support", "value": COVERAGE_RELATION_VALUES["direct_support"],
                 "hit_terms": hit_terms or core_hits, "note": "实例/核心词命中（有向支持，下位实例可支持）"}
@@ -330,6 +345,55 @@ def head_lookup_keys(req: dict) -> list[str]:
 
 
 # ── §2.4 覆盖评分 + §2.5 证据矩阵 ────────────────────────────────
+def _load_deduct_set() -> set:
+    """等价表 deduct 条目集合（懒读文件；无文件/异常→空集，测试 monkeypatch 路径友好）。"""
+    p = getattr(config, "COVERAGE_EQUIVALENCE_PATH", None)
+    if not p or not Path(p).exists():
+        return set()
+    try:
+        data = json.loads(Path(p).read_text(encoding="utf-8"))
+        return {tuple(x) for x in (data.get("deduct") or []) if isinstance(x, (list, tuple)) and len(x) == 2}
+    except Exception:
+        return set()
+
+
+def load_atomic_splits() -> dict[str, list[str]]:
+    """等价表 atomic_splits：复合要求词 → 原子能力列表（用户 A组拆解决议）。"""
+    p = getattr(config, "COVERAGE_EQUIVALENCE_PATH", None)
+    if not p or not Path(p).exists():
+        return {}
+    try:
+        data = json.loads(Path(p).read_text(encoding="utf-8"))
+        return {k: v for k, v in (data.get("atomic_splits") or {}).items()
+                if isinstance(v, list) and v}
+    except Exception:
+        return {}
+
+
+def _expand_requirements(reqs: list[dict], splits: dict[str, list[str]]) -> list[dict]:
+    """A组原子拆解（用户核验决议）：含复合词的要求 → 等权原子子要求。
+
+    匹配半边经等价表命中计分；舍弃半边无表项、走常规通道（通常保持未证实）——
+    防止「半匹配」按整要求计满分污染排名。Σw 不变（原子权重 = 原权重/原子数）。
+    """
+    if not splits:
+        return reqs
+    out: list[dict] = []
+    for r in reqs:
+        h = _norm_literal(r["head"])
+        compound = next((c for c in splits if c and c in h), None)
+        if compound is None:
+            out.append(r)
+            continue
+        atomics = splits[compound]
+        for i, a in enumerate(atomics):
+            out.append({**r, "rid": f"{r['rid']}-{chr(97 + i)}", "text": a, "head": a,
+                        "instances": [], "either_ok": True,
+                        "weight": round(float(r["weight"]) / len(atomics), 4),
+                        "atomic_of": compound})
+    return out
+
+
 def score_coverage(
     requirements: list[dict],
     employees: list[dict],
@@ -337,6 +401,7 @@ def score_coverage(
     cross_encoder_fn=None,
     equivalences: dict[str, list[str]] | None = None,
     encode_fn=None,
+    atomic_splits: dict[str, list[str]] | None = None,
 ) -> dict[str, dict]:
     """全员工 × 全要求覆盖评分（预注册 §2.4 骨架，暂定权重已封存）。
 
@@ -358,6 +423,10 @@ def score_coverage(
     reqs = requirements
     if not reqs:
         return {}
+    # A组原子拆解（用户核验决议）：含复合词的要求 → 等权原子子要求（Σw 不变）
+    if atomic_splits is None:
+        atomic_splits = load_atomic_splits()
+    reqs = _expand_requirements(reqs, atomic_splits)
     equiv = equivalences if equivalences is not None else load_verified_equivalences()
     chunk_emp = np.array([c["emp_id"] for c in index.chunks]) if len(index.chunks) else np.array([])
     query_vecs = encode_query_texts([r["text"] for r in reqs], encode_fn)

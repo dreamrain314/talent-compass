@@ -307,6 +307,8 @@ COVERAGE_W_BEHAVIOR = 10.0       # §七-2 暂定冻结：B 基座（复用冻�
 COVERAGE_W_POTENTIAL = 10.0      # §七-2 暂定冻结：P 基座（复用冻结 T3 通道）
 # 人工核验等价表（§2.3 等价表达唯一入口；不存在/无条目 → 相关改写如实报未证实）
 COVERAGE_EQUIVALENCE_PATH = DATA_DIR / "jobs" / "equivalence_table.json"
+# 等价表 deduct 条目的计分值（用户 D组 #10 决议：受众错位映射「酌情减分」按 0.8 计）
+COVERAGE_DEDUCTION_VALUE = 0.8
 # 负向证据标记（2026-10-21 batch2/gt5 复核类1「只证做过、未证达标」）：含任一标记的
 # 记录不得作为 T0 直接技能命中依据（「做砸了」≠「会做」）。当前 _T0_SOURCES 本就
 # 不含 performance/summary，此护栏防未来 sources 扩展时负向证据混入（用户指令）。
