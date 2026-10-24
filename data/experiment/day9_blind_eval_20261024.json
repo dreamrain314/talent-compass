@@ -1,0 +1,586 @@
+{
+ "generated_at": "2026-10-24T23:53:46",
+ "protocol": "Day9 盲写验收（agent 盲写 JD / 冻结引擎 / 用户裁决）",
+ "jobs": {
+  "JOB_C01": {
+   "title": "嵌入式软件工程师",
+   "job_type": "技术类",
+   "top10": [
+    {
+     "emp": "JZ0012",
+     "name": "杨勇",
+     "pos": "算法工程师",
+     "total": 7.6,
+     "prof": 0.0,
+     "behav": 0.0,
+     "p": 0.8444,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0027",
+     "name": "严志强",
+     "pos": "培训经理",
+     "total": 7.1,
+     "prof": 0.0,
+     "behav": 0.0,
+     "p": 0.7889,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0044",
+     "name": "潘恒",
+     "pos": "人力资源主管",
+     "total": 7.05,
+     "prof": 0.0,
+     "behav": 0.0,
+     "p": 0.7833,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0019",
+     "name": "孟敏",
+     "pos": "FPGA工程师",
+     "total": 6.69,
+     "prof": 0.0,
+     "behav": 0.0,
+     "p": 0.7433,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0029",
+     "name": "毛文",
+     "pos": "人力资源主管",
+     "total": 6.69,
+     "prof": 0.0,
+     "behav": 0.0,
+     "p": 0.7433,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0003",
+     "name": "孟华",
+     "pos": "FPGA工程师",
+     "total": 6.55,
+     "prof": 0.0,
+     "behav": 0.0,
+     "p": 0.7278,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0014",
+     "name": "马洋",
+     "pos": "系统架构师",
+     "total": 6.52,
+     "prof": 0.0,
+     "behav": 0.0,
+     "p": 0.7244,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0039",
+     "name": "曹恒",
+     "pos": "法务专员",
+     "total": 6.52,
+     "prof": 0.0,
+     "behav": 0.0,
+     "p": 0.7244,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0023",
+     "name": "余浩",
+     "pos": "FPGA工程师",
+     "total": 6.45,
+     "prof": 0.0,
+     "behav": 0.0,
+     "p": 0.7167,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0040",
+     "name": "魏天宇",
+     "pos": "招聘主管",
+     "total": 6.29,
+     "prof": 0.0,
+     "behav": 0.0,
+     "p": 0.6989,
+     "bonus": 0.0,
+     "gate": true
+    }
+   ]
+  },
+  "JOB_C02": {
+   "title": "工业大数据平台开发工程师",
+   "job_type": "技术类",
+   "top10": [
+    {
+     "emp": "JZ0012",
+     "name": "杨勇",
+     "pos": "算法工程师",
+     "total": 37.6,
+     "prof": 0.5,
+     "behav": 1.0,
+     "p": 0.8444,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0013",
+     "name": "何天宇",
+     "pos": "软件工程师",
+     "total": 27.98,
+     "prof": 0.3333,
+     "behav": 1.0,
+     "p": 0.5533,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0003",
+     "name": "孟华",
+     "pos": "FPGA工程师",
+     "total": 27.55,
+     "prof": 0.5,
+     "behav": 0.0,
+     "p": 0.7278,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0017",
+     "name": "史飞",
+     "pos": "硬件工程师",
+     "total": 21.43,
+     "prof": 0.1667,
+     "behav": 1.0,
+     "p": 0.6033,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0006",
+     "name": "宋睿",
+     "pos": "结构设计工程师",
+     "total": 21.02,
+     "prof": 0.1667,
+     "behav": 1.0,
+     "p": 0.5578,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0014",
+     "name": "马洋",
+     "pos": "系统架构师",
+     "total": 20.52,
+     "prof": 0.3333,
+     "behav": 0.0,
+     "p": 0.7244,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0001",
+     "name": "周诗涵",
+     "pos": "质量工程师",
+     "total": 19.88,
+     "prof": 0.3333,
+     "behav": 0.0,
+     "p": 0.6533,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0022",
+     "name": "姜宇",
+     "pos": "FPGA工程师",
+     "total": 19.2,
+     "prof": 0.3333,
+     "behav": 0.0,
+     "p": 0.5778,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0051",
+     "name": "周清",
+     "pos": "质量工程师",
+     "total": 18.71,
+     "prof": 0.3333,
+     "behav": 0.0,
+     "p": 0.5233,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0010",
+     "name": "赵子涵",
+     "pos": "工艺工程师",
+     "total": 17.57,
+     "prof": 0.3333,
+     "behav": 0.0,
+     "p": 0.3967,
+     "bonus": 0.0,
+     "gate": true
+    }
+   ]
+  },
+  "JOB_C03": {
+   "title": "财务经理（预算与经营分析方向）",
+   "job_type": "职能类",
+   "top10": [
+    {
+     "emp": "JZ0012",
+     "name": "杨勇",
+     "pos": "算法工程师",
+     "total": 33.2,
+     "prof": 0.0,
+     "behav": 1.0,
+     "p": 0.8444,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0027",
+     "name": "严志强",
+     "pos": "培训经理",
+     "total": 32.2,
+     "prof": 0.0,
+     "behav": 1.0,
+     "p": 0.7889,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0039",
+     "name": "曹恒",
+     "pos": "法务专员",
+     "total": 31.04,
+     "prof": 0.0,
+     "behav": 1.0,
+     "p": 0.7244,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0023",
+     "name": "余浩",
+     "pos": "FPGA工程师",
+     "total": 30.9,
+     "prof": 0.0,
+     "behav": 1.0,
+     "p": 0.7167,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0050",
+     "name": "程芳",
+     "pos": "薪酬福利专员",
+     "total": 30.4,
+     "prof": 0.0,
+     "behav": 1.0,
+     "p": 0.6889,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0031",
+     "name": "贺勇",
+     "pos": "培训经理",
+     "total": 30.3,
+     "prof": 0.0,
+     "behav": 1.0,
+     "p": 0.6833,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0037",
+     "name": "钱思源",
+     "pos": "培训经理",
+     "total": 29.76,
+     "prof": 0.0,
+     "behav": 1.0,
+     "p": 0.6533,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0035",
+     "name": "高川",
+     "pos": "招聘主管",
+     "total": 29.58,
+     "prof": 0.0,
+     "behav": 1.0,
+     "p": 0.6433,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0025",
+     "name": "尹飞",
+     "pos": "嵌入式开发工程师",
+     "total": 29.3,
+     "prof": 0.0,
+     "behav": 1.0,
+     "p": 0.6278,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0033",
+     "name": "崔超",
+     "pos": "战略规划师",
+     "total": 29.1,
+     "prof": 0.0,
+     "behav": 1.0,
+     "p": 0.6167,
+     "bonus": 0.0,
+     "gate": true
+    }
+   ]
+  },
+  "JOB_C04": {
+   "title": "行业销售经理（智慧园区方向）",
+   "job_type": "业务类",
+   "top10": [
+    {
+     "emp": "JZ0001",
+     "name": "周诗涵",
+     "pos": "质量工程师",
+     "total": 21.76,
+     "prof": 0.25,
+     "behav": 0.3333,
+     "p": 0.6533,
+     "bonus": 0.2857,
+     "gate": true
+    },
+    {
+     "emp": "JZ0005",
+     "name": "卢诗涵",
+     "pos": "测试工程师",
+     "total": 20.97,
+     "prof": 0.25,
+     "behav": 0.3333,
+     "p": 0.5878,
+     "bonus": 0.2857,
+     "gate": true
+    },
+    {
+     "emp": "JZ0013",
+     "name": "何天宇",
+     "pos": "软件工程师",
+     "total": 20.56,
+     "prof": 0.25,
+     "behav": 0.3333,
+     "p": 0.5533,
+     "bonus": 0.2857,
+     "gate": true
+    },
+    {
+     "emp": "JZ0051",
+     "name": "周清",
+     "pos": "质量工程师",
+     "total": 20.2,
+     "prof": 0.25,
+     "behav": 0.3333,
+     "p": 0.5233,
+     "bonus": 0.2857,
+     "gate": true
+    },
+    {
+     "emp": "JZ0016",
+     "name": "高飞",
+     "pos": "算法工程师",
+     "total": 19.95,
+     "prof": 0.25,
+     "behav": 0.3333,
+     "p": 0.5022,
+     "bonus": 0.2857,
+     "gate": true
+    },
+    {
+     "emp": "JZ0012",
+     "name": "杨勇",
+     "pos": "算法工程师",
+     "total": 17.3,
+     "prof": 0.0,
+     "behav": 0.3333,
+     "p": 0.8444,
+     "bonus": 0.2857,
+     "gate": true
+    },
+    {
+     "emp": "JZ0027",
+     "name": "严志强",
+     "pos": "培训经理",
+     "total": 16.47,
+     "prof": 0.0,
+     "behav": 0.3333,
+     "p": 0.7889,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0029",
+     "name": "毛文",
+     "pos": "人力资源主管",
+     "total": 15.92,
+     "prof": 0.0,
+     "behav": 0.3333,
+     "p": 0.7433,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0014",
+     "name": "马洋",
+     "pos": "系统架构师",
+     "total": 15.86,
+     "prof": 0.0,
+     "behav": 0.3333,
+     "p": 0.7244,
+     "bonus": 0.2857,
+     "gate": true
+    },
+    {
+     "emp": "JZ0019",
+     "name": "孟敏",
+     "pos": "FPGA工程师",
+     "total": 15.84,
+     "prof": 0.25,
+     "behav": 0.0,
+     "p": 0.7433,
+     "bonus": 0.2857,
+     "gate": true
+    }
+   ]
+  },
+  "JOB_C05": {
+   "title": "工业设计师（智能硬件方向）",
+   "job_type": "创意类",
+   "top10": [
+    {
+     "emp": "JZ0012",
+     "name": "杨勇",
+     "pos": "算法工程师",
+     "total": 20.13,
+     "prof": 0.0,
+     "behav": 0.2,
+     "p": 0.8444,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0003",
+     "name": "孟华",
+     "pos": "FPGA工程师",
+     "total": 17.68,
+     "prof": 0.0,
+     "behav": 0.2,
+     "p": 0.7278,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0014",
+     "name": "马洋",
+     "pos": "系统架构师",
+     "total": 17.61,
+     "prof": 0.0,
+     "behav": 0.2,
+     "p": 0.7244,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0027",
+     "name": "严志强",
+     "pos": "培训经理",
+     "total": 16.57,
+     "prof": 0.0,
+     "behav": 0.0,
+     "p": 0.7889,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0044",
+     "name": "潘恒",
+     "pos": "人力资源主管",
+     "total": 16.45,
+     "prof": 0.0,
+     "behav": 0.0,
+     "p": 0.7833,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0001",
+     "name": "周诗涵",
+     "pos": "质量工程师",
+     "total": 16.12,
+     "prof": 0.0,
+     "behav": 0.2,
+     "p": 0.6533,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0019",
+     "name": "孟敏",
+     "pos": "FPGA工程师",
+     "total": 15.61,
+     "prof": 0.0,
+     "behav": 0.0,
+     "p": 0.7433,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0029",
+     "name": "毛文",
+     "pos": "人力资源主管",
+     "total": 15.61,
+     "prof": 0.0,
+     "behav": 0.0,
+     "p": 0.7433,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0039",
+     "name": "曹恒",
+     "pos": "法务专员",
+     "total": 15.21,
+     "prof": 0.0,
+     "behav": 0.0,
+     "p": 0.7244,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0023",
+     "name": "余浩",
+     "pos": "FPGA工程师",
+     "total": 15.05,
+     "prof": 0.0,
+     "behav": 0.0,
+     "p": 0.7167,
+     "bonus": 0.0,
+     "gate": true
+    }
+   ]
+  }
+ }
+}
