@@ -34,11 +34,12 @@ REPORT = ROOT / "docs" / "reports" / "day9_blind_eval_20261024.md"
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--top-evidence", action="store_true")
+    ap.add_argument("--cache", type=Path, default=config.INTERMEDIATE_DIR / "evidence_cache.npy")
     args = ap.parse_args()
 
     jobs = json.loads(JOBS_IN.read_text(encoding="utf-8"))["jobs"]
     employees = json.loads((config.INTERMEDIATE_DIR / "phase1_output.json").read_text(encoding="utf-8"))["employees"]
-    index = EvidenceIndex.build(employees, cache_path=config.INTERMEDIATE_DIR / "evidence_cache.npy")
+    index = EvidenceIndex.build(employees, cache_path=args.cache)
     equiv = load_verified_equivalences()
     splits = load_atomic_splits()
     names = {e["employee_id"]: (e.get("structured") or {}).get("name", "") for e in employees}

@@ -56,11 +56,14 @@ _STATE_MARKERS = ("学习中", "计划中", "拟参加", "即将参加", "准备
 # 明确否定（预注册 §2.3：记录明确说明未参与相关开发——窄口径，不用泛负向词）
 _NEGATION_MARKERS = ("未参与", "没有相关", "不具备相关", "无相关经验", "未接触")
 
-_GATE_ITEM_RE = re.compile(r"学历|年及以上|年以上.{0,4}经验|司龄|年限")
+_GATE_ITEM_RE = re.compile(r"学历|年及以上|年以上.{0,4}经验|司龄|年限|等相关专业")
 _PAREN_RE = re.compile(r"[（(]([^（）()]*)[)）]")
 _REQ_PREFIX_RE = re.compile(
-    r"^(熟悉|掌握|精通|具备|具有|了解|能够|能|会|熟练使用|熟练掌握)+"
+    r"^(熟悉|掌握|精通|具备|具有|了解|能够|能|会|熟练使用|熟练掌握"
+    r"|承担|参与|负责|主导|组织|配合|协助|跟进|跟踪|推动|编写|收集|维护)+"
 )
+# 尾部清理：加分标记（「者优先」/「优先」）不进 head
+_TAIL_PREF_RE = re.compile(r"(者)?优先$")
 # 顿号枚举（与斜杠枚举同类：上位概念+实例，§2.1）。两种保守模式：
 # P1「A、B等」显式等标记枚举；P2 ≥3 段、每段 2-8 字且无动词头的纯列举子句。
 # 如「工业物联网、智慧园区等数字化项目」→ [工业物联网, 智慧园区]。
@@ -95,14 +98,28 @@ def _duhao_instances(item: str) -> list[str]:
 
 
 # ── §2.1 要求抽取 ────────────────────────────────────────────────
-def extract_requirements(job: dict) -> list[dict]:
+def _split_clauses(item: str) -> list[str]:
+    """复合句拆原子（用户 2026-10-25 指令）：按中文逗号/分号切子句。
+
+    一句话携带多个要求时（「承担嵌入式软件方案设计与模块开发，参与需求
+    分析和技术路线论证」）拆为独立原子要求；顿号不拆（枚举归并语义）；
+    子句 <4 字丢弃；全拆失败回退整句。
+    """
+    parts = [p.strip() for p in re.split(r"[，；;]", item) if p.strip()]
+    kept = [p for p in parts if len(_norm_literal(p)) >= 4]
+    return kept if kept else [item]
+
+
+def extract_requirements(job: dict, clause_split: bool = True) -> list[dict]:
     """JD → 原子要求集 R（确定性，零 LLM；解析结果在验收前须人工核验并冻结）。
 
-    规则（预注册 §2.1）：
+    规则（预注册 §2.1 + 用户 2026-10-25 拆句指令）：
     - 来源：requirements + responsibilities 文本条目；学历/年限条目归硬门槛，不入 R
-    - 必要性：含「优先」→ 加分项 w=0.5，否则必要项 w=1.0（w 来自 JD，不来自候选）
-    - 斜杠枚举：括号内 /、，分隔的实例清单 → 归并为单个上位要求（命中其一即满足）
-    - JD 明确「或」→ either_ok=True（任选）；「同时具备」按并列拆分（mock 未见，保守不拆）
+    - **子句拆分**（clause_split，默认开）：条目按逗号/分号切子句，每子句独立成
+      要求（gate 剔除/括号实例/顿号枚举/优先识别逐子句进行）——「一句话多个
+      要求」不再挤成一个长 head
+    - 必要性：子句含「优先」→ 加分项，否则必要项
+    - 斜杠/顿号枚举：实例清单归并为单个上位要求（命中其一即满足）
 
     Returns:
         [{rid, text, head, instances, kind, weight, either_ok}]
@@ -117,43 +134,50 @@ def extract_requirements(job: dict) -> list[dict]:
             raw_items.extend(str(x) for x in items if x)
 
     for idx, item in enumerate(raw_items):
-        if _GATE_ITEM_RE.search(item):
-            continue  # 硬门槛条目不入要求集（Round 3 骨架无闸门项，权重表达必要性）
-        parens = _PAREN_RE.findall(item)
-        instances: list[str] = []
-        for grp in parens:
-            instances.extend(
-                p.strip() for p in re.split(r"[/、，,]", grp) if p.strip()
-            )
-        head = _PAREN_RE.sub("", item)
-        head = re.sub(r"\s+", "", head)
-        head = _REQ_PREFIX_RE.sub("", head) or head
-        head = head.rstrip("；;。.，, ")
-        if not head:
-            continue
-        # 无括号但 head 本身是斜杠枚举（如「教学设计/课程设计/教学管理」）→ 段即实例
-        if not instances and head.count("/") >= 1:
-            segs = [s.strip() for s in head.split("/") if len(s.strip()) >= 2]
-            if len(segs) >= 2:
-                instances = segs
-        if not instances:
-            instances = _duhao_instances(item)  # 顿号枚举（§2.1 同类归并）
-        kind = "preferred" if "优先" in item else "necessary"
-        key = _norm_literal(head)
-        if key in seen_heads:
-            continue  # 同名要求去重（同 §2.4 一事实不重复计分）
-        seen_heads.add(key)
-        reqs.append({
-            "rid": f"R{idx + 1:02d}",
-            "text": item,
-            "head": head,
-            "instances": instances,
-            "kind": kind,
-            "weight": config.COVERAGE_W_MUST,  # 必须项类内等权；优先项不进加权（加分制）
-            # 斜杠枚举 = 上位+实例，命中其一即满足（§2.1）；v=max 聚合天然实现，
-            # 本标志仅作展示。显式「同时具备」的并列拆分 mock 未见，保守不拆。
-            "either_ok": bool(instances),
-        })
+        sub_items = _split_clauses(item) if clause_split else [item]
+        for si, sub in enumerate(sub_items):
+            if _GATE_ITEM_RE.search(sub):
+                continue  # 硬门槛子句不入要求集
+            parens = _PAREN_RE.findall(sub)
+            instances: list[str] = []
+            for grp in parens:
+                instances.extend(
+                    p.strip() for p in re.split(r"[/、，,]", grp) if p.strip()
+                )
+            head = _PAREN_RE.sub("", sub)
+            head = re.sub(r"\s+", "", head)
+            head = _REQ_PREFIX_RE.sub("", head) or head
+            head = head.rstrip("；;。.，, ")
+            head = _TAIL_PREF_RE.sub("", head.rstrip("；;。.，, ")) or head
+            if not head:
+                continue
+            # 无括号但 head 本身是斜杠枚举（如「教学设计/课程设计/教学管理」）→ 段即实例
+            if not instances and head.count("/") >= 1:
+                segs = [s.strip() for s in head.split("/") if len(s.strip()) >= 2]
+                if len(segs) >= 2:
+                    instances = segs
+            if not instances:
+                instances = _duhao_instances(sub)  # 顿号枚举（§2.1 同类归并）
+            kind = "preferred" if "优先" in sub else "necessary"
+            key = _norm_literal(head)
+            if key in seen_heads:
+                continue  # 同名要求去重（同 §2.4 一事实不重复计分）
+            seen_heads.add(key)
+            # rid=父条目索引（被剔的学历/年限条目照旧占号——保持既有 rid 空间
+            # 稳定，用户裁决表/等价表键不漂移）；拆出的子句加字母后缀
+            base = f"R{idx + 1:02d}"
+            rid = base if len(sub_items) == 1 else f"{base}-{chr(97 + si)}"
+            reqs.append({
+                "rid": rid,
+                "text": sub,
+                "head": head,
+                "instances": instances,
+                "kind": kind,
+                "weight": config.COVERAGE_W_MUST,  # 必须项类内等权；优先项不进加权（加分制）
+                # 斜杠枚举 = 上位+实例，命中其一即满足（§2.1）；v=max 聚合天然实现，
+                # 本标志仅作展示。显式「同时具备」的并列拆分 mock 未见，保守不拆。
+                "either_ok": bool(instances),
+            })
     return reqs
 
 
@@ -651,11 +675,16 @@ def score_coverage(
                  / max(1, n_must)) if preferred_reqs else 0.0
         # total = [W1·S_prof + W2·S_behav + W3·P] + bonus（W 百分数 × S∈[0,1] → 满分 100）
         total = w1 * s_prof + w2 * s_behav + w3 * p + bonus
-        # 闸门：专业类必须项未成立（v=0）→ total ×GATE（一次不叠乘；行为类必须项不触发）
-        gate_hit = [r["rid"] for r in prof_must
-                    if req_results[r["rid"]]["v"] <= 0.0 + 1e-9]
-        if gate_hit:
-            total *= getattr(config, "COVERAGE_REQUIRED_SKILL_GATE", 0.6)
+        # 闸门（用户 2026-10-25 指令）：专业必须项缺 k 项 → total ×(1-0.05k)，封 0；
+        # 行为类必须项不触发
+        gate_rids = [r["rid"] for r in prof_must
+                     if req_results[r["rid"]]["v"] <= 0.0 + 1e-9]
+        step = getattr(config, "COVERAGE_GATE_STEP", 0.05)
+        gate_coef = max(0.0, 1.0 - step * len(gate_rids))
+        gate_info = ({"k": len(gate_rids), "coef": round(gate_coef, 4),
+                      "rids": gate_rids} if gate_rids else None)
+        if gate_rids:
+            total *= gate_coef
         out[eid] = {
             "total": round(total, 2),
             "coverage": round(coverage, 4),
@@ -665,7 +694,7 @@ def score_coverage(
             "bonus": round(bonus, 4),
             "w_matrix": [w1, w2, w3],
             "class_neutral": [c for c, f in (("professional", s_prof_flagged), ("behavioral", s_behav_flagged)) if f] or None,
-            "required_skill_gate": gate_hit or None,
+            "required_skill_gate": gate_info,
             "requirements": req_results,
         }
     return out

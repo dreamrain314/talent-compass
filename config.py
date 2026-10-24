@@ -319,8 +319,8 @@ COVERAGE_JOB_WEIGHT_MATRIX = {
 }
 # 优先项加分制（原案 §2.6）：bonus = k×Σ(优先项v)/max(1,N_must)，不进加权、不满足不扣分
 COVERAGE_PREFERRED_K = 2.0
-# 专业类必须项未成立（v=0）→ 整个 total ×0.6（一次不叠乘；行为类必须项不触发）
-COVERAGE_REQUIRED_SKILL_GATE = 0.6
+# 专业类必须项缺 k 项 → total ×(1-0.05k)（用户 2026-10-25 指令：线性递减，封 0）
+COVERAGE_GATE_STEP = 0.05
 # 负向证据标记（2026-10-21 batch2/gt5 复核类1「只证做过、未证达标」）：含任一标记的
 # 记录不得作为 T0 直接技能命中依据（「做砸了」≠「会做」）。当前 _T0_SOURCES 本就
 # 不含 performance/summary，此护栏防未来 sources 扩展时负向证据混入（用户指令）。

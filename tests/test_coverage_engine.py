@@ -178,7 +178,7 @@ class TestScoreCoverage:
         w = job_weight_triple("技术类")
         expect = w[0] * r["s_prof"] + w[1] * r["s_behav"] + w[2] * r["p"] + r["bonus"]
         if r["required_skill_gate"]:
-            expect *= config.COVERAGE_REQUIRED_SKILL_GATE
+            expect *= r["required_skill_gate"]["coef"]
         assert r["total"] == pytest.approx(expect, abs=0.05)
         assert r["w_matrix"] == [70.0, 15.0, 15.0]
 
@@ -343,9 +343,11 @@ class TestTwoClass:
                              atomic_splits={}, job_type="技术类")
         r = res["E1"]
         assert r["required_skill_gate"] is not None    # 专业必须 STM32 未成立
+        assert r["required_skill_gate"]["k"] == 1
+        assert r["required_skill_gate"]["coef"] == pytest.approx(1 - config.COVERAGE_GATE_STEP)
         w = job_weight_triple("技术类")
         core = w[0] * r["s_prof"] + w[1] * r["s_behav"] + w[2] * r["p"] + r["bonus"]
-        assert r["total"] == pytest.approx(core * config.COVERAGE_REQUIRED_SKILL_GATE, abs=0.05)
+        assert r["total"] == pytest.approx(core * r["required_skill_gate"]["coef"], abs=0.05)
 
     def test_behav_must_unmet_no_gate(self):
         # 行为类必须项未成立不触发闸门（仅专业必须触发）
@@ -385,3 +387,48 @@ class TestTwoClass:
         cls_behav = classify_relation(_req(head="团队管理"), chunk, equiv)
         assert cls_behav["value"] == 1.0              # 行为要求被项目证据满足，不打折
         assert "跨类" not in cls_behav["note"]
+
+
+# ── 拆句（用户 2026-10-25）+ 闸门 k 线性 ─────────────────────────
+class TestClauseSplit:
+    def test_compound_sentence_split(self):
+        job = {"responsibilities": ["承担嵌入式软件方案设计与模块开发，参与需求分析和技术路线论证"]}
+        reqs = extract_requirements(job)
+        heads = [r["head"] for r in reqs]
+        assert heads == ["嵌入式软件方案设计与模块开发", "需求分析和技术路线论证"]
+
+    def test_gate_clause_dropped_subsentence(self):
+        job = {"requirements": ["本科及以上学历，精通Java与微服务架构"]}
+        reqs = extract_requirements(job)
+        assert len(reqs) == 1 and reqs[0]["head"] == "Java与微服务架构"
+
+    def test_preferred_per_clause(self):
+        job = {"requirements": ["熟悉数据分析，有军工电子行业背景者优先"]}
+        reqs = extract_requirements(job)
+        kinds = {r["head"]: r["kind"] for r in reqs}
+        assert kinds["数据分析"] == "necessary"
+        assert kinds["有军工电子行业背景"] == "preferred"
+
+    def test_no_clause_split_compat(self):
+        job = {"requirements": ["熟悉数据处理与分析方法，了解大数据平台调度工具"]}
+        reqs = extract_requirements(job, clause_split=False)
+        assert len(reqs) == 1  # 旧模式整句单要求（83 闸门对照用）
+
+    def test_short_fragment_fallback(self):
+        job = {"requirements": ["懂C，会Linux"]}
+        reqs = extract_requirements(job)  # 子句<4字全弃 → 回退整句
+        assert len(reqs) == 1
+
+    def test_gate_linear_k2(self):
+        job = {"requirements": ["熟悉嵌入式开发（STM32）", "掌握CAN总线协议", "熟悉以太网"]}
+        reqs = extract_requirements(job)
+        emp = _employee()
+        chunks = [{"emp_id": "E1", "source": "training", "text": "培训：瑜伽入门", "anchor": "a"}]
+        from utils.evidence_index import EvidenceIndex
+        idx = EvidenceIndex(chunks, char_bucket_encode([c["text"] for c in chunks]), encode_fn=char_bucket_encode)
+        res = score_coverage(reqs, [emp], idx, cross_encoder_fn=None,
+                             equivalences={}, encode_fn=char_bucket_encode,
+                             atomic_splits={}, job_type="技术类")
+        r = res["E1"]
+        assert r["required_skill_gate"]["k"] == 3          # 三条专业必须全缺
+        assert r["required_skill_gate"]["coef"] == pytest.approx(1 - 0.05 * 3)

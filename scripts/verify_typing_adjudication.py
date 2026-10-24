@@ -52,7 +52,9 @@ def main() -> int:
     seen: set[tuple[str, str]] = set()
     for job in jobs:
         jid = str(job["job_id"])
-        reqs = _expand_requirements(extract_requirements(job), splits)
+        # 闸门对照用旧抽取（clause_split=False）：用户 83 条表按旧 rid 空间记录，
+        # 拆句改动不得污染词典校准对照
+        reqs = _expand_requirements(extract_requirements(job, clause_split=False), splits)
         for r in reqs:
             key = (jid, r["rid"])
             seen.add(key)
