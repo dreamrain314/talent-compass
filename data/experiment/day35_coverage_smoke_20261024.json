@@ -1,9 +1,9 @@
 {
- "generated_at": "2026-10-24T23:33:24",
+ "generated_at": "2026-10-24T23:44:57",
  "protocol": "Round3 Day3-5 冒烟（开发资产调试，非验收；要求集未人工核验冻结）",
  "prereg": "docs/preregister_round3_evidence_alignment_20261022.md",
  "ce_enabled": false,
- "elapsed_seconds": 6.7,
+ "elapsed_seconds": 2.9,
  "ce_pairs_estimated": 0,
  "equivalence_table_size": 137,
  "jobs": {
@@ -730,7 +730,7 @@
    "gold_coverage": 0.7222,
    "gold_rank_among_50": 1,
    "coverage_stats": {
-    "mean": 0.4681,
+    "mean": 0.4671,
     "max": 0.7222
    },
    "top5": [
@@ -832,26 +832,24 @@
      "rtype": "behavioral"
     }
    ],
-   "gold_total": 48.68,
-   "gold_s_prof": 0.8571,
+   "gold_total": 86.85,
+   "gold_s_prof": 1.0,
    "gold_s_behav": 0.8182,
    "gold_p": 0.7433,
    "gold_bonus": 0.0,
-   "gold_gate": [
-    "R06-b"
-   ],
-   "gold_coverage": 0.8333,
-   "gold_rank_among_50": 13,
+   "gold_gate": null,
+   "gold_coverage": 0.8889,
+   "gold_rank_among_50": 1,
    "coverage_stats": {
-    "mean": 0.5586,
-    "max": 0.8333
+    "mean": 0.5597,
+    "max": 0.8889
    },
    "top5": [
+    "JZ0029",
     "JZ0048",
     "JZ0026",
     "JZ0041",
-    "JZ0040",
-    "JZ0042"
+    "JZ0040"
    ]
   },
   "JOB_B09": {
@@ -1085,7 +1083,7 @@
    "gold_coverage": 0.7778,
    "gold_rank_among_50": 4,
    "coverage_stats": {
-    "mean": 0.4588,
+    "mean": 0.4609,
     "max": 1.0
    },
    "top5": [
