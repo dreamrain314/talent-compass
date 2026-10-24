@@ -373,14 +373,31 @@ def load_atomic_splits() -> dict[str, list[str]]:
         return {}
 
 
-# ── 杠杆三c：要求三分类（必要技能 skill_required / 专业技能 professional / 行为技能 behavior）──
-# 词典 = 标签库 T2 名称与关键词（懒加载）+ 行为词根补充；用户决议：按 JD 划界
+# ── 两类划分（用户 2026-10-24 五决议 + 划界准则表；用户 83 条裁决为回归闸门）──
+# 判定次序（用户准则）：①专业名词命中 → professional（最优先）；
+# ②行为词典命中 head → behavioral；③兜底 professional（拿不准宁归专业——
+# 专业池为空是更严重症状）。「有XX经验者优先」等经验类归 professional。
 _BEHAVIOR_EXTRA = (
     "沟通", "协作", "团队", "激励", "倾听", "表达", "协调", "跨部门", "学习",
     "担当", "影响力", "带动", "骨干", "意识", "态度", "靠谱", "自驱", "成长",
     "适应", "亲和", "反馈", "迁移", "敏捷", "推动", "按时", "闭环意识",
 )
+# 专业词根补充（T1 标签库 + T0 注册表之外的裁决覆盖，来源=用户改判 22 条归纳）
+_PROFESSIONAL_EXTRA = (
+    "内审", "数据治理", "调度", "数据集成", "方案设计", "进度管理", "员工关系",
+    "取数", "建模", "端到端", "部署", "架构", "系统集成", "风险矩阵", "内控",
+    "审计", "测评", "职称", "师者优先", "经验者优先",
+)
+# 毒词剔除（用户 83 条裁决校准）：这些词或是领域语境词（智能制造/数据分析/项目管理
+# ——只该在实例枚举里算专业），或是 T2 行为关键词混入（交付/合规/可靠性/敏捷/培训
+# ——留在行为词典），或是工艺过程词（试制/质量管控）。命中不算专业信号。
+_PROFESSIONAL_EXCLUDE = frozenset((
+    "交付", "试制", "合规", "可靠性", "敏捷", "培训", "质量管控",
+    "智能制造", "数据分析", "项目管理", "人力资源",
+))
 _behavior_lexicon: set[str] | None = None
+_professional_strong: set[str] | None = None
+_professional_weak: set[str] | None = None
 
 
 def _get_behavior_lexicon() -> set[str]:
@@ -388,7 +405,7 @@ def _get_behavior_lexicon() -> set[str]:
     global _behavior_lexicon
     if _behavior_lexicon is not None:
         return _behavior_lexicon
-    lex = set(_BEHAVIOR_EXTRA)
+    lex = set(_BEHAVIOR_EXTRA) | {"管控", "决策"}
     try:
         lib = json.loads((config.DATA_DIR / "standard_label_library_v1.json").read_text(encoding="utf-8"))
         for item in (lib.get("labels") or {}).get("T2_行为能力") or []:
@@ -401,16 +418,67 @@ def _get_behavior_lexicon() -> set[str]:
     return _behavior_lexicon
 
 
-def requirement_type(req: dict) -> str:
-    """要求二分类（用户 2026-10-24 决议：行为类/专业类）。
+def _build_professional_lexicons() -> tuple[set[str], set[str]]:
+    """专业词典两档（强/弱）。
 
-    行为词典（T2 标签库名称+关键词 ∪ 行为词根）命中 → behavioral（软实力：
-    团队领导/沟通/协调/执行/学习适应等）；否则 professional（硬技能：数据
-    分析/编程/审计/工具方法等）。必须/优先（kind）是正交维度不参与类判定。
-    分类正确性是唯一的类间守门人——证据侧不隔离不打折（证据天然多面，
-    同一条记录可同时支撑两类要求）。
+    strong：具体专业名词/工具/方法/证书——T0 工具+知识体系（名称+别名）、
+    T1 keywords、curated 词根。head 或 instances 命中即 professional。
+    weak：领域语境词——T1 标签名、T0 行业领域名。仅在 instances（枚举清单）
+    命中才算 professional；出现在 head 只作语境不算（「智能制造平台类项目的
+    质量管控」的能力是管控行为，不是智能制造）。
+    毒词（_PROFESSIONAL_EXCLUDE）两档全部剔除。
+    """
+    strong: set[str] = set(_PROFESSIONAL_EXTRA)
+    weak: set[str] = set()
+    try:
+        lib = json.loads((config.DATA_DIR / "standard_label_library_v1.json").read_text(encoding="utf-8"))
+        for item in (lib.get("labels") or {}).get("T1_专业能力") or []:
+            weak.add(_norm_literal(item.get("name", "")))
+            for kw in item.get("keywords") or []:
+                strong.add(_norm_literal(kw))
+        t0 = json.loads((config.DATA_DIR / "t0_registries.json").read_text(encoding="utf-8"))
+        for item in t0.get("TOOL_REGISTRY") or []:
+            strong.add(_norm_literal(item.get("name", "")))
+            for a in item.get("aliases") or []:
+                strong.add(_norm_literal(a))
+        for item in t0.get("KNOWLEDGE_REGISTRY") or []:
+            strong.add(_norm_literal(item.get("name", "")))
+            for a in item.get("aliases") or []:
+                strong.add(_norm_literal(a))
+        for item in t0.get("DOMAIN_REGISTRY") or []:
+            weak.add(_norm_literal(item.get("name", "")))
+            for a in item.get("aliases") or []:
+                weak.add(_norm_literal(a))
+    except Exception:
+        pass
+    strong = {w for w in strong if len(w) >= 2 and w not in _PROFESSIONAL_EXCLUDE}
+    weak = {w for w in weak if len(w) >= 2 and w not in _PROFESSIONAL_EXCLUDE} - strong
+    return strong, weak
+
+
+def _get_professional_lexicons() -> tuple[set[str], set[str]]:
+    global _professional_strong, _professional_weak
+    if _professional_strong is None:
+        _professional_strong, _professional_weak = _build_professional_lexicons()
+    return _professional_strong, _professional_weak
+
+
+def requirement_type(req: dict) -> str:
+    """要求二分类（用户划界准则 2026-10-24，83 条裁决=回归闸门 verify_typing_adjudication.py）。
+
+    ①强专业名词命中（head 或实例；T0 工具/知识体系 + T1 keywords + 词根）
+      或 弱领域词命中实例（枚举清单）→ professional——「质量管理体系（ISO9001）」
+      「Spark/Flink 等大数据调度组件」归此类；
+    ②行为词典命中 head → behavioral——含 T2 全部名称/关键词（交付/合规/可靠性/
+      敏捷等双栖词以行为侧为准）；
+    ③兜底 professional（拿不准宁归专业）。
+    证据侧不隔离不打折（证据天然多面）。
     """
     h = _norm_literal(req.get("head") or "")
+    inst = _norm_literal("".join(str(x) for x in (req.get("instances") or [])))
+    strong, weak = _get_professional_lexicons()
+    if any(w in h for w in strong) or any(w in inst for w in strong | weak):
+        return "professional"
     lex = _get_behavior_lexicon()
     if any(w in h for w in lex):
         return "behavioral"

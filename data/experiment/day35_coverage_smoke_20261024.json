@@ -1,9 +1,9 @@
 {
- "generated_at": "2026-10-24T04:09:38",
+ "generated_at": "2026-10-24T23:33:24",
  "protocol": "Round3 Day3-5 冒烟（开发资产调试，非验收；要求集未人工核验冻结）",
  "prereg": "docs/preregister_round3_evidence_alignment_20261022.md",
  "ce_enabled": false,
- "elapsed_seconds": 2.4,
+ "elapsed_seconds": 6.7,
  "ce_pairs_estimated": 0,
  "equivalence_table_size": 137,
  "jobs": {
@@ -28,7 +28,7 @@
       "8D"
      ],
      "kind": "necessary",
-     "rtype": "behavioral"
+     "rtype": "professional"
     },
     {
      "rid": "R04",
@@ -38,7 +38,7 @@
       "智慧园区"
      ],
      "kind": "preferred",
-     "rtype": "behavioral"
+     "rtype": "professional"
     },
     {
      "rid": "R05",
@@ -61,7 +61,7 @@
       "ISO9001"
      ],
      "kind": "necessary",
-     "rtype": "behavioral"
+     "rtype": "professional"
     },
     {
      "rid": "R08",
@@ -78,27 +78,27 @@
       "智慧园区类项目的质量策划与评审"
      ],
      "kind": "necessary",
-     "rtype": "behavioral"
+     "rtype": "professional"
     }
    ],
-   "gold_total": 54.39,
-   "gold_s_prof": 0.5,
-   "gold_s_behav": 0.75,
+   "gold_total": 85.64,
+   "gold_s_prof": 1.0,
+   "gold_s_behav": 0.5,
    "gold_p": 0.5233,
    "gold_bonus": 0.2857,
    "gold_gate": null,
    "gold_coverage": 0.75,
-   "gold_rank_among_50": 3,
+   "gold_rank_among_50": 2,
    "coverage_stats": {
     "mean": 0.2268,
     "max": 0.75
    },
    "top5": [
-    "JZ0012",
     "JZ0001",
     "JZ0051",
+    "JZ0022",
     "JZ0029",
-    "JZ0019"
+    "JZ0031"
    ]
   },
   "JOB_B02": {
@@ -120,7 +120,7 @@
       "Flink等大数据调度组件"
      ],
      "kind": "necessary",
-     "rtype": "behavioral"
+     "rtype": "professional"
     },
     {
      "rid": "R02",
@@ -134,7 +134,7 @@
      "head": "有数据治理或数据平台项目交付经验者优先",
      "instances": [],
      "kind": "preferred",
-     "rtype": "behavioral"
+     "rtype": "professional"
     },
     {
      "rid": "R04",
@@ -155,14 +155,14 @@
      "head": "负责工业大数据调度平台的开发与优化，处理数据链路性能问题",
      "instances": [],
      "kind": "necessary",
-     "rtype": "behavioral"
+     "rtype": "professional"
     },
     {
      "rid": "R07",
      "head": "承担数据治理专项建设，保障数据质量与项目交付",
      "instances": [],
      "kind": "necessary",
-     "rtype": "behavioral"
+     "rtype": "professional"
     },
     {
      "rid": "R08",
@@ -190,12 +190,15 @@
      "rtype": "behavioral"
     }
    ],
-   "gold_total": 83.72,
-   "gold_s_prof": 1.0,
-   "gold_s_behav": 0.2857,
+   "gold_total": 33.11,
+   "gold_s_prof": 0.6,
+   "gold_s_behav": 0.25,
    "gold_p": 0.6289,
    "gold_bonus": 0.0,
-   "gold_gate": null,
+   "gold_gate": [
+    "R06",
+    "R07"
+   ],
    "gold_coverage": 0.4444,
    "gold_rank_among_50": 2,
    "coverage_stats": {
@@ -205,9 +208,9 @@
    "top5": [
     "JZ0013",
     "JZ0052",
-    "JZ0018",
-    "JZ0016",
-    "JZ0025"
+    "JZ0010",
+    "JZ0012",
+    "JZ0018"
    ]
   },
   "JOB_B03": {
@@ -247,7 +250,7 @@
      "head": "负责ERP系统定制开发与Java微服务方案设计实现",
      "instances": [],
      "kind": "necessary",
-     "rtype": "behavioral"
+     "rtype": "professional"
     },
     {
      "rid": "R07",
@@ -256,7 +259,7 @@
       "Airflow"
      ],
      "kind": "necessary",
-     "rtype": "behavioral"
+     "rtype": "professional"
     },
     {
      "rid": "R08",
@@ -273,15 +276,18 @@
      "head": "主导跨系统集成项目的方案设计与进度管理",
      "instances": [],
      "kind": "necessary",
-     "rtype": "behavioral"
+     "rtype": "professional"
     }
    ],
-   "gold_total": 84.08,
-   "gold_s_prof": 1.0,
-   "gold_s_behav": 0.3333,
+   "gold_total": 35.15,
+   "gold_s_prof": 0.6,
+   "gold_s_behav": 0.5,
    "gold_p": 0.5789,
    "gold_bonus": 0.4,
-   "gold_gate": null,
+   "gold_gate": [
+    "R07",
+    "R09"
+   ],
    "gold_coverage": 0.6,
    "gold_rank_among_50": 2,
    "coverage_stats": {
@@ -291,9 +297,9 @@
    "top5": [
     "JZ0004",
     "JZ0053",
+    "JZ0019",
     "JZ0023",
-    "JZ0007",
-    "JZ0022"
+    "JZ0017"
    ]
   },
   "JOB_B04": {
@@ -350,7 +356,7 @@
      "head": "统筹人力资源综合管理：规划、绩效、培训与员工关系",
      "instances": [],
      "kind": "necessary",
-     "rtype": "behavioral"
+     "rtype": "professional"
     },
     {
      "rid": "R07",
@@ -381,23 +387,25 @@
      "rtype": "behavioral"
     }
    ],
-   "gold_total": 65.09,
-   "gold_s_prof": 1.0,
-   "gold_s_behav": 0.2,
+   "gold_total": 35.15,
+   "gold_s_prof": 0.8,
+   "gold_s_behav": 0.25,
    "gold_p": 0.6289,
    "gold_bonus": 0.2222,
-   "gold_gate": null,
+   "gold_gate": [
+    "R06"
+   ],
    "gold_coverage": 0.5556,
-   "gold_rank_among_50": 1,
+   "gold_rank_among_50": 4,
    "coverage_stats": {
     "mean": 0.3004,
     "max": 0.5556
    },
    "top5": [
-    "JZ0054",
     "JZ0029",
     "JZ0031",
     "JZ0037",
+    "JZ0054",
     "JZ0048"
    ]
   },
@@ -417,7 +425,7 @@
      "head": "COSO内控框架与风险矩阵方法",
      "instances": [],
      "kind": "necessary",
-     "rtype": "behavioral"
+     "rtype": "professional"
     },
     {
      "rid": "R04",
@@ -441,14 +449,14 @@
       "风险矩阵"
      ],
      "kind": "necessary",
-     "rtype": "behavioral"
+     "rtype": "professional"
     },
     {
      "rid": "R07",
      "head": "主导内控审计协调与流程梳理优化",
      "instances": [],
      "kind": "necessary",
-     "rtype": "behavioral"
+     "rtype": "professional"
     },
     {
      "rid": "R08",
@@ -559,14 +567,14 @@
      "head": "承担软件测试方案设计、自动化测试与缺陷管理，保障交付质量",
      "instances": [],
      "kind": "necessary",
-     "rtype": "behavioral"
+     "rtype": "professional"
     },
     {
      "rid": "R08",
      "head": "建立测试用例库与测试验证规范，推动过程规范与持续改进",
      "instances": [],
      "kind": "necessary",
-     "rtype": "behavioral"
+     "rtype": "professional"
     },
     {
      "rid": "R09",
@@ -585,13 +593,14 @@
      "rtype": "behavioral"
     }
    ],
-   "gold_total": 39.83,
-   "gold_s_prof": 0.6667,
-   "gold_s_behav": 0.8333,
+   "gold_total": 38.53,
+   "gold_s_prof": 0.6,
+   "gold_s_behav": 1.0,
    "gold_p": 0.4667,
    "gold_bonus": 0.2222,
    "gold_gate": [
-    "R06"
+    "R06",
+    "R08"
    ],
    "gold_coverage": 0.7778,
    "gold_rank_among_50": 1,
@@ -604,7 +613,7 @@
     "JZ0019",
     "JZ0023",
     "JZ0005",
-    "JZ0002"
+    "JZ0027"
    ]
   },
   "JOB_B07": {
@@ -685,7 +694,7 @@
       "可视化报表"
      ],
      "kind": "necessary",
-     "rtype": "behavioral"
+     "rtype": "professional"
     },
     {
      "rid": "R07",
@@ -709,13 +718,14 @@
      "rtype": "behavioral"
     }
    ],
-   "gold_total": 42.82,
-   "gold_s_prof": 0.75,
-   "gold_s_behav": 0.7,
+   "gold_total": 41.99,
+   "gold_s_prof": 0.7273,
+   "gold_s_behav": 0.7143,
    "gold_p": 0.5578,
    "gold_bonus": 0.0,
    "gold_gate": [
-    "R05"
+    "R05",
+    "R07-b"
    ],
    "gold_coverage": 0.7222,
    "gold_rank_among_50": 1,
@@ -727,8 +737,8 @@
     "JZ0006",
     "JZ0004",
     "JZ0008",
-    "JZ0027",
-    "JZ0029"
+    "JZ0048",
+    "JZ0045"
    ]
   },
   "JOB_B08": {
@@ -791,7 +801,7 @@
      "head": "统筹人力资源规划、招聘配置、培训开发、绩效管理、薪酬福利与劳动关系管理",
      "instances": [],
      "kind": "necessary",
-     "rtype": "behavioral"
+     "rtype": "professional"
     },
     {
      "rid": "R06",
@@ -822,24 +832,26 @@
      "rtype": "behavioral"
     }
    ],
-   "gold_total": 85.87,
-   "gold_s_prof": 1.0,
-   "gold_s_behav": 0.7857,
+   "gold_total": 48.68,
+   "gold_s_prof": 0.8571,
+   "gold_s_behav": 0.8182,
    "gold_p": 0.7433,
    "gold_bonus": 0.0,
-   "gold_gate": null,
+   "gold_gate": [
+    "R06-b"
+   ],
    "gold_coverage": 0.8333,
-   "gold_rank_among_50": 1,
+   "gold_rank_among_50": 13,
    "coverage_stats": {
     "mean": 0.5586,
     "max": 0.8333
    },
    "top5": [
-    "JZ0029",
-    "JZ0019",
     "JZ0048",
     "JZ0026",
-    "JZ0023"
+    "JZ0041",
+    "JZ0040",
+    "JZ0042"
    ]
   },
   "JOB_B09": {
@@ -899,7 +911,7 @@
      "head": "负责专业技能教学、课程设计与教学管理，含教研、实习指导与教学评估",
      "instances": [],
      "kind": "necessary",
-     "rtype": "behavioral"
+     "rtype": "professional"
     },
     {
      "rid": "R06",
@@ -939,13 +951,14 @@
      "rtype": "behavioral"
     }
    ],
-   "gold_total": 39.89,
-   "gold_s_prof": 0.6667,
-   "gold_s_behav": 0.6667,
+   "gold_total": 38.29,
+   "gold_s_prof": 0.5,
+   "gold_s_behav": 0.8,
    "gold_p": 0.6533,
    "gold_bonus": 0.2222,
    "gold_gate": [
-    "R01"
+    "R01",
+    "R05"
    ],
    "gold_coverage": 0.6667,
    "gold_rank_among_50": 4,
@@ -958,7 +971,7 @@
     "JZ0026",
     "JZ0050",
     "JZ0037",
-    "JZ0027"
+    "JZ0044"
    ]
   },
   "JOB_B10": {
@@ -994,7 +1007,7 @@
       "部署"
      ],
      "kind": "necessary",
-     "rtype": "behavioral"
+     "rtype": "professional"
     },
     {
      "rid": "R03",
@@ -1032,7 +1045,7 @@
       "Web应用"
      ],
      "kind": "necessary",
-     "rtype": "behavioral"
+     "rtype": "professional"
     },
     {
      "rid": "R07",
@@ -1061,24 +1074,26 @@
      "rtype": "behavioral"
     }
    ],
-   "gold_total": 90.13,
-   "gold_s_prof": 1.0,
-   "gold_s_behav": 0.7143,
+   "gold_total": 44.35,
+   "gold_s_prof": 0.75,
+   "gold_s_behav": 0.8,
    "gold_p": 0.6278,
    "gold_bonus": 0.0,
-   "gold_gate": null,
+   "gold_gate": [
+    "R02"
+   ],
    "gold_coverage": 0.7778,
-   "gold_rank_among_50": 2,
+   "gold_rank_among_50": 4,
    "coverage_stats": {
     "mean": 0.4588,
     "max": 1.0
    },
    "top5": [
     "JZ0012",
-    "JZ0025",
     "JZ0017",
-    "JZ0018",
-    "JZ0022"
+    "JZ0053",
+    "JZ0025",
+    "JZ0013"
    ]
   }
  }
