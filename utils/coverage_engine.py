@@ -281,7 +281,8 @@ def recall_candidates(
 
 
 # ── §2.3 关系分类 g(r,e)（规则确定性判定；CE 只是相关性信号）────────
-def classify_relation(req: dict, chunk: dict, equivalences: dict[str, list[str]]) -> dict:
+def classify_relation(req: dict, chunk: dict, equivalences: dict[str, list[str]],
+                 bridge_keys: list[tuple[str, float]] | None = None) -> dict:
     """单 (要求, 证据) 对的五类关系判定（预注册 §2.3 冻结定义，零 LLM）。
 
     判定次序：明确否定 > 状态不同 > 等价（核验表）> 有向支持（实例命中）> 仅相关。
@@ -324,6 +325,15 @@ def classify_relation(req: dict, chunk: dict, equivalences: dict[str, list[str]]
                 for equiv in equivalences[k]:
                     if equiv and equiv in text_n:
                         eq_hits.append((k, equiv))
+    # ③ 语义桥兜底（用户 2026-10-25 决议）：要求词与表键 bge 词级 cos≥阈值 →
+    # 表键视作统一标签，其人工核验值链复用（证据侧不引入新碰词面）
+    bridge_hit = False
+    if not eq_hits and bridge_keys:
+        for k, _cos in bridge_keys:
+            for equiv in equivalences.get(k, []):
+                if equiv and equiv in text_n:
+                    eq_hits.append((k, equiv))
+                    bridge_hit = True
     if eq_hits:
         # deduct 条目（用户 D组决议）：受众错位映射按 0.8 计
         deduct_set = _load_deduct_set()
@@ -331,6 +341,12 @@ def classify_relation(req: dict, chunk: dict, equivalences: dict[str, list[str]]
             return {"relation": "equivalent", "value": config.COVERAGE_DEDUCTION_VALUE,
                     "hit_terms": [ev for (_, ev) in eq_hits],
                     "note": "经核验等价表命中（D组受众错位，按 0.8 酌情减分）"}
+        if bridge_hit:
+            src = "；".join(f"{k}({c:.2f})" for k, c in (bridge_keys or []) if any(
+                ev in text_n for ev in equivalences.get(k, [])))
+            return {"relation": "equivalent", "value": COVERAGE_RELATION_VALUES["equivalent"],
+                    "hit_terms": [ev for (_, ev) in eq_hits],
+                    "note": f"语义桥激活表键 {src}→值链复用（与字面同档）"}
         return {"relation": "equivalent", "value": COVERAGE_RELATION_VALUES["equivalent"],
                 "hit_terms": [ev for (_, ev) in eq_hits],
                 "note": "经核验等价表命中（与字面同档，无字面加成）"}
@@ -382,6 +398,39 @@ def _load_deduct_set() -> set:
         return {tuple(x) for x in (data.get("deduct") or []) if isinstance(x, (list, tuple)) and len(x) == 2}
     except Exception:
         return set()
+
+
+class SemanticBridgeIndex:
+    """语义桥索引：表键词向量矩阵（懒构建一次；测试注入 encode_fn 时同样构建）。
+
+    桥的职责=「要求词 → 已核验表键」的对接（用户 2026-10-25 决议）：
+    cos ≥ COVERAGE_SEMANTIC_BRIDGE_THRESHOLD 的表键被视作统一标签激活，
+    其人工核验值链全部复用；证据侧不引入新碰词面。仅 professional 类要求。
+    """
+
+    def __init__(self, equivalences: dict[str, list[str]], encode_fn=None):
+        from utils.label_embedding import encode_labels as _enc
+
+        self.keys = [k for k in equivalences if k]
+        # 编码器绑定实例（同 EvidenceIndex 契约）：构建用哪个编码器，激活也用它
+        self.encode_fn = encode_fn if encode_fn is not None else (lambda xs: _enc(list(xs)))
+        mat = np.asarray(self.encode_fn(self.keys), dtype=float)
+        nrm = np.linalg.norm(mat, axis=1, keepdims=True)
+        self.matrix = mat / np.where(nrm == 0, 1.0, nrm)
+
+    def activate(self, terms: list[str], threshold: float | None = None,
+                 top_k: int = 3) -> list[tuple[str, float]]:
+        """terms（要求侧词）→ [(表键, cos)]，按 cos 降序，仅 ≥threshold，≤top_k。"""
+        if not self.keys or not terms:
+            return []
+        th = threshold if threshold is not None else getattr(
+            config, "COVERAGE_SEMANTIC_BRIDGE_THRESHOLD", 0.72)
+        q = np.asarray(self.encode_fn(terms), dtype=float)
+        nrm = np.linalg.norm(q, axis=1, keepdims=True)
+        q = q / np.where(nrm == 0, 1.0, nrm)
+        best = (q @ self.matrix.T).max(axis=0)  # 每表键取 terms 内最高 cos
+        order = np.argsort(-best)[:top_k]
+        return [(self.keys[i], float(best[i])) for i in order if best[i] >= th]
 
 
 def load_atomic_splits() -> dict[str, list[str]]:
@@ -589,6 +638,18 @@ def score_coverage(
     if query_vecs is None or query_vecs.size == 0:
         return {}
     w1, w2, w3 = job_weight_triple(job_type)
+    # 语义桥：表键向量索引（懒构建一次）+ 每条 professional 要求的桥激活（req 级一次）
+    bridge_keys_by_rid: dict[str, list[tuple[str, float]]] = {}
+    if getattr(config, "COVERAGE_SEMANTIC_BRIDGE_ENABLED", True):
+        try:
+            bridge = SemanticBridgeIndex(equiv, encode_fn=encode_fn)
+            for r in reqs:
+                if r.get("rtype") == "professional":
+                    keys = bridge.activate(head_lookup_keys(r))
+                    if keys:
+                        bridge_keys_by_rid[r["rid"]] = keys
+        except Exception:
+            bridge_keys_by_rid = {}  # 桥失败不阻断主链路（fail-open 到无桥口径）
     # 分池索引：专业必须 / 行为必须 / 优先项（加分池，不进加权求和）
     prof_must = [r for r in reqs if r["rtype"] == "professional" and r["kind"] == "necessary"]
     behav_must = [r for r in reqs if r["rtype"] == "behavioral" and r["kind"] == "necessary"]
@@ -636,7 +697,8 @@ def score_coverage(
             best_cls: dict | None = None
             best_key: tuple = (-1.0, 0)
             for c in cands:
-                cls = classify_relation(req, c, equiv)
+                cls = classify_relation(req, c, equiv,
+                                        bridge_keys=bridge_keys_by_rid.get(req["rid"]))
                 # v=max；同分时矛盾标记优先于仅相关（§2.3 不被高相似度覆盖）
                 key = (cls["value"], 1 if cls["relation"] == "contradiction" else 0)
                 if key > best_key:

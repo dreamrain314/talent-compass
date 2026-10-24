@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-25T00:15:03",
+ "generated_at": "2026-10-25T01:17:40",
  "protocol": "Day9 盲写验收（agent 盲写 JD / 冻结引擎 / 用户裁决）",
  "jobs": {
   "JOB_C01": {
@@ -10,8 +10,8 @@
      "emp": "JZ0023",
      "name": "余浩",
      "pos": "FPGA工程师",
-     "total": 6.45,
-     "prof": 0.0769,
+     "total": 13.45,
+     "prof": 0.2308,
      "behav": 0.0,
      "p": 0.7167,
      "bonus": 0.0,
@@ -21,10 +21,87 @@
      "emp": "JZ0007",
      "name": "莫晨",
      "pos": "结构设计工程师",
-     "total": 5.81,
-     "prof": 0.0769,
+     "total": 12.64,
+     "prof": 0.2308,
      "behav": 0.0,
      "p": 0.6089,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0022",
+     "name": "姜宇",
+     "pos": "FPGA工程师",
+     "total": 12.41,
+     "prof": 0.2308,
+     "behav": 0.0,
+     "p": 0.5778,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0004",
+     "name": "贺峰",
+     "pos": "结构设计工程师",
+     "total": 12.23,
+     "prof": 0.2308,
+     "behav": 0.0,
+     "p": 0.5533,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0009",
+     "name": "钱梅",
+     "pos": "测试工程师",
+     "total": 11.58,
+     "prof": 0.2308,
+     "behav": 0.0,
+     "p": 0.4667,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0019",
+     "name": "孟敏",
+     "pos": "FPGA工程师",
+     "total": 9.86,
+     "prof": 0.1538,
+     "behav": 0.0,
+     "p": 0.7433,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0025",
+     "name": "尹飞",
+     "pos": "嵌入式开发工程师",
+     "total": 9.08,
+     "prof": 0.1538,
+     "behav": 0.0,
+     "p": 0.6278,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0002",
+     "name": "万强",
+     "pos": "嵌入式开发工程师",
+     "total": 7.9,
+     "prof": 0.1538,
+     "behav": 0.0,
+     "p": 0.4522,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0005",
+     "name": "卢诗涵",
+     "pos": "测试工程师",
+     "total": 5.68,
+     "prof": 0.0769,
+     "behav": 0.0,
+     "p": 0.5878,
      "bonus": 0.0,
      "gate": true
     },
@@ -38,83 +115,6 @@
      "p": 0.5789,
      "bonus": 0.0,
      "gate": true
-    },
-    {
-     "emp": "JZ0022",
-     "name": "姜宇",
-     "pos": "FPGA工程师",
-     "total": 5.62,
-     "prof": 0.0769,
-     "behav": 0.0,
-     "p": 0.5778,
-     "bonus": 0.0,
-     "gate": true
-    },
-    {
-     "emp": "JZ0006",
-     "name": "宋睿",
-     "pos": "结构设计工程师",
-     "total": 5.5,
-     "prof": 0.0769,
-     "behav": 0.0,
-     "p": 0.5578,
-     "bonus": 0.0,
-     "gate": true
-    },
-    {
-     "emp": "JZ0004",
-     "name": "贺峰",
-     "pos": "结构设计工程师",
-     "total": 5.47,
-     "prof": 0.0769,
-     "behav": 0.0,
-     "p": 0.5533,
-     "bonus": 0.0,
-     "gate": true
-    },
-    {
-     "emp": "JZ0012",
-     "name": "杨勇",
-     "pos": "算法工程师",
-     "total": 4.43,
-     "prof": 0.0,
-     "behav": 0.0,
-     "p": 0.8444,
-     "bonus": 0.0,
-     "gate": true
-    },
-    {
-     "emp": "JZ0027",
-     "name": "严志强",
-     "pos": "培训经理",
-     "total": 4.14,
-     "prof": 0.0,
-     "behav": 0.0,
-     "p": 0.7889,
-     "bonus": 0.0,
-     "gate": true
-    },
-    {
-     "emp": "JZ0044",
-     "name": "潘恒",
-     "pos": "人力资源主管",
-     "total": 4.11,
-     "prof": 0.0,
-     "behav": 0.0,
-     "p": 0.7833,
-     "bonus": 0.0,
-     "gate": true
-    },
-    {
-     "emp": "JZ0019",
-     "name": "孟敏",
-     "pos": "FPGA工程师",
-     "total": 3.9,
-     "prof": 0.0,
-     "behav": 0.0,
-     "p": 0.7433,
-     "bonus": 0.0,
-     "gate": true
     }
    ]
   },
@@ -126,10 +126,21 @@
      "emp": "JZ0012",
      "name": "杨勇",
      "pos": "算法工程师",
-     "total": 18.16,
-     "prof": 0.2308,
+     "total": 22.94,
+     "prof": 0.3077,
      "behav": 0.5,
      "p": 0.8444,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0013",
+     "name": "何天宇",
+     "pos": "软件工程师",
+     "total": 15.98,
+     "prof": 0.2308,
+     "behav": 0.5,
+     "p": 0.5533,
      "bonus": 0.0,
      "gate": true
     },
@@ -145,13 +156,24 @@
      "gate": true
     },
     {
-     "emp": "JZ0013",
-     "name": "何天宇",
-     "pos": "软件工程师",
-     "total": 11.96,
-     "prof": 0.1538,
-     "behav": 0.5,
-     "p": 0.5533,
+     "emp": "JZ0022",
+     "name": "姜宇",
+     "pos": "FPGA工程师",
+     "total": 12.41,
+     "prof": 0.2308,
+     "behav": 0.0,
+     "p": 0.5778,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0010",
+     "name": "赵子涵",
+     "pos": "工艺工程师",
+     "total": 11.05,
+     "prof": 0.2308,
+     "behav": 0.0,
+     "p": 0.3967,
      "bonus": 0.0,
      "gate": true
     },
@@ -178,6 +200,17 @@
      "gate": true
     },
     {
+     "emp": "JZ0020",
+     "name": "吕静",
+     "pos": "硬件工程师",
+     "total": 9.19,
+     "prof": 0.1538,
+     "behav": 0.0,
+     "p": 0.6433,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
      "emp": "JZ0017",
      "name": "史飞",
      "pos": "硬件工程师",
@@ -189,46 +222,13 @@
      "gate": true
     },
     {
-     "emp": "JZ0022",
-     "name": "姜宇",
-     "pos": "FPGA工程师",
-     "total": 8.75,
-     "prof": 0.1538,
-     "behav": 0.0,
-     "p": 0.5778,
-     "bonus": 0.0,
-     "gate": true
-    },
-    {
-     "emp": "JZ0006",
-     "name": "宋睿",
-     "pos": "结构设计工程师",
-     "total": 8.5,
+     "emp": "JZ0053",
+     "name": "韩正",
+     "pos": "Java开发工程师",
+     "total": 8.63,
      "prof": 0.0769,
      "behav": 0.5,
-     "p": 0.5578,
-     "bonus": 0.0,
-     "gate": true
-    },
-    {
-     "emp": "JZ0051",
-     "name": "周清",
-     "pos": "质量工程师",
-     "total": 8.38,
-     "prof": 0.1538,
-     "behav": 0.0,
-     "p": 0.5233,
-     "bonus": 0.0,
-     "gate": true
-    },
-    {
-     "emp": "JZ0010",
-     "name": "赵子涵",
-     "pos": "工艺工程师",
-     "total": 7.52,
-     "prof": 0.1538,
-     "behav": 0.0,
-     "p": 0.3967,
+     "p": 0.5789,
      "bonus": 0.0,
      "gate": true
     }
@@ -239,6 +239,17 @@
    "job_type": "职能类",
    "top10": [
     {
+     "emp": "JZ0025",
+     "name": "尹飞",
+     "pos": "嵌入式开发工程师",
+     "total": 14.76,
+     "prof": 0.0769,
+     "behav": 0.5,
+     "p": 0.6278,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
      "emp": "JZ0012",
      "name": "杨勇",
      "pos": "算法工程师",
@@ -246,6 +257,17 @@
      "prof": 0.0,
      "behav": 0.5,
      "p": 0.8444,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0004",
+     "name": "贺峰",
+     "pos": "结构设计工程师",
+     "total": 13.87,
+     "prof": 0.0769,
+     "behav": 0.5,
+     "p": 0.5533,
      "bonus": 0.0,
      "gate": true
     },
@@ -264,11 +286,11 @@
      "emp": "JZ0039",
      "name": "曹恒",
      "pos": "法务专员",
-     "total": 12.86,
+     "total": 12.9,
      "prof": 0.0,
      "behav": 0.5,
      "p": 0.7244,
-     "bonus": 0.0,
+     "bonus": 0.1333,
      "gate": true
     },
     {
@@ -286,11 +308,11 @@
      "emp": "JZ0050",
      "name": "程芳",
      "pos": "薪酬福利专员",
-     "total": 12.48,
+     "total": 12.53,
      "prof": 0.0,
      "behav": 0.5,
      "p": 0.6889,
-     "bonus": 0.0,
+     "bonus": 0.1333,
      "gate": true
     },
     {
@@ -325,28 +347,6 @@
      "p": 0.6433,
      "bonus": 0.0,
      "gate": true
-    },
-    {
-     "emp": "JZ0025",
-     "name": "尹飞",
-     "pos": "嵌入式开发工程师",
-     "total": 11.84,
-     "prof": 0.0,
-     "behav": 0.5,
-     "p": 0.6278,
-     "bonus": 0.0,
-     "gate": true
-    },
-    {
-     "emp": "JZ0033",
-     "name": "崔超",
-     "pos": "战略规划师",
-     "total": 11.72,
-     "prof": 0.0,
-     "behav": 0.5,
-     "p": 0.6167,
-     "bonus": 0.0,
-     "gate": true
     }
    ]
   },
@@ -355,6 +355,28 @@
    "job_type": "业务类",
    "top10": [
     {
+     "emp": "JZ0034",
+     "name": "王军",
+     "pos": "招聘主管",
+     "total": 11.8,
+     "prof": 0.2,
+     "behav": 0.25,
+     "p": 0.5878,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0049",
+     "name": "郭静",
+     "pos": "培训经理",
+     "total": 11.61,
+     "prof": 0.2,
+     "behav": 0.25,
+     "p": 0.5633,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
      "emp": "JZ0013",
      "name": "何天宇",
      "pos": "软件工程师",
@@ -362,6 +384,17 @@
      "prof": 0.2,
      "behav": 0.25,
      "p": 0.5533,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
+     "emp": "JZ0046",
+     "name": "何燕",
+     "pos": "绩效经理",
+     "total": 11.21,
+     "prof": 0.2,
+     "behav": 0.25,
+     "p": 0.5133,
      "bonus": 0.0,
      "gate": true
     },
@@ -388,6 +421,17 @@
      "gate": true
     },
     {
+     "emp": "JZ0029",
+     "name": "毛文",
+     "pos": "人力资源主管",
+     "total": 10.37,
+     "prof": 0.1333,
+     "behav": 0.25,
+     "p": 0.7433,
+     "bonus": 0.0,
+     "gate": true
+    },
+    {
      "emp": "JZ0014",
      "name": "马洋",
      "pos": "系统架构师",
@@ -410,57 +454,13 @@
      "gate": true
     },
     {
-     "emp": "JZ0018",
-     "name": "王雨桐",
-     "pos": "结构设计工程师",
-     "total": 9.07,
-     "prof": 0.2,
-     "behav": 0.0,
-     "p": 0.6833,
-     "bonus": 0.0,
-     "gate": true
-    },
-    {
-     "emp": "JZ0051",
-     "name": "周清",
-     "pos": "质量工程师",
-     "total": 8.83,
+     "emp": "JZ0026",
+     "name": "付涛",
+     "pos": "审计专员",
+     "total": 9.7,
      "prof": 0.1333,
      "behav": 0.25,
-     "p": 0.5233,
-     "bonus": 0.0,
-     "gate": true
-    },
-    {
-     "emp": "JZ0027",
-     "name": "严志强",
-     "pos": "培训经理",
-     "total": 8.26,
-     "prof": 0.0667,
-     "behav": 0.25,
-     "p": 0.7889,
-     "bonus": 0.0,
-     "gate": true
-    },
-    {
-     "emp": "JZ0044",
-     "name": "潘恒",
-     "pos": "人力资源主管",
-     "total": 8.22,
-     "prof": 0.0667,
-     "behav": 0.25,
-     "p": 0.7833,
-     "bonus": 0.0,
-     "gate": true
-    },
-    {
-     "emp": "JZ0023",
-     "name": "余浩",
-     "pos": "FPGA工程师",
-     "total": 7.82,
-     "prof": 0.0667,
-     "behav": 0.25,
-     "p": 0.7167,
+     "p": 0.6489,
      "bonus": 0.0,
      "gate": true
     }

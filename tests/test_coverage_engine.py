@@ -432,3 +432,48 @@ class TestClauseSplit:
         r = res["E1"]
         assert r["required_skill_gate"]["k"] == 3          # 三条专业必须全缺
         assert r["required_skill_gate"]["coef"] == pytest.approx(1 - 0.05 * 3)
+
+
+# ── 语义桥（用户 2026-10-25 决议；阈值 0.72 冻结自校准报告）────────
+class TestSemanticBridge:
+    def test_bridge_activates_reworded_requirement(self):
+        # 「嵌入式软件方案设计与模块开发」字面接不上表键「嵌入式开发」→ 桥接管
+        equiv = {"嵌入式开发": ["嵌入式"]}
+        req = _req(head="嵌入式软件方案设计与模块开发")
+        from utils.coverage_engine import SemanticBridgeIndex, head_lookup_keys
+        bridge = SemanticBridgeIndex(equiv, encode_fn=char_bucket_encode)
+        keys = bridge.activate(head_lookup_keys(req), threshold=0.5)
+        assert any(k == "嵌入式开发" and c >= 0.5 for k, c in keys)  # 字符桶下共享「嵌入式」高相似
+        cls = classify_relation(req, {"text": "岗位：嵌入式开发工程师"}, equiv, bridge_keys=keys)
+        assert cls["relation"] == "equivalent" and cls["value"] == 1.0
+        assert "语义桥" in cls["note"]
+
+    def test_bridge_below_threshold_no_activation(self):
+        equiv = {"瑜伽入门": ["瑜伽"]}
+        from utils.coverage_engine import SemanticBridgeIndex
+        bridge = SemanticBridgeIndex(equiv, encode_fn=char_bucket_encode)
+        keys = bridge.activate(["嵌入式软件开发"], threshold=0.72)
+        assert keys == []  # 无关词对过不了阈值
+
+    def test_bridge_only_for_professional_requirements(self):
+        # 行为类要求不走桥（词面泛，桥接=陷阱）：score_coverage 内部只对 professional 激活
+        job = {"requirements": ["熟悉嵌入式开发（STM32）", "具备良好的沟通表达能力"]}
+        reqs = extract_requirements(job)
+        for r in reqs:
+            assert r["rid"] and r["kind"] == "necessary"
+        # 沟通表达 = behavioral；嵌入式开发 = professional（词典口径，83 闸门保证）
+        assert requirement_type(reqs[0]) == "professional"
+        assert requirement_type(reqs[1]) == "behavioral"
+
+    def test_bridge_fails_open(self):
+        # 桥异常不阻断主链路（fail-open 到无桥口径）
+        job = {"requirements": ["熟悉嵌入式开发（STM32）"]}
+        reqs = extract_requirements(job)
+        emp = _employee()
+        chunks = [{"emp_id": "E1", "source": "projects", "text": "项目：STM32 固件开发", "anchor": "a"}]
+        from utils.evidence_index import EvidenceIndex
+        idx = EvidenceIndex(chunks, char_bucket_encode([c["text"] for c in chunks]), encode_fn=char_bucket_encode)
+        res = score_coverage(reqs, [emp], idx, cross_encoder_fn=None,
+                             equivalences={}, encode_fn=char_bucket_encode,
+                             atomic_splits={}, job_type="技术类")  # 空表→桥无键→正常跑
+        assert res["E1"]["s_prof"] == 1.0

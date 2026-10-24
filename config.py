@@ -321,6 +321,15 @@ COVERAGE_JOB_WEIGHT_MATRIX = {
 COVERAGE_PREFERRED_K = 2.0
 # 专业类必须项缺 k 项 → total ×(1-0.05k)（用户 2026-10-25 指令：线性递减，封 0）
 COVERAGE_GATE_STEP = 0.05
+# ── 语义桥（用户 2026-10-25 决议；竞品 TalentAtlas 三层栈 L2 同构）──
+# 要求词 ↔ 已核验表键 的 bge 词级 cos ≥ 阈值 → 表键激活（值链复用人工核验映射，
+# 证据侧不引入新碰词面）。仅 professional 类要求激活（行为类词面泛，桥接=陷阱）。
+# 阈值 0.72 冻结依据 semantic_bridge_calibration_20261025.md：负样本 p95=0.571、
+# 陷阱对（预算执行↔执行推进）0.680 被拦、目标对（嵌入式软件方案设计↔嵌入式开发）0.748 过线
+COVERAGE_SEMANTIC_BRIDGE_ENABLED = True
+COVERAGE_SEMANTIC_BRIDGE_THRESHOLD = 0.72
+# 语义桥命中审计（Day6-7 固化候选；高频对人工核验后入等价表，桥的活越来越少）
+COVERAGE_SEMANTIC_BRIDGE_LOG = DATA_DIR / "experiment" / "semantic_bridge_hits.jsonl"
 # 负向证据标记（2026-10-21 batch2/gt5 复核类1「只证做过、未证达标」）：含任一标记的
 # 记录不得作为 T0 直接技能命中依据（「做砸了」≠「会做」）。当前 _T0_SOURCES 本就
 # 不含 performance/summary，此护栏防未来 sources 扩展时负向证据混入（用户指令）。
