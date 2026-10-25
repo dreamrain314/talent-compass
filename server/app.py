@@ -85,6 +85,24 @@ class Workspace:
             )
         return self._index
 
+    def warmup(self) -> None:
+        """启动预热（仅 __main__ 调用）：索引构建 + CE 加载都在启动期完成，
+        用户首次匹配即秒出（此前冷启动首匹配要 1-5 分钟：索引重建 ~24s +
+        2.2GB reranker 磁盘加载分钟级，前端只有一个转圈）。"""
+        t0 = time.perf_counter()
+        n_chunks = len(self.index.chunks)
+        t1 = time.perf_counter()
+        if self._cross_encoder_fn is None:
+            from utils.label_matching import _load_cross_encoder
+
+            enc = _load_cross_encoder()
+            if enc is not None:
+                self._cross_encoder_fn = enc.predict if hasattr(enc, "predict") else enc
+        t2 = time.perf_counter()
+        print(f"预热完成：索引 {n_chunks} chunks（{t1 - t0:.1f}s）+ "
+              f"cross-encoder（{t2 - t1:.1f}s，{'已加载' if self._cross_encoder_fn else '不可用·降级纯 bi'}）"
+              f"——首次匹配不再冷启动等待")
+
     def match(self, job: dict, top_k: int, employees: list[dict] | None = None) -> dict:
         """一次完整匹配（离线解析 → 固定公式排序）。互斥锁串行化（确定性）。
 
@@ -274,10 +292,12 @@ def create_app(employees=None, encode_fn=None, cross_encoder_fn=None) -> Flask:
             },
         })
 
+    app.extensions["workspace"] = ws
     return app
 
 
 if __name__ == "__main__":
     app = create_app()
     print("Talent Compass 匹配工作台 → http://127.0.0.1:8082")
+    app.extensions["workspace"].warmup()
     app.run(host="127.0.0.1", port=8082, threaded=True, debug=False)
