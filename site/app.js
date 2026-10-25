@@ -30,8 +30,9 @@ const App = (() => {
   }
 
   function presetToJD(p) {
-    const src = { "blind_gold_jobs.json": "data/jobs/", }[p.source];
-    return p._jd_cache || "";
+    const jd = p.jd || {};
+    return [...(jd.requirements || []), ...(jd.responsibilities || [])].join("
+");
   }
 
   async function runMatch(presetId) {
@@ -42,7 +43,7 @@ const App = (() => {
     let job = null;
     if (presetId) {
       const p = PRESETS.find((x) => x.job_id === presetId);
-      job = p && p._job ? p._job : parseJDText(jdText, p ? p.job_type : "");
+      job = p ? parseJDText(jdText, p.job_type) : parseJDText(jdText, "");
     } else job = parseJDText(jdText, "");
     const t0 = performance.now();
     const { w, results } = Engine.score(job.job_type, job, EMP);

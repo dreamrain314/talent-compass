@@ -120,7 +120,9 @@ def main() -> int:
             presets.append({"job_id": job["job_id"], "title": job.get("title", ""),
                             "job_type": jt, "w_matrix": config.COVERAGE_JOB_WEIGHT_MATRIX.get(
                                 jt, config.COVERAGE_JOB_WEIGHT_MATRIX["_default"]),
-                            "source": jf, "top": top})
+                            "source": jf, "top": top,
+                            "jd": {"requirements": job.get("requirements") or [],
+                                   "responsibilities": job.get("responsibilities") or []}})
     (out / "data" / "presets.json").write_text(
         json.dumps(presets, ensure_ascii=False), encoding="utf-8")
 
