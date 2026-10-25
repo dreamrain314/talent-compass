@@ -85,6 +85,11 @@ $("#matchForm").addEventListener("submit", async (ev) => {
     responsibilities: $("#jobResp").value.split("\n").map((s) => s.trim()).filter(Boolean),
     requirements: $("#jobReq").value.split("\n").map((s) => s.trim()).filter(Boolean),
     top_k: +$("#topK").value,
+    filters: {
+      gender: $("#fltGender").value,
+      education_min: $("#fltEdu").value,
+      major: $("#fltMajor").value.trim(),
+    },
   };
   if (!payload.responsibilities.length && !payload.requirements.length) {
     alert("请填写工作职责或任职要求（也可点选示例岗位）");
@@ -125,6 +130,7 @@ function renderResults(data) {
   const s = data.summary, dc = s.decision_counts;
   $("#resultStats").innerHTML = `
     <span class="stat-pill">候选 <b>${s.n_candidates}</b> 人</span>
+    ${s.filtered_out ? `<span class="stat-pill" title="用户硬性条件（性别/学历/专业）过滤排除">硬性过滤排除 <b>${s.filtered_out}</b> 人</span>` : ""}
     <span class="stat-pill">自动推荐 <b>${dc.recommend}</b></span>
     <span class="stat-pill">待审 <b>${dc.review}</b></span>
     <span class="stat-pill">备选池 <b>${dc.backup_pool}</b></span>
@@ -196,12 +202,16 @@ function renderCard(c, idx) {
         </div>
       </div>
     </div>`;
-  // 拉员工摘要行
+  // 拉员工摘要行（基本信息优先：性别/年龄/工龄/专业/学历/政治面貌）
   const emp = STATE.employees.find((e) => e.employee_id === c.emp_id);
   if (emp) {
-    $(".emp-sub", el).textContent =
-      `${emp.position || "—"} · ${emp.level || "—"} · ${emp.job_sequence || "—"} · ${emp.years ?? "—"} 年 · 360 均分 ${emp.s360_avg ?? "—"}`;
+    $(".emp-sub", el).innerHTML =
+      `<span class="basic-line" title="基本信息">${esc(emp.gender || "—")} · ${emp.age ?? "—"} 岁 · 工龄 ${emp.years ?? "—"} 年 · ${esc(emp.major || "—")} · ${esc(emp.education || "—")} · ${esc(emp.political_status || "—")}</span>` +
+      `<span class="pos-line">${esc(emp.position || "—")} · ${esc(emp.level || "—")} · 360 均分 ${emp.s360_avg ?? "—"}</span>`;
   }
+  // 双击卡片 → 完整档案
+  el.title = "双击查看完整档案";
+  el.addEventListener("dblclick", () => openDrawer(c.emp_id));
   // 动画挂载后触发
   requestAnimationFrame(() => {
     const num = $(".score-num", el);
@@ -332,11 +342,14 @@ function renderEmpGrid(filter = "") {
     const trend = (e.performance_trend || []).map((g) =>
       `<span class="trend-dot g${{ A: 4, B: 3, C: 2, D: 1 }[g] || 0}" title="${esc(g)}">${esc(g)}</span>`).join("");
     el.innerHTML = `<div class="cand-inner">
-      <div class="emp-name">${esc(e.name || e.employee_id)}</div>
-      <div class="emp-sub">${esc(e.position || "—")} · ${esc(e.level || "—")}</div>
+      <div class="emp-name">${esc(e.name || e.employee_id)}<span class="emp-gender">${esc(e.gender || "—")}</span></div>
+      <div class="emp-sub">${e.age ?? "—"} 岁 · 工龄 ${e.years ?? "—"} 年 · ${esc(e.education || "—")}</div>
+      <div class="emp-sub">${esc(e.major || "—")} · ${esc(e.political_status || "—")}</div>
+      <div class="emp-sub pos">${esc(e.position || "—")} · ${esc(e.level || "—")}</div>
       <div class="emp-trend">${trend || "<span style='color:var(--ink-faint);font-size:.7rem'>无绩效记录</span>"}</div>
-      <div class="emp-foot"><span>${esc(e.job_sequence || "—")}</span><span>${e.years ?? "—"} 年 · 证据 ${e.n_evidence}</span></div>
+      <div class="emp-foot"><span>${esc(e.job_sequence || "—")}</span><span>证据 ${e.n_evidence}</span></div>
     </div>`;
+    el.title = "点击查看完整档案";
     el.addEventListener("click", () => openDrawer(e.employee_id));
     grid.appendChild(el);
   });
@@ -383,9 +396,19 @@ async function openDrawer(empId) {
       <div class="item-list">${(emp.training || []).map((t) =>
         `<div class="item-card"><b>${esc(t.course_name)}</b>　${esc(t.status || "")}${t.score ? " · " + t.score + " 分" : ""}</div>`).join("") || "（无）"}</div>
     </div>
-    <div class="sec"><div class="sec-title">证据切片（向量索引素材 · ${emp.evidence.length} 条）</div>
+    <div class="sec"><div class="sec-title">项目摘要（全文）</div>
+      <div class="item-card">${esc(emp.text_summaries?.project_summary || "（无）")}</div>
+    </div>
+    <div class="sec"><div class="sec-title">360 评价摘要（全文，按分句展开）</div>
+      ${(emp.text_summaries?.evaluation_summary || "").split("；").filter(Boolean).map((s) =>
+        `<div class="item-card">· ${esc(s)}</div>`).join("") || '<div class="item-card">（无）</div>'}
+    </div>
+    <div class="sec"><div class="sec-title">绩效摘要（全文）</div>
+      <div class="item-card">${esc(emp.text_summaries?.performance_summary || "（无）")}</div>
+    </div>
+    <div class="sec"><div class="sec-title">证据切片（向量索引素材 · ${emp.evidence.length} 条 · 全文）</div>
       <div class="item-list">${emp.evidence.map((e) =>
-        `<div class="item-card"><span class="evi-count">${esc(e.source_label)}</span><br>${esc(e.text.length > 120 ? e.text.slice(0, 120) + "…" : e.text)}</div>`).join("")}</div>
+        `<div class="item-card"><span class="evi-count">${esc(e.source_label)}</span><br>${esc(e.text)}</div>`).join("")}</div>
     </div>`;
   $("#empDrawer").classList.remove("hidden");
   $("#empDrawer").classList.add("open");

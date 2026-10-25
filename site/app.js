@@ -31,8 +31,7 @@ const App = (() => {
 
   function presetToJD(p) {
     const jd = p.jd || {};
-    return [...(jd.requirements || []), ...(jd.responsibilities || [])].join("
-");
+    return [...(jd.requirements || []), ...(jd.responsibilities || [])].join("\n");
   }
 
   async function runMatch(presetId) {

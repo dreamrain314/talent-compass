@@ -26,7 +26,7 @@ import config  # noqa: E402
 from agents.job_analysis import _offline_extract, build_queries  # noqa: E402
 from utils.evidence_index import EvidenceIndex, chunk_employee  # noqa: E402
 from utils.label_embedding import load_label_corpus  # noqa: E402
-from utils.match_engine import display_score, rank_candidates  # noqa: E402
+from utils.match_engine import _EDU_ORDINAL, display_score, rank_candidates  # noqa: E402
 
 from flask import Flask, jsonify, request, send_from_directory  # noqa: E402
 
@@ -85,16 +85,20 @@ class Workspace:
             )
         return self._index
 
-    def match(self, job: dict, top_k: int) -> dict:
-        """一次完整匹配（离线解析 → 固定公式排序）。互斥锁串行化（确定性）。"""
+    def match(self, job: dict, top_k: int, employees: list[dict] | None = None) -> dict:
+        """一次完整匹配（离线解析 → 固定公式排序）。互斥锁串行化（确定性）。
+
+        employees: 传入则用过滤后的候选池（用户硬性条件），None=全员。
+        """
         t0 = time.perf_counter()
+        pool = employees if employees is not None else self.employees
         with self._lock:
             profile = _offline_extract(job, self.corpus)
             profile["job_id"] = str(job.get("job_id", ""))
             profile["title"] = str(job.get("title", ""))
             profile["queries"] = build_queries(profile, self.corpus)
             ranking = rank_candidates(
-                profile, self.employees, self.index,
+                profile, pool, self.index,
                 cross_encoder_fn=self._cross_encoder_fn,
             )
         ranking["duration_ms"] = int((time.perf_counter() - t0) * 1000)
@@ -116,10 +120,42 @@ def _emp_summary(emp: dict) -> dict:
         "job_sequence": structured.get("job_sequence", ""),
         "education": structured.get("education", ""),
         "years": structured.get("years_of_service"),
+        "gender": structured.get("gender", ""),
+        "age": structured.get("age"),
+        "major": structured.get("major", ""),
+        "political_status": structured.get("political_status", ""),
         "performance_trend": perf,
         "s360_avg": round(sum(s360_vals) / len(s360_vals), 2) if s360_vals else None,
         "n_evidence": len(chunk_employee(emp)),
     }
+
+
+def _hard_filter(employees: list[dict], filters: dict) -> tuple[list[dict], int]:
+    """用户硬性条件过滤（性别/学历下限/专业）。返回 (通过池, 被排除数)。"""
+    gender = str(filters.get("gender") or "").strip()
+    edu_min = str(filters.get("education_min") or "").strip()
+    major = str(filters.get("major") or "").strip().lower()
+    if not (gender or edu_min or major):
+        return employees, 0
+    need = _EDU_ORDINAL.get(edu_min.replace("及以上", ""))
+    passed, excluded = [], 0
+    for e in employees:
+        st = e.get("structured") or {}
+        if gender and str(st.get("gender", "")) != gender:
+            excluded += 1
+            continue
+        if need is not None:
+            have = _EDU_ORDINAL.get(str(st.get("education", "")).strip())
+            if have is None or have < need:
+                excluded += 1
+                continue
+        if major:
+            m = str(st.get("major", "")).lower()
+            if not m or (major not in m and m not in major):
+                excluded += 1
+                continue
+        passed.append(e)
+    return passed, excluded
 
 
 def create_app(employees=None, encode_fn=None, cross_encoder_fn=None) -> Flask:
@@ -203,7 +239,12 @@ def create_app(employees=None, encode_fn=None, cross_encoder_fn=None) -> Flask:
         except (TypeError, ValueError):
             top_k = config.MATCH_TOP_K
 
-        ranking = ws.match(job, top_k)
+        filters = body.get("filters") or {}
+        pool, filtered_out = _hard_filter(ws.employees, filters if isinstance(filters, dict) else {})
+        if not pool:
+            return jsonify({"error": "硬性条件过滤后无候选员工，请放宽条件", "filtered_out": filtered_out}), 200
+
+        ranking = ws.match(job, top_k, employees=pool)
         candidates = ranking.get("candidates") or []
         counts = {k: 0 for k in DECISION_LABELS}
         for c in candidates:
@@ -225,6 +266,7 @@ def create_app(employees=None, encode_fn=None, cross_encoder_fn=None) -> Flask:
             "candidates": candidates[: max(top_k, 10)],
             "summary": {
                 "n_candidates": len(candidates),
+                "filtered_out": filtered_out,
                 "decision_counts": counts,
                 "duration_ms": ranking.get("duration_ms"),
                 "formula": ranking.get("formula"),

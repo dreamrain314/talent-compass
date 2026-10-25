@@ -56,6 +56,30 @@
             </label>
             <div class="field-row">
               <label class="field inline">
+                <span>性别</span>
+                <select id="fltGender">
+                  <option value="" selected>不限</option>
+                  <option value="男">男</option>
+                  <option value="女">女</option>
+                </select>
+              </label>
+              <label class="field inline">
+                <span>学历要求</span>
+                <select id="fltEdu">
+                  <option value="" selected>不限</option>
+                  <option value="大专及以上">大专及以上</option>
+                  <option value="本科及以上">本科及以上</option>
+                  <option value="硕士及以上">硕士及以上</option>
+                  <option value="博士及以上">博士及以上</option>
+                </select>
+              </label>
+            </div>
+            <label class="field">
+              <span>硬性条件 <em>专业含即可，可组合性别/学历快速筛选</em></span>
+              <input type="text" id="fltMajor" placeholder="如：计算机 / 心理学 / 自动化（留空=不限）" autocomplete="off">
+            </label>
+            <div class="field-row">
+              <label class="field inline">
                 <span>展示人数</span>
                 <select id="topK">
                   <option value="5" selected>Top 5</option>
