@@ -1,0 +1,41 @@
+岗位 5｜员工 59｜索引 761 chunks
+概念流：新建 14029 对（3s）→ day67_concept_stream_blind.json
+裁决批次：共 339，已完成 0，待跑 339
+  批 10/339（JOB_C01/R03-a#b1 n=50 判定=50） | 0.10批/s ETA 54min
+  批 20/339（JOB_C01/R04-a#b3 n=8 判定=8） | 0.08批/s ETA 63min
+  批 30/339（JOB_C01/R06-a#b1 n=50 判定=50） | 0.09批/s ETA 58min
+  批 40/339（JOB_C01/R07-a#b3 n=3 判定=3） | 0.09批/s ETA 54min
+  批 50/339（JOB_C01/R08-b#b1 n=50 判定=50） | 0.09批/s ETA 51min
+  批 60/339（JOB_C01/R09-b#b3 n=13 判定=13） | 0.10批/s ETA 48min
+  批 70/339（JOB_C02/R02-b#b1 n=50 判定=50） | 0.10批/s ETA 47min
+  批 80/339（JOB_C02/R04-a#b3 n=23 判定=23） | 0.09批/s ETA 46min
+  批 90/339（JOB_C02/R05-b#b1 n=50 判定=50） | 0.09批/s ETA 46min
+  批 100/339（JOB_C02/R06#b3 n=8 判定=8） | 0.09批/s ETA 45min
+  批 110/339（JOB_C02/R08-a#b1 n=50 判定=50） | 0.09批/s ETA 44min
+  批 120/339（JOB_C02/R09-a#b3 n=9 判定=9） | 0.09批/s ETA 42min
+  批 130/339（JOB_C02/R10-b#b1 n=50 判定=50） | 0.09批/s ETA 40min
+  批 140/339（JOB_C03/R03-a#b3 n=19 判定=19） | 0.09批/s ETA 38min
+  批 150/339（JOB_C03/R04#b1 n=50 判定=50） | 0.09批/s ETA 37min
+  批 160/339（JOB_C03/R06-a#b3 n=13 判定=13） | 0.09批/s ETA 34min
+  批 170/339（JOB_C03/R07-a#b1 n=50 判定=50） | 0.09批/s ETA 32min
+  批 180/339（JOB_C03/R08-a#b3 n=15 判定=15） | 0.09批/s ETA 30min
+  批 190/339（JOB_C03/R09-b#b1 n=50 判定=50） | 0.09批/s ETA 28min
+  批 200/339（JOB_C03/R10-b#b3 n=2 判定=2） | 0.09批/s ETA 26min
+  批 210/339（JOB_C04/R04-a#b1 n=50 判定=50） | 0.09批/s ETA 24min
+  批 220/339（JOB_C04/R04-c#b3 n=19 判定=19） | 0.09批/s ETA 22min
+  批 230/339（JOB_C04/R06-a#b1 n=50 判定=50） | 0.09批/s ETA 20min
+  批 240/339（JOB_C04/R07-a#b3 n=24 判定=24） | 0.09批/s ETA 18min
+  批 250/339（JOB_C04/R08-a#b1 n=50 判定=50） | 0.09批/s ETA 16min
+  批 260/339（JOB_C04/R08-c#b3 n=7 判定=7） | 0.09批/s ETA 14min
+  批 270/339（JOB_C04/R09-c#b1 n=50 判定=50） | 0.09批/s ETA 13min
+  批 280/339（JOB_C05/R02-b#b0 n=50 判定=50） | 0.09批/s ETA 11min
+  批 290/339（JOB_C05/R04-a#b2 n=50 判定=50） | 0.09批/s ETA 9min
+  批 300/339（JOB_C05/R06-a#b0 n=50 判定=50） | 0.09批/s ETA 7min
+  批 310/339（JOB_C05/R07-a#b2 n=50 判定=50） | 0.09批/s ETA 5min
+  批 320/339（JOB_C05/R08-b#b0 n=50 判定=50） | 0.09批/s ETA 3min
+  批 330/339（JOB_C05/R09-b#b2 n=50 判定=50） | 0.09批/s ETA 2min
+  批 339/339（JOB_C05/R10-b#b3 n=21 判定=21） | 0.09批/s ETA 0min
+裁决完成，聚合提议…
+⚠ 1 批三次重试仍失败（checkpoint ok=false），续跑可重试
+提议 384 条词对 → day67_equivalence_proposals_blind.json｜判定直方图 {'relevant_only': 12676, 'direct_support': 700, 'contradiction': 80, 'state_different': 242, 'equivalent': 281}
+核验清单 → day67_equivalence_checklist_20261023.md

@@ -299,11 +299,13 @@ def aggregate(ckpt_path=None, proposals_path=None, checklist_path=None):
     print(f"核验清单 → {CHECKLIST_OUT.name}")
 
 
-def apply_approved():
+def apply_approved(blind: bool = False):
     """读核验清单 ✓ 行 → 版本化等价表。"""
-    text = CHECKLIST_OUT.read_text(encoding="utf-8")
+    checklist = CHECKLIST_BLIND if blind else CHECKLIST_OUT
+    proposals = PROPOSALS_BLIND if blind else PROPOSALS_OUT
+    text = checklist.read_text(encoding="utf-8")
     props = {i: p for i, p in enumerate(
-        json.loads(PROPOSALS_OUT.read_text(encoding="utf-8"))["proposals"], 1)}
+        json.loads(proposals.read_text(encoding="utf-8"))["proposals"], 1)}
     table: dict[str, list[str]] = defaultdict(list)
     n_ok = n_skip = 0
     for line in text.splitlines():
@@ -340,7 +342,7 @@ def main() -> int:
     args = ap.parse_args()
     blind = bool(args.jobs_file)
     if args.apply:
-        apply_approved()
+        apply_approved(blind=blind)
         return 0
     if not args.aggregate_only:
         run_adjudication({"JOB_" + j if not j.startswith("JOB_") else j
