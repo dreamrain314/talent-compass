@@ -330,8 +330,8 @@ function renderEmpGrid(filter = "") {
     const trend = (e.performance_trend || []).map((g) =>
       `<span class="trend-dot g${{ A: 4, B: 3, C: 2, D: 1 }[g] || 0}" title="${esc(g)}">${esc(g)}</span>`).join("");
     el.innerHTML = `<div class="cand-inner">
-      <div class="emp-name">${esc(e.name || e.employee_id)}<span class="emp-gender">${esc(e.gender || "—")}</span></div>
-      <div class="emp-sub">${e.age ?? "—"} 岁 · 工龄 ${e.years ?? "—"} 年 · ${esc(e.education || "—")}</div>
+      <div class="emp-name">${esc(e.name || e.employee_id)}</div>
+      <div class="emp-sub">${esc(e.gender || "—")} · ${e.age ?? "—"} 岁 · 工龄 ${e.years ?? "—"} 年 · ${esc(e.education || "—")}</div>
       <div class="emp-sub">${esc(e.major || "—")} · ${esc(e.political_status || "—")}</div>
       <div class="emp-sub pos">${esc(e.position || "—")} · ${esc(e.level || "—")}</div>
       <div class="emp-trend">${trend || "<span style='color:var(--ink-faint);font-size:.7rem'>无绩效记录</span>"}</div>
