@@ -432,7 +432,7 @@ form { padding: .2rem 1.2rem 1.2rem; display: flex; flex-direction: column; gap:
 @keyframes drawerIn { from { transform: translateX(60px); opacity: 0; } to { transform: none; opacity: 1; } }
 .drawer-mask { align-items: stretch; justify-content: flex-end; }
 .drawer-head { display: flex; align-items: flex-start; justify-content: space-between; padding: 1.6rem 1.6rem 1.1rem; border-bottom: 1px solid var(--hairline); }
-.drawer-body { padding: 1.4rem 1.6rem 3rem; overflow-y: auto; }
+.drawer-body { padding: 1.4rem 1.6rem 3rem; overflow-y: auto; overscroll-behavior: contain; }
 .sec { margin-bottom: 1.6rem; }
 .sec-title { font-size: .68rem; letter-spacing: .2em; color: var(--ink-faint); margin-bottom: .8rem; }
 .kv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .55rem .9rem; }
@@ -460,3 +460,24 @@ form { padding: .2rem 1.2rem 1.2rem; display: flex; flex-direction: column; gap:
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.10); border-radius: 999px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::selection { background: rgba(124,140,255,.35); }
+
+
+/* ── 档案对比弹层（双栏独立滚动） ── */
+.cmp-mask { position: fixed; inset: 0; background: rgba(4,8,16,.72); backdrop-filter: blur(6px); z-index: 90; display: flex; align-items: center; justify-content: center; }
+.cmp-mask.hidden { display: none; }
+.cmp-shell { width: min(1500px, 96vw); height: min(880px, 94vh); display: grid; grid-template-columns: 240px 1fr 1fr; gap: 0; background: var(--panel); border: 1px solid var(--hairline); border-radius: 18px; overflow: hidden; }
+.cmp-picker { border-right: 1px solid var(--hairline); overflow-y: auto; overscroll-behavior: contain; padding: 1rem .8rem; }
+.cmp-picker h4 { font-size: .78rem; color: var(--ink-dim); margin-bottom: .6rem; font-weight: 600; }
+.cmp-item { padding: .5rem .7rem; border-radius: 10px; cursor: pointer; border: 1px solid transparent; margin-bottom: 4px; }
+.cmp-item:hover { background: rgba(110,168,255,.06); }
+.cmp-item.sel { border-color: var(--accent); background: rgba(110,168,255,.1); }
+.cmp-item b { font-size: .86rem; display: block; }
+.cmp-item span { font-size: .72rem; color: var(--ink-dim); }
+.cmp-col { display: flex; flex-direction: column; min-width: 0; }
+.cmp-col + .cmp-col { border-left: 1px solid var(--hairline); }
+.cmp-col-head { padding: .9rem 1.2rem; border-bottom: 1px solid var(--hairline); display: flex; align-items: baseline; gap: .6rem; }
+.cmp-col-head b { font-size: 1.02rem; }
+.cmp-col-head span { font-size: .74rem; color: var(--ink-dim); }
+.cmp-body { overflow-y: auto; overscroll-behavior: contain; padding: 1.2rem 1.2rem 2.5rem; flex: 1; }
+.cmp-empty { display: flex; align-items: center; justify-content: center; height: 100%; color: var(--ink-faint); font-size: .85rem; }
+.cmp-head-btn { align-self: center; margin-left: auto; }

@@ -358,25 +358,20 @@ function renderEmpGrid(filter = "") {
 $("#empSearch").addEventListener("input", (e) => renderEmpGrid(e.target.value));
 
 /* ── 员工档案抽屉 ── */
-async function openDrawer(empId) {
-  const res = await fetch(`/api/employees/${encodeURIComponent(empId)}`);
-  const emp = await res.json();
+function profileBodyHTML(emp) {
   const s = emp.summary, st = emp.structured || {};
-  $("#drawerTitle").innerHTML = `
-    <span class="eyebrow">EMPLOYEE PROFILE</span>
-    <h3 style="font-size:1.3rem;margin-top:.5rem">${esc(s.name || empId)}
-      <span style="font-size:.78rem;color:var(--ink-faint);font-family:var(--mono)">${esc(empId)}</span></h3>`;
   const trend = (s.performance_trend || []).map((g) =>
     `<span class="trend-dot g${{ A: 4, B: 3, C: 2, D: 1 }[g] || 0}">${esc(g)}</span>`).join(" → ");
   const s360 = emp.scores_360 || {};
   const s360max = Math.max(1, ...Object.values(s360).map((v) => +v || 0), 5);
-  $("#drawerBody").innerHTML = `
+  return `
     <div class="sec"><div class="sec-title">基本信息</div>
       <div class="kv-grid">
         ${kv("岗位", st.current_position)}${kv("职级", st.current_level)}
-        ${kv("序列", st.job_sequence)}${kv("学历", st.education)}
-        ${kv("专业", st.major)}${kv("司龄", st.years_of_service != null ? st.years_of_service + " 年" : "—")}
-        ${kv("证书", st.certificates)}${kv("政治面貌", st.political_status)}
+        ${kv("性别", st.gender)}${kv("年龄", st.age != null ? st.age + " 岁" : "—")}
+        ${kv("工龄", st.years_of_service != null ? st.years_of_service + " 年" : "—")}
+        ${kv("学历", st.education)}${kv("专业", st.major)}${kv("政治面貌", st.political_status)}
+        ${kv("序列", st.job_sequence)}${kv("证书", st.certificates)}
       </div>
     </div>
     <div class="sec"><div class="sec-title">绩效轨迹</div>
@@ -410,6 +405,24 @@ async function openDrawer(empId) {
       <div class="item-list">${emp.evidence.map((e) =>
         `<div class="item-card"><span class="evi-count">${esc(e.source_label)}</span><br>${esc(e.text)}</div>`).join("")}</div>
     </div>`;
+}
+
+async function openDrawer(empId) {
+  const res = await fetch(`/api/employees/${encodeURIComponent(empId)}`);
+  const emp = await res.json();
+  const s = emp.summary, st = emp.structured || {};
+  $("#drawerTitle").innerHTML = `
+    <span class="eyebrow">EMPLOYEE PROFILE</span>
+    <h3 style="font-size:1.3rem;margin-top:.5rem">${esc(s.name || empId)}
+      <span style="font-size:.78rem;color:var(--ink-faint);font-family:var(--mono)">${esc(empId)}</span></h3>`;
+  $("#drawerBody").innerHTML = profileBodyHTML(emp);
+  // 对比入口：记住当前员工，按钮带候选人上下文
+  $("#cmpBtn")?.remove();
+  const btn = document.createElement("button");
+  btn.className = "icon-btn"; btn.id = "cmpBtn"; btn.title = "与筛选出的员工并排对比";
+  btn.textContent = "⇄ 对比";
+  btn.addEventListener("click", () => openCompare(empId, emp));
+  document.querySelector(".drawer-head").appendChild(btn);
   $("#empDrawer").classList.remove("hidden");
   $("#empDrawer").classList.add("open");
   requestAnimationFrame(() => $$(".bar-fill", $("#drawerBody")).forEach((b) => { b.style.width = b.dataset.w + "%"; }));
@@ -418,6 +431,47 @@ async function openDrawer(empId) {
 function kv(k, v) {
   return `<div class="kv"><div class="k">${esc(k)}</div><div class="v">${esc(v || "—")}</div></div>`;
 }
+
+/* ── 档案对比（双栏独立滚动；左=筛选出的候选列表，中=原员工，右=对比员工） ── */
+async function openCompare(empId, empCached) {
+  let empA = empCached;
+  if (!empA) {
+    const res = await fetch(`/api/employees/${encodeURIComponent(empId)}`);
+    empA = await res.json();
+  }
+  // 候选来源：最近一次匹配的筛选结果；无匹配则全员
+  const pool = (STATE.lastResults?.candidates || []).length
+    ? STATE.lastResults.candidates.map((c) => ({ id: c.emp_id, name: c.name || c.emp_id, position: "" }))
+    : STATE.employees.map((e) => ({ id: e.employee_id, name: e.name, position: e.position }));
+  $("#cmpPicker").innerHTML = "<h4>筛选出的员工（点击选择）</h4>" + pool.map((p) =>
+    `<div class="cmp-item ${p.id === empId ? "sel-self" : ""}" data-emp="${esc(p.id)}" data-name="${esc(p.name)}">
+       <b>${esc(p.name)}</b><span>${esc(p.id)}${p.position ? " · " + esc(p.position) : ""}</span></div>`).join("");
+  $("#cmpLeftHead").innerHTML = `<b>${esc(empA.summary.name || empId)}</b><span>原档案（独立滚动）</span>`;
+  $("#cmpLeftBody").innerHTML = profileBodyHTML(empA);
+  $("#cmpRightHead").innerHTML = `<span>右侧选择后显示对比档案</span>`;
+  $("#cmpRightBody").innerHTML = `<div class="cmp-empty">← 从左侧选择要对比的员工</div>`;
+  $$(".cmp-item", $("#cmpPicker")).forEach((item) => {
+    item.addEventListener("click", async () => {
+      $$(".cmp-item", $("#cmpPicker")).forEach((x) => x.classList.remove("sel"));
+      item.classList.add("sel");
+      const rid = item.dataset.emp;
+      $("#cmpRightBody").innerHTML = '<div class="cmp-empty">加载中…</div>';
+      const res2 = await fetch(`/api/employees/${encodeURIComponent(rid)}`);
+      const empB = await res2.json();
+      $("#cmpRightHead").innerHTML = `<b>${esc(empB.summary.name || rid)}</b><span>对比档案（独立滚动）</span>`;
+      $("#cmpRightBody").innerHTML = profileBodyHTML(empB);
+      $$(".bar-fill", $("#cmpRightBody")).forEach((b) => { b.style.width = b.dataset.w + "%"; });
+    });
+  });
+  $("#cmpModal").classList.remove("hidden");
+  requestAnimationFrame(() => $$(".bar-fill", $("#cmpLeftBody")).forEach((b) => { b.style.width = b.dataset.w + "%"; }));
+}
+
+function closeCompare() { $("#cmpModal").classList.add("hidden"); }
+$("#cmpModal").addEventListener("click", (e) => { if (e.target === e.currentTarget) closeCompare(); });
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") { closeTrace(); closeDrawer(); closeCompare(); }
+});
 
 function closeDrawer() { $("#empDrawer").classList.add("hidden"); }
 $("#drawerClose").addEventListener("click", closeDrawer);

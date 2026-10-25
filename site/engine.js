@@ -134,7 +134,16 @@ const Engine = {
     const scored = chunks.map((c) => ({ c, lex: Engine.lexicalScore(req, c.text) }));
     scored.sort((x, y) => y.lex - x.lex);
     const top = scored.slice(0, 2).map((s) => s.c);
-    return [...new Set(top)].slice(0, Engine.CFG.params.recall_k);
+    // 字面包含快速通道：head（≥6 字）逐字出现的 chunk 必入候选且不受 top-k
+    // 截断（Dice 对长 chunk 系统性不利，逐字包含是最强证据）
+    const h = Engine.norm(req.head);
+    const contain = [];
+    if (h.length >= 6) {
+      for (const c of chunks) {
+        if (Engine.norm(c.text).includes(h) && !top.includes(c)) contain.push(c);
+      }
+    }
+    return [...top.slice(0, Engine.CFG.params.recall_k), ...contain];
   },
 
   classifyRelation(req, chunk) {

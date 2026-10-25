@@ -268,7 +268,18 @@ def recall_candidates(
     order_embed = sorted(range(n), key=lambda i: -sims[i])[: min(2, n)]
     order_lex = sorted(range(n), key=lambda i: -lex[i])[: min(2, n)]
     union = list(dict.fromkeys(order_embed + order_lex))  # 去重保序
-    union.sort(key=lambda i: -max(float(sims[i]), lex[i]))
+    # 字面包含快速通道：head（≥6 字）逐字出现的 chunk **必入候选且不受 top-k
+    # 截断**——Dice 对长 chunk 系统性不利（bigram 分母摊薄），逐字包含是最强
+    # 证据不容漏召，也不容被低分挤出
+    h = _norm_literal(req["head"])
+    contain: list[int] = []
+    if len(h) >= 6:
+        for i in range(n):
+            if i not in union and h in _norm_literal(emp_chunks[i]["text"]):
+                contain.append(i)
+    rest = [i for i in union]
+    rest.sort(key=lambda i: -max(float(sims[i]), lex[i]))
+    final = list(dict.fromkeys(rest[:k] + contain))  # containment 追加在 top-k 之后
 
     return [
         {
@@ -276,7 +287,7 @@ def recall_candidates(
             "sim_embed": round(float(sims[i]), 4),
             "sim_lexical": round(lex[i], 4),
         }
-        for i in union[:k]
+        for i in final[: max(k, len(contain) + k)]
     ]
 
 
@@ -322,9 +333,15 @@ def classify_relation(req: dict, chunk: dict, equivalences: dict[str, list[str]]
     if not eq_hits:
         for k in equivalences:
             if len(k) >= 2 and k in req_full:
-                for equiv in equivalences[k]:
-                    if equiv and equiv in text_n:
-                        eq_hits.append((k, equiv))
+                # 表键本身出现在证据侧也算命中（键=人工核验能力词，双向对称：
+                # 「薪酬体系设计」⊂ 要求且 ⊂ 证据 → 直接证据，不再要求证据侧
+                # 恰好写了值词）
+                if k in text_n:
+                    eq_hits.append((k, k))
+                else:
+                    for equiv in equivalences[k]:
+                        if equiv and equiv in text_n:
+                            eq_hits.append((k, equiv))
     # ③ 语义桥兜底（用户 2026-10-25 决议）：要求词与表键 bge 词级 cos≥阈值 →
     # 表键视作统一标签，其人工核验值链复用（证据侧不引入新碰词面）
     bridge_hit = False
