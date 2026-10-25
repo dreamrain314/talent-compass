@@ -468,6 +468,7 @@ async function openCompare(empId, empCached) {
 }
 
 function closeCompare() { $("#cmpModal").classList.add("hidden"); }
+$("#cmpClose").addEventListener("click", closeCompare);
 $("#cmpModal").addEventListener("click", (e) => { if (e.target === e.currentTarget) closeCompare(); });
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") { closeTrace(); closeDrawer(); closeCompare(); }

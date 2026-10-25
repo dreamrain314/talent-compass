@@ -465,7 +465,8 @@ form { padding: .2rem 1.2rem 1.2rem; display: flex; flex-direction: column; gap:
 /* ── 档案对比弹层（双栏独立滚动） ── */
 .cmp-mask { position: fixed; inset: 0; background: rgba(4,8,16,.72); backdrop-filter: blur(6px); z-index: 90; display: flex; align-items: center; justify-content: center; }
 .cmp-mask.hidden { display: none; }
-.cmp-shell { width: min(1500px, 96vw); height: min(880px, 94vh); display: grid; grid-template-columns: 240px 1fr 1fr; gap: 0; background: var(--panel); border: 1px solid var(--hairline); border-radius: 18px; overflow: hidden; }
+.cmp-shell { position: relative; width: min(1500px, 96vw); height: min(880px, 94vh); display: grid; grid-template-columns: 240px 1fr 1fr; gap: 0; background: var(--panel); border: 1px solid var(--hairline); border-radius: 18px; overflow: hidden; }
+.cmp-close { position: absolute; top: 12px; right: 14px; z-index: 5; }
 .cmp-picker { border-right: 1px solid var(--hairline); overflow-y: auto; overscroll-behavior: contain; padding: 1rem .8rem; }
 .cmp-picker h4 { font-size: .78rem; color: var(--ink-dim); margin-bottom: .6rem; font-weight: 600; }
 .cmp-item { padding: .5rem .7rem; border-radius: 10px; cursor: pointer; border: 1px solid transparent; margin-bottom: 4px; }
