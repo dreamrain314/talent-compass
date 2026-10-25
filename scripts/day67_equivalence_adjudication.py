@@ -44,8 +44,11 @@ from utils.evidence_index import EvidenceIndex  # noqa: E402
 
 STREAM_OUT = ROOT / "data" / "experiment" / "day67_concept_stream.json"
 CHECKPOINT = ROOT / "data" / "experiment" / "day67_adjudication_checkpoint.jsonl"
+CHECKPOINT_BLIND = ROOT / "data" / "experiment" / "day67_checkpoint_blind.jsonl"
 PROPOSALS_OUT = ROOT / "data" / "experiment" / "day67_equivalence_proposals.json"
+PROPOSALS_BLIND = ROOT / "data" / "experiment" / "day67_equivalence_proposals_blind.json"
 CHECKLIST_OUT = ROOT / "docs" / "reports" / "day67_equivalence_checklist_20261023.md"
+CHECKLIST_BLIND = ROOT / "docs" / "reports" / "day67_checklist_blind_20261025.md"
 TABLE_OUT = ROOT / "data" / "jobs" / "equivalence_table.json"
 
 BATCH_SIZE = 50
@@ -53,9 +56,12 @@ SYSTEM = ("你是人力资源岗位匹配系统的离线映射裁决器。只输
           "判定从严：没有把握一律 relevant_only。")
 
 
-def load_inputs(job_filter: set[str] | None):
-    jobs = (json.loads((config.DATA_DIR / "jobs" / "blind_gold_jobs.json").read_text(encoding="utf-8"))["jobs"]
-            + json.loads((config.DATA_DIR / "jobs" / "blind_gold_jobs_batch2.json").read_text(encoding="utf-8"))["jobs"])
+def load_inputs(job_filter: set[str] | None, jobs_file: str | None = None):
+    if jobs_file:
+        jobs = json.loads((config.DATA_DIR / "jobs" / jobs_file).read_text(encoding="utf-8"))["jobs"]
+    else:
+        jobs = (json.loads((config.DATA_DIR / "jobs" / "blind_gold_jobs.json").read_text(encoding="utf-8"))["jobs"]
+                + json.loads((config.DATA_DIR / "jobs" / "blind_gold_jobs_batch2.json").read_text(encoding="utf-8"))["jobs"])
     if job_filter:
         jobs = [j for j in jobs if j["job_id"] in job_filter]
     employees = json.loads((config.INTERMEDIATE_DIR / "phase1_output.json").read_text(encoding="utf-8"))["employees"]
@@ -145,23 +151,27 @@ def judge_batch(req_text: str, keys_raw: list[str], items: list[dict]) -> list[d
     return []  # 三次失败：该批标记空（checkpoint 记 failed，续跑可重试）
 
 
-def run_adjudication(job_filter):
-    jobs, employees = load_inputs(job_filter)
+def run_adjudication(job_filter, jobs_file=None):
+    ckpt_path = CHECKPOINT_BLIND if jobs_file else CHECKPOINT
+    proposals_path = PROPOSALS_BLIND if jobs_file else PROPOSALS_OUT
+    checklist_path = CHECKLIST_BLIND if jobs_file else CHECKLIST_OUT
+    jobs, employees = load_inputs(job_filter, jobs_file)
     index = EvidenceIndex.build(employees, cache_path=config.INTERMEDIATE_DIR / "evidence_cache.npy")
     equiv = load_verified_equivalences()
     print(f"岗位 {len(jobs)}｜员工 {len(employees)}｜索引 {len(index.chunks)} chunks")
 
-    if STREAM_OUT.exists():
-        stream = json.loads(STREAM_OUT.read_text(encoding="utf-8"))["pairs"]
+    stream_path = STREAM_OUT.with_name(STREAM_OUT.stem + ("_blind" if jobs_file else "") + ".json")
+    if stream_path.exists():
+        stream = json.loads(stream_path.read_text(encoding="utf-8"))["pairs"]
         print(f"概念流：读缓存 {len(stream)} 对")
     else:
         t0 = time.time()
         stream = build_stream(jobs, employees, index, equiv)
-        STREAM_OUT.write_text(json.dumps(
+        stream_path.write_text(json.dumps(
             {"generated_at": datetime.now().isoformat(timespec="seconds"),
              "protocol": "Round3 §三 全量未筛选概念流", "n_pairs": len(stream),
              "pairs": stream}, ensure_ascii=False), encoding="utf-8")
-        print(f"概念流：新建 {len(stream)} 对（{time.time()-t0:.0f}s）→ {STREAM_OUT.name}")
+        print(f"概念流：新建 {len(stream)} 对（{time.time()-t0:.0f}s）→ {stream_path.name}")
 
     # 分批（按 job+rid 分组，组内再切 60）
     groups: dict[tuple, list[dict]] = defaultdict(list)
@@ -173,8 +183,8 @@ def run_adjudication(job_filter):
             batches.append(((job, rid, bi // BATCH_SIZE), items[bi:bi + BATCH_SIZE]))
 
     done: set[tuple] = set()
-    if CHECKPOINT.exists():
-        for line in CHECKPOINT.read_text(encoding="utf-8").splitlines():
+    if ckpt_path.exists():
+        for line in ckpt_path.read_text(encoding="utf-8").splitlines():
             try:
                 rec = json.loads(line)
                 done.add((rec["job"], rec["rid"], rec["batch"]))
@@ -183,7 +193,7 @@ def run_adjudication(job_filter):
     todo = [(k, v) for k, v in batches if k not in done]
     print(f"裁决批次：共 {len(batches)}，已完成 {len(done)}，待跑 {len(todo)}")
 
-    ckpt = open(CHECKPOINT, "a", encoding="utf-8")
+    ckpt = open(ckpt_path, "a", encoding="utf-8")
     t0 = time.time()
     for n, (key, items) in enumerate(todo, 1):
         arr = judge_batch(items[0]["req_text"], items[0]["keys_raw"], items)
@@ -205,14 +215,17 @@ def run_adjudication(job_filter):
                   f" | {rate:.2f}批/s ETA {eta/60:.0f}min", flush=True)
     ckpt.close()
     print("裁决完成，聚合提议…")
-    aggregate()
+    aggregate(ckpt_path, proposals_path, checklist_path)
 
 
-def aggregate():
+def aggregate(ckpt_path=None, proposals_path=None, checklist_path=None):
     """checkpoint（自带 chunk 上下文，无 id 对齐问题）→ 词对提议 + 核验清单。"""
+    ckpt_path = ckpt_path or CHECKPOINT
+    proposals_path = proposals_path or PROPOSALS_OUT
+    checklist_path = checklist_path or CHECKLIST_OUT
     pairs_all = []
     n_failed_batches = 0
-    for line in CHECKPOINT.read_text(encoding="utf-8").splitlines():
+    for line in ckpt_path.read_text(encoding="utf-8").splitlines():
         try:
             rec = json.loads(line)
         except Exception:
@@ -253,13 +266,13 @@ def aggregate():
                       "relation": pc["relation"], "count": pc["count"],
                       "n_emps": len(pc["emps"]), "jobs": sorted(pc["jobs"]),
                       "examples": pc["examples"], "approved": None})
-    PROPOSALS_OUT.write_text(json.dumps({
+    proposals_path.write_text(json.dumps({
         "generated_at": datetime.now().isoformat(timespec="seconds"),
         "protocol": "Round3 §三 LLM 离线提议（未筛选全量概念流），人工核验后 --apply 入表",
         "n_pairs_total": len(pairs_all), "n_pairs_judged": judged,
         "relation_histogram": dict(rel_hist),
         "proposals": props}, ensure_ascii=False, indent=1), encoding="utf-8")
-    print(f"提议 {len(props)} 条词对 → {PROPOSALS_OUT.name}｜判定直方图 {dict(rel_hist)}")
+    print(f"提议 {len(props)} 条词对 → {proposals_path.name}｜判定直方图 {dict(rel_hist)}")
 
     # 核验清单
     lines = [
@@ -321,17 +334,22 @@ def apply_approved():
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--jobs", type=str, default=None, help="只跑指定岗位（逗号分隔）")
+    ap.add_argument("--jobs-file", type=str, default=None, help="岗位文件名（data/jobs/ 下，如 agent_blind_jobs_v1.json）——checkpoint/提议/清单走 blind 独立文件")
     ap.add_argument("--aggregate-only", action="store_true", help="跳过 LLM，只聚合 checkpoint")
     ap.add_argument("--apply", action="store_true", help="读核验清单 ✓ → 写等价表")
     args = ap.parse_args()
+    blind = bool(args.jobs_file)
     if args.apply:
         apply_approved()
         return 0
     if not args.aggregate_only:
         run_adjudication({"JOB_" + j if not j.startswith("JOB_") else j
-                          for j in args.jobs.split(",")} if args.jobs else None)
+                          for j in args.jobs.split(",")} if args.jobs else None,
+                         jobs_file=args.jobs_file)
     else:
-        aggregate()
+        aggregate(CHECKPOINT_BLIND if blind else CHECKPOINT,
+                  PROPOSALS_BLIND if blind else PROPOSALS_OUT,
+                  CHECKLIST_BLIND if blind else CHECKLIST_OUT)
     return 0
 
 
