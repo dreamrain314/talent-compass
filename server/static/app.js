@@ -1,11 +1,10 @@
-/* Talent Compass 匹配工作台 — 前端交互（无构建依赖，vanilla JS） */
+/* Talent Compass 匹配工作台 — 前端交互（Round 3 覆盖引擎口径） */
 "use strict";
 
 const $ = (sel, el = document) => el.querySelector(sel);
 const $$ = (sel, el = document) => [...el.querySelectorAll(sel)];
 
 const STATE = {
-  decisionLabels: {},
   sourceLabels: {},
   employees: [],
   jobs: [],
@@ -28,7 +27,6 @@ function countUp(el, target, decimals = 1, ms = 900) {
   requestAnimationFrame(tick);
 }
 
-/* 进场动画 */
 const io = new IntersectionObserver((entries) => {
   for (const e of entries) {
     if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
@@ -44,14 +42,12 @@ async function init() {
     const state = await stateRes.json();
     const empData = await empRes.json();
     const jobData = await jobRes.json();
-    STATE.decisionLabels = state.decision_labels;
     STATE.sourceLabels = state.source_labels;
     STATE.employees = empData.employees;
     STATE.jobs = jobData.jobs;
 
-    $("#navMeta").textContent = `${state.n_employees} 人 · ${state.parse_mode.split("（")[0]}`;
-    $("#footModels").textContent =
-      `${state.embedding_model} + ${state.reranker_model} · 阈值 ${state.thresholds.reject}/${state.thresholds.review}`;
+    $("#navMeta").textContent = `${state.n_employees} 人 · ${state.engine.split("（")[0]}`;
+    $("#footModels").textContent = state.engine;
     renderGoldChips();
     renderEmpGrid();
     $$(".reveal").forEach((el) => io.observe(el));
@@ -73,6 +69,8 @@ function renderGoldChips() {
       $("#jobTitle").value = j.title;
       $("#jobResp").value = (j.responsibilities || []).join("\n");
       $("#jobReq").value = (j.requirements || []).join("\n");
+      const jt = $("#jobType");
+      if (jt) jt.value = j.job_type || "技术类";
     });
   });
 }
@@ -82,20 +80,21 @@ $("#matchForm").addEventListener("submit", async (ev) => {
   ev.preventDefault();
   const payload = {
     title: $("#jobTitle").value.trim(),
+    job_type: $("#jobType") ? $("#jobType").value : "技术类",
     responsibilities: $("#jobResp").value.split("\n").map((s) => s.trim()).filter(Boolean),
     requirements: $("#jobReq").value.split("\n").map((s) => s.trim()).filter(Boolean),
     top_k: +$("#topK").value,
     filters: {
-      gender: $("#fltGender").value,
-      education_min: $("#fltEdu").value,
-      major: $("#fltMajor").value.trim(),
+      gender: $("#fltGender") ? $("#fltGender").value : "",
+      education_min: $("#fltEdu") ? $("#fltEdu").value : "",
+      major: $("#fltMajor") ? $("#fltMajor").value.trim() : "",
     },
   };
   if (!payload.responsibilities.length && !payload.requirements.length) {
     alert("请填写工作职责或任职要求（也可点选示例岗位）");
     return;
   }
-  setLoading(true, "构建岗位画像 · 全员向量检索 · cross-encoder 校准…");
+  setLoading(true, "要求拆解 · 全员证据对齐 · 覆盖评分…");
   try {
     const t0 = performance.now();
     const res = await fetch("/api/match", {
@@ -105,7 +104,6 @@ $("#matchForm").addEventListener("submit", async (ev) => {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
-    // 最少转场 600ms，避免闪屏
     const remain = Math.max(0, 600 - (performance.now() - t0));
     setTimeout(() => { renderResults(data); setLoading(false); }, remain);
   } catch (err) {
@@ -122,54 +120,47 @@ function setLoading(on, text) {
   if (text) $("#loadingText").textContent = text;
 }
 
+const STATUS = {
+  equivalent: "已支持（等价）", direct_support: "已支持",
+  state_different: "部分（状态存疑）", relevant_only: "未证实",
+  contradiction: "冲突标记", no_candidate: "未证实（无候选）",
+};
+
 function renderResults(data) {
   STATE.lastResults = data;
   $("#matchEmpty").classList.add("hidden");
   $("#matchResults").classList.remove("hidden");
-  $("#resultJobTitle").textContent = data.job.title;
-  const s = data.summary, dc = s.decision_counts;
+  $("#resultJobTitle").textContent = `${data.job.title}（${data.job.job_type}）`;
+  const s = data.summary;
   $("#resultStats").innerHTML = `
     <span class="stat-pill">候选 <b>${s.n_candidates}</b> 人</span>
-    ${s.filtered_out ? `<span class="stat-pill" title="用户硬性条件（性别/学历/专业）过滤排除">硬性过滤排除 <b>${s.filtered_out}</b> 人</span>` : ""}
-    <span class="stat-pill">自动推荐 <b>${dc.recommend}</b></span>
-    <span class="stat-pill">待审 <b>${dc.review}</b></span>
-    <span class="stat-pill">备选池 <b>${dc.backup_pool}</b></span>
-    <span class="stat-pill">未通过 <b>${dc.rejected}</b></span>
+    ${s.filtered_out ? `<span class="stat-pill" title="用户硬性条件过滤排除">硬性过滤排除 <b>${s.filtered_out}</b> 人</span>` : ""}
+    <span class="stat-pill">要求 <b>${s.n_requirements}</b> 条（专业 ${s.n_prof} / 行为 ${s.n_behav} / 优先 ${s.n_pref}）</span>
+    <span class="stat-pill">权重 W <b>${s.w_matrix.join("/")}</b></span>
+    <span class="stat-pill">闸门触发 <b>${s.n_gate}</b> 人</span>
     <span class="stat-pill">耗时 <b>${s.duration_ms}</b>ms</span>`;
 
   const strip = $("#parsedStrip");
-  const hard = data.job.hard_requirements || {};
-  const hardBits = [
-    hard.education_min ? `学历≥${hard.education_min}` : null,
-    hard.years_min ? `年限≥${hard.years_min}年` : null,
-    ...(hard.certificates || []),
-  ].filter(Boolean);
   strip.innerHTML = `
-    <div class="p-label">引擎解析的岗位画像（${esc(data.job.parse_source)}）</div>
+    <div class="p-label">引擎拆解的原子要求（专=硬技能 · 行=软实力；必须进覆盖分 / 优先进加分）</div>
     <div class="parsed-tags">
-      ${hardBits.map((h) => `<span class="ptag hard">闸门 · ${esc(h)}</span>`).join("")}
-      ${(data.job.skill_requirements || []).slice(0, 12).map((r) =>
-        `<span class="ptag">${esc(r.name)}</span>`).join("")}
+      ${(data.job.reqs || []).map((r) =>
+        `<span class="ptag ${r.rtype === "behavioral" ? "hard" : ""}">${esc(r.head.slice(0, 16))}<i> ${r.rtype === "behavioral" ? "行" : "专"}${r.kind === "preferred" ? " · 优" : ""}</i></span>`).join("")}
     </div>`;
 
   const list = $("#cardList");
   list.innerHTML = "";
   data.candidates.forEach((c, i) => list.appendChild(renderCard(c, i)));
   $$(".reveal", $("#matchResults")).forEach((el) => io.observe(el));
-  $$(".cand", list).forEach((el) => {
-    el.style.animationDelay = `${Math.min(i0(el), 8) * 70}ms`;
-  });
 }
-
-function i0(el) { return +el.dataset.rank - 1 || 0; }
 
 function renderCard(c, idx) {
   const el = document.createElement("article");
   el.className = `cand bezel rank-${idx + 1}`;
   el.dataset.rank = idx + 1;
-  const s = c.scores;
-  const gates = (c.gate && !c.gate.passed)
-    ? `<span class="badge rejected" title="${esc((c.gate.fail_reasons || []).join("；"))}">闸门拦截</span>` : "";
+  const gate = c.gate
+    ? `<span class="badge rejected" title="专业类必须项缺 ${c.gate.k} 项 → 总分 ×${c.gate.coef}">专业闸门 −${Math.round((1 - c.gate.coef) * 100)}%</span>` : "";
+  const neutral = c.class_neutral ? `<span class="badge clickable" title="该类要求为空 → 按缺失层惯例取中性 0.5">${c.class_neutral[0] === "behavioral" ? "行为类空·中性" : "专业类空·中性"}</span>` : "";
   el.innerHTML = `
     <div class="cand-inner">
       <div class="cand-top">
@@ -178,47 +169,41 @@ function renderCard(c, idx) {
           <div class="cand-name-row">
             <span class="cand-name">${esc(c.name || c.emp_id)}</span>
             <span class="cand-meta">${esc(c.emp_id)}</span>
-            <span class="badge ${c.decision}">${esc(STATE.decisionLabels[c.decision] || c.decision)}</span>
-            ${gates}
-            ${c.ce_calibrated ? '<span class="badge clickable" style="color:var(--accent-2);border:1px solid rgba(95,212,196,.3);background:rgba(95,212,196,.06)" title="Top-10 候选经 bge-reranker 交叉校准">CE 校准</span>' : ""}
+            ${gate}${neutral}
           </div>
           <div class="emp-sub" style="margin-top:.35rem" data-emp="${esc(c.emp_id)}"></div>
         </div>
-        <div class="score-box top-score" title="公式原始分 ${s.total}（金标锚定映射后的展示分）">
-          <div class="score-num" data-target="${c.display_score ?? s.total}">0</div>
+        <div class="score-box top-score" title="覆盖引擎总分 = W1·专业 + W2·行为 + W3·潜力 + 优先加分（闸门后）">
+          <div class="score-num" data-target="${c.total}">0</div>
           <div class="score-sub">综合匹配 / 100</div>
         </div>
       </div>
       <div class="cand-body">
         <div class="score-box" style="padding:.9rem .6rem">
-          ${barRow("t0", "T0 直接技能", s.t0, 50)}
-          ${barRow("t1", "T1 语义匹配", s.t1, 30)}
-          ${barRow("t2", "T2 行为能力", s.t2, 10)}
-          ${barRow("t3", "T3 发展潜力", s.t3, 10)}
+          ${barRow("t0", "专业覆盖", c.s_prof)}
+          ${barRow("t1", "行为覆盖", c.s_behav)}
+          ${barRow("t3", "发展潜力", c.p)}
+          ${c.bonus > 0 ? `<div class="bar-row"><span class="bar-label">优先加分</span><span class="bar-val" style="margin-left:auto">+${c.bonus}</span></div>` : ""}
         </div>
         <div>
-          <div class="reason">${renderReason(c.reason)}</div>
-          ${renderEvidence(c)}
+          <div class="reason">${coverageSummary(c)}</div>
+          ${renderReqMatrix(c)}
         </div>
       </div>
     </div>`;
-  // 拉员工摘要行（基本信息优先：性别/年龄/工龄/专业/学历/政治面貌）
   const emp = STATE.employees.find((e) => e.employee_id === c.emp_id);
   if (emp) {
     $(".emp-sub", el).innerHTML =
-      `<span class="basic-line" title="基本信息">${esc(emp.gender || "—")} · ${emp.age ?? "—"} 岁 · 工龄 ${emp.years ?? "—"} 年 · ${esc(emp.major || "—")} · ${esc(emp.education || "—")} · ${esc(emp.political_status || "—")}</span>` +
-      `<span class="pos-line">${esc(emp.position || "—")} · ${esc(emp.level || "—")} · 360 均分 ${emp.s360_avg ?? "—"}</span>`;
+      `<span class="basic-line">${esc(emp.gender || "—")} · ${emp.age ?? "—"} 岁 · 工龄 ${emp.years ?? "—"} 年 · ${esc(emp.major || "—")} · ${esc(emp.education || "—")} · ${esc(emp.political_status || "—")}</span>` +
+      `<span class="pos-line">${esc(emp.position || "—")} · ${esc(emp.level || "—")}</span>`;
   }
-  // 双击卡片 → 完整档案
   el.title = "双击查看完整档案";
   el.addEventListener("dblclick", () => openDrawer(c.emp_id));
-  // 动画挂载后触发
   requestAnimationFrame(() => {
     const num = $(".score-num", el);
-    countUp(num, parseFloat(num.dataset.target), 1);  // 动画终点 = data-target（展示分），勿用原始分覆盖
+    countUp(num, parseFloat(num.dataset.target), 1);
     $$(".bar-fill", el).forEach((b) => { b.style.width = b.dataset.w + "%"; });
   });
-  // 证据折叠 + 溯源
   const tog = $(".evi-toggle", el);
   tog.addEventListener("click", () => {
     tog.classList.toggle("open");
@@ -230,61 +215,64 @@ function renderCard(c, idx) {
   return el;
 }
 
-function barRow(cls, label, val01, full) {
-  const pts = (val01 * full).toFixed(1);
+function barRow(cls, label, val01) {
   const pct = Math.min(100, val01 * 100).toFixed(1);
   return `<div class="bar-row ${"b-" + cls}">
     <span class="bar-label">${label}</span>
     <div class="bar-track"><div class="bar-fill" data-w="${pct}"></div></div>
-    <span class="bar-val">${pts}/${full}</span>
+    <span class="bar-val">${pct}%</span>
   </div>`;
 }
 
-function renderReason(reason) {
-  // 「字面命中技能证据 N 项（如「X」）；语义最相关证据：anchor…（sim 0.xx）；T1语义 …」
-  return esc(reason).replace(/（如「([^」]+)」）/g, "（如「<b>$1</b>」）");
+function coverageSummary(c) {
+  const vals = Object.values(c.requirements);
+  const full = vals.filter((r) => r.v >= 1.0).length;
+  const partial = vals.filter((r) => r.v > 0 && r.v < 1.0).length;
+  const miss = vals.length - full - partial;
+  return `要求覆盖 <b>${full}</b> 支持 / ${partial} 部分 / <b>${miss}</b> 未证实（共 ${vals.length} 条，v=max 取最佳证据）`;
 }
 
-function renderEvidence(c) {
-  const evs = c.evidence || [];
-  if (!evs.length) return "";
+function renderReqMatrix(c) {
+  const rows = Object.entries(c.requirements || {});
+  if (!rows.length) return "";
   return `<div class="evi-wrap">
-    <button type="button" class="evi-toggle"><span class="arr">▶</span> 证据链 · ${evs.length} 条（点开逐条溯源）</button>
+    <button type="button" class="evi-toggle"><span class="arr">▶</span> 证据矩阵 · ${rows.length} 项要求（点开逐条溯源）</button>
     <div class="evi-list">
-      ${evs.map((e, i) => `
+      ${rows.map(([rid, rr], i) => {
+        const e = (rr.evidence || [])[0];
+        return `
         <div class="evi-item">
-          <div class="evi-src">${esc(STATE.sourceLabels[e.source] || e.source)}</div>
+          <div class="evi-src">${esc(STATUS[rr.relation] || rr.relation)} · v=${rr.v}</div>
           <div class="evi-text">
-            <span class="q">命中要求：<b>${esc(e.query)}</b></span>
-            ${esc(e.text.length > 160 ? e.text.slice(0, 160) + "…" : e.text)}
+            <span class="q">${esc(rr.note)}</span>
+            ${e ? esc(e.text.length > 160 ? e.text.slice(0, 160) + "…" : e.text) : "（无候选证据）"}
           </div>
-          <div><div class="evi-sim">sim ${e.sim.toFixed(2)}</div>
-            <button type="button" class="trace-btn" data-emp="${esc(c.emp_id)}" data-evi="${i}">溯源 ↗</button>
-          </div>
-        </div>`).join("")}
+          <div>${e ? `<button type="button" class="trace-btn" data-emp="${esc(c.emp_id)}" data-evi="${i}">溯源 ↗</button>` : ""}</div>
+        </div>`;
+      }).join("")}
     </div>
   </div>`;
 }
 
-/* ── 溯源弹层：证据原文 + 员工完整原始记录 ── */
+/* ── 溯源弹层 ── */
 async function openTrace(cand, eviIdx) {
-  const evi = (cand.evidence || [])[eviIdx];
+  const rows = Object.entries(cand.requirements || {});
+  const [, rr] = rows[eviIdx] || [];
+  const evi = (rr?.evidence || [])[0];
   if (!evi) return;
   $("#traceTitle").textContent = `证据溯源 · ${cand.name || cand.emp_id}`;
-  $("#traceBody").innerHTML = `<div class="trace-q">匹配要求：<b>${esc(evi.query)}</b>　·　相似度 ${evi.sim.toFixed(3)}（bge 语义空间）</div>
-    <div class="trace-block"><span class="trace-src">${esc(STATE.sourceLabels[evi.source] || evi.source)}</span>
-      <div class="trace-anchor">锚点「${esc(evi.anchor)}…」</div>
+  $("#traceBody").innerHTML = `<div class="trace-q">支持状态：${esc(STATUS[rr.relation] || rr.relation)}（v=${rr.v}）</div>
+    <div class="trace-block"><span class="trace-src">${esc(evi.source_label || evi.source)}</span>
       <div class="trace-text">${esc(evi.text)}</div>
       <div class="trace-full"><span class="fl">LOADING ORIGINAL…</span></div>
     </div>`;
   $("#traceModal").classList.remove("hidden");
-  // 拉原始记录全文（截断的证据 → 完整原文）
   try {
     const res = await fetch(`/api/employees/${encodeURIComponent(cand.emp_id)}`);
     const emp = await res.json();
     const full = fullTextFor(emp, evi);
     $(".trace-full", $("#traceBody")).innerHTML =
-      `<span class="fl">原始记录 · ${esc(STATE.sourceLabels[evi.source] || evi.source)}（完整）</span>${full}
+      `<span class="fl">原始记录 · ${esc(evi.source_label || evi.source)}（完整）</span>${full}
        <button class="trace-link" id="openProfile">打开 ${esc(emp.summary.name || cand.emp_id)} 完整档案 →</button>`;
     $("#openProfile").addEventListener("click", () => {
       closeTrace();
@@ -410,13 +398,11 @@ function profileBodyHTML(emp) {
 async function openDrawer(empId) {
   const res = await fetch(`/api/employees/${encodeURIComponent(empId)}`);
   const emp = await res.json();
-  const s = emp.summary, st = emp.structured || {};
   $("#drawerTitle").innerHTML = `
     <span class="eyebrow">EMPLOYEE PROFILE</span>
-    <h3 style="font-size:1.3rem;margin-top:.5rem">${esc(s.name || empId)}
+    <h3 style="font-size:1.3rem;margin-top:.5rem">${esc(emp.summary.name || empId)}
       <span style="font-size:.78rem;color:var(--ink-faint);font-family:var(--mono)">${esc(empId)}</span></h3>`;
   $("#drawerBody").innerHTML = profileBodyHTML(emp);
-  // 对比入口：记住当前员工，按钮带候选人上下文
   $("#cmpBtn")?.remove();
   const btn = document.createElement("button");
   btn.className = "icon-btn"; btn.id = "cmpBtn"; btn.title = "与筛选出的员工并排对比";
@@ -432,19 +418,18 @@ function kv(k, v) {
   return `<div class="kv"><div class="k">${esc(k)}</div><div class="v">${esc(v || "—")}</div></div>`;
 }
 
-/* ── 档案对比（双栏独立滚动；左=筛选出的候选列表，中=原员工，右=对比员工） ── */
+/* ── 档案对比（双栏独立滚动） ── */
 async function openCompare(empId, empCached) {
   let empA = empCached;
   if (!empA) {
     const res = await fetch(`/api/employees/${encodeURIComponent(empId)}`);
     empA = await res.json();
   }
-  // 候选来源：最近一次匹配的筛选结果；无匹配则全员
   const pool = (STATE.lastResults?.candidates || []).length
     ? STATE.lastResults.candidates.map((c) => ({ id: c.emp_id, name: c.name || c.emp_id, position: "" }))
     : STATE.employees.map((e) => ({ id: e.employee_id, name: e.name, position: e.position }));
   $("#cmpPicker").innerHTML = "<h4>筛选出的员工（点击选择）</h4>" + pool.map((p) =>
-    `<div class="cmp-item ${p.id === empId ? "sel-self" : ""}" data-emp="${esc(p.id)}" data-name="${esc(p.name)}">
+    `<div class="cmp-item" data-emp="${esc(p.id)}" data-name="${esc(p.name)}">
        <b>${esc(p.name)}</b><span>${esc(p.id)}${p.position ? " · " + esc(p.position) : ""}</span></div>`).join("");
   $("#cmpLeftHead").innerHTML = `<b>${esc(empA.summary.name || empId)}</b><span>原档案（独立滚动）</span>`;
   $("#cmpLeftBody").innerHTML = profileBodyHTML(empA);
@@ -470,15 +455,12 @@ async function openCompare(empId, empCached) {
 function closeCompare() { $("#cmpModal").classList.add("hidden"); }
 $("#cmpClose").addEventListener("click", closeCompare);
 $("#cmpModal").addEventListener("click", (e) => { if (e.target === e.currentTarget) closeCompare(); });
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") { closeTrace(); closeDrawer(); closeCompare(); }
-});
 
 function closeDrawer() { $("#empDrawer").classList.add("hidden"); }
 $("#drawerClose").addEventListener("click", closeDrawer);
 $("#empDrawer").addEventListener("click", (e) => { if (e.target === e.currentTarget) closeDrawer(); });
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape") { closeTrace(); closeDrawer(); }
+  if (e.key === "Escape") { closeTrace(); closeDrawer(); closeCompare(); }
 });
 
 /* ── 视图切换 ── */

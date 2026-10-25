@@ -23,19 +23,18 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 import config  # noqa: E402
-from agents.job_analysis import _offline_extract, build_queries  # noqa: E402
+from utils.coverage_engine import (  # noqa: E402
+    _expand_requirements,
+    build_evidence_matrix,
+    extract_requirements,
+    load_atomic_splits,
+    load_verified_equivalences,
+    score_coverage,
+)
 from utils.evidence_index import EvidenceIndex, chunk_employee  # noqa: E402
-from utils.label_embedding import load_label_corpus  # noqa: E402
-from utils.match_engine import _EDU_ORDINAL, display_score, rank_candidates  # noqa: E402
+from utils.match_engine import _EDU_ORDINAL  # noqa: E402
 
 from flask import Flask, jsonify, request, send_from_directory  # noqa: E402
-
-DECISION_LABELS = {
-    "recommend": "自动推荐",
-    "review": "待审",
-    "backup_pool": "备选池",
-    "rejected": "未通过",
-}
 
 SOURCE_LABELS = {
     "position": "岗位与证书",
@@ -103,25 +102,52 @@ class Workspace:
               f"cross-encoder（{t2 - t1:.1f}s，{'已加载' if self._cross_encoder_fn else '不可用·降级纯 bi'}）"
               f"——首次匹配不再冷启动等待")
 
-    def match(self, job: dict, top_k: int, employees: list[dict] | None = None) -> dict:
-        """一次完整匹配（离线解析 → 固定公式排序）。互斥锁串行化（确定性）。
+    def match(self, job: dict, top_k: int, employees: list[dict] | None = None,
+              job_type: str = "") -> dict:
+        """一次完整匹配（Round 3 覆盖引擎：要求—证据对齐，运行时零 LLM）。
 
         employees: 传入则用过滤后的候选池（用户硬性条件），None=全员。
+        返回 {candidates, meta}——candidates 按新引擎 total 降序。
         """
         t0 = time.perf_counter()
         pool = employees if employees is not None else self.employees
         with self._lock:
-            profile = _offline_extract(job, self.corpus)
-            profile["job_id"] = str(job.get("job_id", ""))
-            profile["title"] = str(job.get("title", ""))
-            profile["queries"] = build_queries(profile, self.corpus)
-            ranking = rank_candidates(
-                profile, pool, self.index,
-                cross_encoder_fn=self._cross_encoder_fn,
-            )
-        ranking["duration_ms"] = int((time.perf_counter() - t0) * 1000)
-        ranking["_profile"] = profile
-        return ranking
+            reqs_raw = extract_requirements(job)
+            reqs = _expand_requirements(reqs_raw, load_atomic_splits())
+            res = score_coverage(reqs_raw, pool, self.index,
+                                 equivalences=load_verified_equivalences(),
+                                 atomic_splits=load_atomic_splits(),
+                                 job_type=job_type)
+        order = sorted(res.items(), key=lambda kv: (-kv[1]["total"], kv[0]))
+        candidates = []
+        for eid, r in order:
+            emp = next((x for x in pool if str(x.get("employee_id")) == eid), None)
+            st = (emp or {}).get("structured") or {}
+            candidates.append({
+                "emp_id": eid,
+                "name": st.get("name", ""),
+                "total": r["total"],
+                "s_prof": r["s_prof"], "s_behav": r["s_behav"],
+                "p": r["p"], "bonus": r["bonus"],
+                "gate": r["required_skill_gate"],
+                "class_neutral": r["class_neutral"],
+                "requirements": {
+                    rid: {"v": rr["v"], "relation": rr["relation"], "note": rr["note"],
+                          "evidence": [{**ev, "source_label": SOURCE_LABELS.get(ev["source"], ev["source"])}
+                                       for ev in rr["evidence"]]}
+                    for rid, rr in r["requirements"].items()},
+            })
+        return {
+            "candidates": candidates,
+            "meta": {
+                "n_requirements": len(reqs),
+                "reqs": [{"rid": x["rid"], "head": x["head"], "rtype": x.get("rtype", ""),
+                          "kind": x["kind"], "weight": x["weight"]} for x in reqs],
+                "w_matrix": list(config.COVERAGE_JOB_WEIGHT_MATRIX.get(
+                    job_type, config.COVERAGE_JOB_WEIGHT_MATRIX["_default"])),
+                "duration_ms": int((time.perf_counter() - t0) * 1000),
+            },
+        }
 
 
 def _emp_summary(emp: dict) -> dict:
@@ -191,23 +217,12 @@ def create_app(employees=None, encode_fn=None, cross_encoder_fn=None) -> Flask:
 
     @app.get("/api/state")
     def api_state():
-        counts = {k: 0 for k in DECISION_LABELS}
         return jsonify({
             "n_employees": len(ws.employees),
-            "formula": config.MATCH_FORMULA_WEIGHTS,
-            "thresholds": {
-                "reject": config.MATCH_REJECT_THRESHOLD,
-                "review": config.MATCH_REVIEW_THRESHOLD,
-                "pool_semantic_min": config.MATCH_POOL_SEMANTIC_MIN,
-                "rerank_topn": config.MATCH_RERANK_TOPN,
-                "rerank_blend": config.MATCH_RERANK_BLEND,
-            },
-            "embedding_model": config.EMBEDDING_MODEL_NAME,
-            "reranker_model": config.RERANKER_MODEL_NAME,
+            "engine": "Round 3 要求—证据对齐（两类矩阵 + 等价表 + 专业闸门，零 LLM）",
+            "w_matrix": {k: list(v) for k, v in config.COVERAGE_JOB_WEIGHT_MATRIX.items()},
             "parse_mode": "offline（零 LLM，确定性）",
-            "decision_labels": DECISION_LABELS,
             "source_labels": SOURCE_LABELS,
-            "_decision_counts_unused": counts,
         })
 
     @app.get("/api/employees")
@@ -251,6 +266,7 @@ def create_app(employees=None, encode_fn=None, cross_encoder_fn=None) -> Flask:
         }
         if not job["responsibilities"] and not job["requirements"]:
             return jsonify({"error": "职责与任职要求不能同时为空"}), 400
+        job_type = str(body.get("job_type") or "技术类")
         top_k = body.get("top_k") or config.MATCH_TOP_K
         try:
             top_k = max(1, min(int(top_k), 20))
@@ -262,33 +278,23 @@ def create_app(employees=None, encode_fn=None, cross_encoder_fn=None) -> Flask:
         if not pool:
             return jsonify({"error": "硬性条件过滤后无候选员工，请放宽条件", "filtered_out": filtered_out}), 200
 
-        ranking = ws.match(job, top_k, employees=pool)
-        candidates = ranking.get("candidates") or []
-        counts = {k: 0 for k in DECISION_LABELS}
-        for c in candidates:
-            counts[c["decision"]] = counts.get(c["decision"], 0) + 1
-        profile = ranking.pop("_profile", {})
-        # 展示层金标锚定映射（Phase D）：display_score 只进展示，原始分保留
-        for c in candidates:
-            c["display_score"] = round(display_score(c["scores"]["total"]), 1)
+        result = ws.match(job, top_k, employees=pool, job_type=job_type)
+        candidates = result["candidates"]
+        meta = result["meta"]
+        n_gate = sum(1 for c in candidates if c["gate"])
         return jsonify({
-            "job": {
-                "job_id": ranking.get("job_id", job["job_id"]),
-                "title": ranking.get("title", job["title"]),
-                "parse_source": profile.get("parse_source", "offline"),
-                "hard_requirements": profile.get("hard_requirements"),
-                "skill_requirements": profile.get("skill_requirements") or [],
-                "soft_requirements": profile.get("soft_requirements") or [],
-                "queries": profile.get("queries") or [],
-            },
+            "job": {"title": job["title"], "job_type": job_type},
             "candidates": candidates[: max(top_k, 10)],
             "summary": {
                 "n_candidates": len(candidates),
                 "filtered_out": filtered_out,
-                "decision_counts": counts,
-                "duration_ms": ranking.get("duration_ms"),
-                "formula": ranking.get("formula"),
-                "thresholds": ranking.get("thresholds"),
+                "n_requirements": meta["n_requirements"],
+                "n_prof": sum(1 for r in meta["reqs"] if r["rtype"] == "professional"),
+                "n_behav": sum(1 for r in meta["reqs"] if r["rtype"] == "behavioral"),
+                "n_pref": sum(1 for r in meta["reqs"] if r["kind"] == "preferred"),
+                "w_matrix": meta["w_matrix"],
+                "n_gate": n_gate,
+                "duration_ms": meta["duration_ms"],
             },
         })
 

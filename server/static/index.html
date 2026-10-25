@@ -54,6 +54,15 @@
               <span>任职要求 <em>每行一条</em></span>
               <textarea id="jobReq" rows="5" placeholder="本科及以上学历，3年及以上相关经验&#10;熟悉质量管理体系与质量工具"></textarea>
             </label>
+            <label class="field inline">
+              <span>岗位类别 <em>决定权重矩阵</em></span>
+              <select id="jobType">
+                <option value="技术类" selected>技术类（70/15/15）</option>
+                <option value="职能类">职能类（40/30/30）</option>
+                <option value="业务类">业务类（45/35/20）</option>
+                <option value="创意类">创意类（45/20/35）</option>
+              </select>
+            </label>
             <div class="field-row">
               <label class="field inline">
                 <span>性别</span>
@@ -106,8 +115,8 @@
             <div class="empty-inner">
               <div class="empty-glyph">🧭</div>
               <h3>等待一次匹配请求</h3>
-              <p>左侧输入岗位，或点选示例岗位。结果按固定公式评分：<br>
-              T0 直接技能 50 · T1 语义匹配 30 · T2 行为 10 · T3 潜力 10</p>
+              <p>左侧输入岗位，或点选示例岗位。覆盖引擎评分：<br>
+              专业覆盖 × W1 + 行为覆盖 × W2 + 潜力 × W3 + 优先加分（专业闸门缺 k 项 ×(1−0.05k)）</p>
             </div>
           </div>
         </div>
