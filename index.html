@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Talent Compass · 人才匹配工作台</title>
+<meta name="description" content="岗位要求—证据对齐的人岗匹配工作台：54 人人才池、证据可溯源、等价表人工核验、两类能力矩阵评分。">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="stars"></div>
+<header>
+  <div class="brand">Talent<span>Compass</span></div>
+  <nav>
+    <button id="matchTab" class="tab active">岗位匹配</button>
+    <button id="empTab" class="tab">员工库</button>
+    <a class="tab ghost" href="https://github.com/dreamrain314/talent-compass" target="_blank">GitHub ↗</a>
+  </nav>
+</header>
+<main>
+  <section id="matchView">
+    <div class="panel">
+      <h3>岗位 JD</h3>
+      <textarea id="jdBox" rows="8" placeholder="粘贴岗位要求（每行一条），或点击下方示例岗位。例：&#10;熟悉嵌入式软件开发，精通 C/C++&#10;具备良好的沟通协作能力&#10;有军工电子经验者优先"></textarea>
+      <div class="chips" id="presetChips"></div>
+      <div class="runrow">
+        <button id="runBtn" class="primary">开始匹配</button>
+        <span id="runStatus"></span>
+      </div>
+      <p class="note">在线版为轻量引擎（词法召回 + 人工核验等价表，零 LLM、浏览器本地计算）；示例岗位同时展示 Python 全引擎官方口径。引擎口径：两类能力（专业/行为）×四类职业矩阵 + 专业闸门（缺 k 项 ×(1-0.05k)）。</p>
+      <p class="meta" id="meta"></p>
+    </div>
+    <div id="results"></div>
+  </section>
+  <section id="empView" style="display:none">
+    <div class="panel">
+      <h3>员工库（54 人）</h3>
+      <input id="empSearch" placeholder="搜索姓名 / 岗位 / 工号…">
+      <p class="note">点击卡片查看完整档案与证据切片——匹配引擎检索的就是这些原始记录。</p>
+    </div>
+    <div id="empGrid"></div>
+  </section>
+</main>
+<aside id="drawer"></aside>
+<footer>四川九洲场景 · mock 数据演示｜要求—证据对齐引擎（Round 3）｜部署：GitHub Pages</footer>
+<script src="engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
