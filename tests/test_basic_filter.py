@@ -279,7 +279,7 @@ class TestEmptyConditions:
 
     def test_empty_dict(self, filter_: BasicFilter):
         result = filter_.apply({})
-        assert result["total_after"] == 100
+        assert result["total_after"] == 105  # 100 + 5 探针测试员工（JZ9001-9005）
         assert result["filter_log"] == []
         assert result["skipped_conditions"] == []
 
@@ -290,7 +290,7 @@ class TestUnknownCondition:
     def test_unknown_key(self, filter_: BasicFilter):
         result = filter_.apply({"foo": "bar"})
         assert result["skipped_conditions"] == ["foo"]
-        assert result["total_after"] == 100  # 不中断其他条件
+        assert result["total_after"] == 105  # 100 + 5 探针测试员工（JZ9001-9005）  # 不中断其他条件
 
     def test_unknown_with_known(self, filter_: BasicFilter):
         """未知 + 已知条件混合"""
@@ -313,7 +313,7 @@ class TestSerialization:
         json_str = json.dumps(result, ensure_ascii=False)
         assert isinstance(json_str, str)
         parsed = json.loads(json_str)
-        assert parsed["total_before"] == 100
+        assert parsed["total_before"] == 105  # 100 + 5 探针测试员工
 
 
 # ═══════════════════════════════════════════════════════════════════════════

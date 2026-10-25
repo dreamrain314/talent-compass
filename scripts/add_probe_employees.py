@@ -46,18 +46,31 @@ def main() -> int:
         rows = list(reader)
         fieldnames = reader.fieldnames
     have = {r["employee_id"] for r in rows}
+    DEPT = {"JZ9001": "质量与标准化部", "JZ9002": "信息技术部", "JZ9003": "信息技术部",
+            "JZ9004": "人力资源部", "JZ9005": "审计部"}
     added = 0
     for e in probes:
-        if e["employee_id"] in have:
-            continue
-        rows.append({k: str(e.get(k, "")) for k in fieldnames})
-        added += 1
+        st = e["structured"]
+        row = {
+            "employee_id": e["employee_id"], "name": st["name"], "age": st["age"],
+            "gender": st["gender"], "political_status": st["political_status"],
+            "education": st["education"], "major": st["major"],
+            "department": DEPT.get(e["employee_id"], "综合管理部"),
+            "job_sequence": st["job_sequence"], "current_position": st["current_position"],
+            "current_level": st["current_level"], "hire_date": "2015-01-01",
+            "years_of_service": st["years_of_service"], "certificates": st["certificates"],
+        }
+        if e["employee_id"] in have:  # upsert：修复历史空行
+            rows = [row if r["employee_id"] == e["employee_id"] else r for r in rows]
+        else:
+            rows.append(row)
+            added += 1
     rows.sort(key=lambda r: r["employee_id"])
-    if not dry and added:
+    if not dry:
         with open(raw / "employees.csv", "w", encoding="utf-8-sig", newline="") as f:
             w = csv.DictWriter(f, fieldnames=fieldnames)
             w.writeheader(); w.writerows(rows)
-    print(f"{tag}employees.csv: +{added}")
+    print(f"{tag}employees.csv: +{added}（upsert 总 {len(rows)} 行）")
 
     # 2) projects.json
     projs = json.loads((raw / "projects.json").read_text(encoding="utf-8-sig"))
@@ -72,29 +85,29 @@ def main() -> int:
 
     # 3-5) performance / training / evaluation_360（同 inject 模式）
     def replace_csv(fname, build):
+        """upsert：先删探针 ids 的旧行（修复历史脏数据），再追加正确行。"""
         with open(raw / fname, encoding="utf-8-sig", newline="") as f:
             reader = csv.DictReader(f)
             rr = list(reader)
             fn = reader.fieldnames
-        have_ids = {r.get("employee_id") for r in rr}
+        ids = {e["employee_id"] for e in probes}
+        rr = [r for r in rr if r.get("employee_id") not in ids]
         new_rows = []
         for e in probes:
-            if e["employee_id"] in have_ids:
-                continue
             for tup in build(e):
                 row = dict(zip(fn, tup))
                 row["employee_id"] = e["employee_id"]
                 new_rows.append(row)
         rr.extend(new_rows)
         rr.sort(key=lambda r: r.get("employee_id", ""))
-        if not dry and new_rows:
+        if not dry:
             with open(raw / fname, "w", encoding="utf-8-sig", newline="") as f:
                 w = csv.DictWriter(f, fieldnames=fn)
                 w.writeheader(); w.writerows(rr)
-        print(f"{tag}{fname}: +{len(new_rows)}")
+        print(f"{tag}{fname}: upsert {len(new_rows)}")
 
     replace_csv("performance.csv", lambda e: [
-        (e["employee_id"], y, g, c) for (y, g, c) in e["performance"]])
+        (e["employee_id"], p["year"], p["grade"], p["comment"]) for p in e["performance"]])
     replace_csv("training.csv", lambda e: [
         (e["employee_id"], t["course_name"], t["completion_date"], t["status"], t["score"]) for t in e["training"]])
     def eval360_rows(e):

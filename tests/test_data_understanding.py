@@ -699,14 +699,14 @@ class TestWithRealMockData:
     def test_read_real_data(self, agent, real_data):
         dfs = agent._read_data_files(real_data)
         assert dfs is not None
-        assert len(dfs["employees"]) == 100
-        assert 200 <= len(dfs["performance"]) <= 300
+        assert len(dfs["employees"]) == 105  # 100 + 5 探针测试员工
+        assert 300 <= len(dfs["performance"]) <= 330  # 105 人 × 3 年 ≈ 315（100 原始 + 5 探针测试员工）
         assert len(dfs["evaluation_360"]) > 1000
 
     def test_data_quality_real(self, agent, real_data):
         dfs = agent._read_data_files(real_data)
         report = agent._detect_missing(dfs)
-        assert report["total_employees"] == 100
+        assert report["total_employees"] == 105  # 100 + 5 探针测试员工
         assert report["text_insufficient_count"] == 0
 
     def test_360_preprocess_real(self, agent, real_data):
