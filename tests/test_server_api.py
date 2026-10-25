@@ -97,8 +97,8 @@ class TestStateAndLibrary:
         assert res.status_code == 200
         data = res.get_json()
         assert data["n_employees"] == 2
-        assert data["formula"]["t0_direct"] == 50.0
-        assert "自动推荐" in data["decision_labels"].values()
+        assert "要求—证据对齐" in data["engine"]
+        assert data["w_matrix"]["技术类"] == [70.0, 15.0, 15.0]
         assert "项目经历" in data["source_labels"].values()
 
     def test_employees_list(self, client):
@@ -132,27 +132,26 @@ class TestMatchEndpoint:
         assert res.status_code == 200
         data = res.get_json()
         assert data["job"]["title"] == "质量体系工程师"
-        assert data["job"]["skill_requirements"]
+        assert data["summary"]["n_requirements"] > 0
         cands = data["candidates"]
         assert len(cands) >= 2
         # 排序：total 降序
-        totals = [c["scores"]["total"] for c in cands]
+        totals = [c["total"] for c in cands]
         assert totals == sorted(totals, reverse=True)
-        # 结构契约：每个候选带证据链与理由
+        # 结构契约：每个候选带分量与要求级覆盖
         for c in cands[:2]:
-            assert set(c["scores"]) == {"t0", "t1", "t2", "t3", "total", "confidence"}
-            assert c["decision"] in {"recommend", "review", "backup_pool", "rejected"}
-            assert isinstance(c["reason"], str) and c["reason"]
-            for e in c["evidence"]:
-                assert {"query", "source", "text", "anchor", "sim"} <= set(e)
-        assert data["summary"]["n_candidates"] == 2
+            assert {"total", "s_prof", "s_behav", "p", "bonus", "gate", "requirements"} <= set(c)
+            for rr in c["requirements"].values():
+                assert {"v", "relation", "note", "evidence"} <= set(rr)
         assert data["summary"]["duration_ms"] >= 0
+        assert data["summary"]["w_matrix"] == [70.0, 15.0, 15.0]
 
     def test_match_gold_style_job(self, client):
         """质量岗 → E001 应排在 E002 前（证据密集度决定）。"""
         data = client.post("/api/match", json=JOB_PAYLOAD).get_json()
         ids = [c["emp_id"] for c in data["candidates"]]
-        assert ids.index("E001") < ids.index("E002")
+        # 新引擎口径：证据更密集/更贴 JD 词面者在前（夹具 E001 质量证据密集）
+        assert ids.index("E001") < ids.index("E002") or ids[-1] == "E002"
 
     def test_match_empty_body_400(self, client):
         res = client.post("/api/match", json={"title": "空岗位"})

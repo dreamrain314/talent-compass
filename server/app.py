@@ -117,7 +117,8 @@ class Workspace:
             res = score_coverage(reqs_raw, pool, self.index,
                                  equivalences=load_verified_equivalences(),
                                  atomic_splits=load_atomic_splits(),
-                                 job_type=job_type)
+                                 job_type=job_type,
+                                 encode_fn=self._encode_fn)  # 编码器绑定实例（防 fake/真实维度错配）
         order = sorted(res.items(), key=lambda kv: (-kv[1]["total"], kv[0]))
         candidates = []
         for eid, r in order:
